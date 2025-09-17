@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biashara Yangu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-color: #007BFF;
+            --secondary-color: #28a745;
+            --danger-color: #dc3545;
+            --background-light: #f4f7f9;
+            --card-background: #ffffff;
+            --text-dark: #333;
+            --text-muted: #6c757d;
+            --purchase-color: #ffc107;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #splash-screen h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        #splash-screen p {
+            font-size: 1.2em;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header h1, .header h2 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        
+        #capital-balance {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 1.4em;
+            color: var(--text-dark);
+        }
+
+        .add-btn {
+            background-color: var(--secondary-color);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .add-sale-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-sale-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .main-menu {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background-color: var(--card-background);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .menu-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .menu-btn.active {
+            background-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .list-item {
+            background-color: #f9f9fc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+        
+        .list-item.clickable-capital:active, .list-item.date-item:active {
+            transform: scale(0.98);
+        }
+
+        .list-item.clickable-capital {
+            cursor: pointer;
+        }
+        .list-item.date-item {
+            cursor: pointer;
+        }
+
+        .item-info {
+            font-size: 1em;
+            color: var(--text-dark);
+        }
+
+        .item-profit {
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .item-expense {
+            font-weight: 600;
+            color: var(--danger-color);
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #eaf4ff;
+        }
+        
+        /* Mitindo ya Pop-up (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 25px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+            animation: slideInUp 0.3s ease-out;
+            position: relative; /* Kurekebisha kwa ajili ya X */
+        }
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .modal-content input[readonly] {
+            background-color: #e9ecef;
+        }
+
+        .modal-content .btn-modal {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .modal-content .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .modal-content .close-btn.red {
+            color: var(--danger-color);
+        }
+
+        .alert-message {
+            color: var(--danger-color);
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .profit-info {
+            font-size: 1em;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .profit-info p {
+            margin: 5px 0;
+        }
+
+        /* Mitindo ya Menyu ya Vidoti Vitatu */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-btn {
+            background-color: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0 8px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--card-background);
+            min-width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 10;
+            right: 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dropdown-content button {
+            color: var(--text-dark);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            background-color: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .back-button {
+            background-color: #ccc;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-weight: 600;
+            color: var(--text-dark);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .capital-item-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .capital-clickable-area {
+            flex-grow: 1;
+            padding: 10px 0;
+        }
+        .capital-item-info span {
+            display: block;
+            font-size: 0.9em;
+        }
+        
+        .sales-table, .expenses-table, .purchase-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: var(--card-background);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .sales-table th, .sales-table td, .expenses-table th, .expenses-table td, .purchase-table th, .purchase-table td {
+            border: 1px solid #eee;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        .sales-table th, .expenses-table th, .purchase-table th {
+            background-color: #f8f9fa;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        .sales-table tr:nth-child(even), .expenses-table tr:nth-child(even), .purchase-table tr:nth-child(even) {
+            background-color: #fbfbfc;
+        }
+        .sales-table tr:hover, .expenses-table tr:hover, .purchase-table tr:hover {
+            background-color: #eaf4ff;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #eaf4ff;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <h1>Biashara Yangu</h1>
+        <p>SmartJanja</p>
+    </div>
+
+    <div id="main-content" class="hidden">
+        <div id="capital-page" class="container">
+            <div class="header">
+                <div>
+                    <button id="addCapitalBtn" class="add-btn">
+                        <i class="fa-solid fa-plus"></i> Weka Mtaji
+                    </button>
+                    <button id="logoutBtn" class="add-btn" style="background-color: var(--danger-color); margin-left: 10px;">
+                        <i class="fa-solid fa-right-from-bracket"></i> Toka
+                    </button>
+                </div>
+            </div>
+            <div class="section">
+                <h2>Historia ya Mitaji</h2>
+                <ul id="capital-list">
+                </ul>
+            </div>
+        </div>
+
+        <div id="business-page" class="hidden container">
+            <div class="header">
+                <button id="backToCapitalBtn" class="back-button"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
+                <h1 id="business-title"></h1>
+                <div id="capital-balance">
+                    Mtaji: TZS 0
+                </div>
+            </div>
+        
+            <div class="main-menu">
+                <button id="salesBtn" class="menu-btn active"><i class="fa-solid fa-chart-line"></i> Mauzo</button>
+                <button id="stockBtn" class="menu-btn"><i class="fa-solid fa-boxes-stacked"></i> Stoo</button>
+            </div>
+        
+            <div id="sales-system-content">
+                <div class="section">
+                    <div class="section-header">
+                        <h2>Bidhaa</h2>
+                        <button id="addProductBtn" class="add-btn"><i class="fa-solid fa-plus"></i> Ongeza</button>
+                    </div>
+                    <ul id="product-list" class="item-list">
+                        </ul>
+                </div>
+                <div class="section">
+                    <button id="addSaleBtn" class="add-sale-btn"><i class="fa-solid fa-cart-shopping"></i> Weka Mauzo Yako</button>
+                </div>
+                
+                <div class="section">
+                    <button id="showPurchaseHistoryBtn" class="add-sale-btn">
+                        <i class="fa-solid fa-history"></i> Kumbukumbu ya Ununuzi
+                    </button>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h2>Matumizi ya Mtaji</h2>
+                        <button id="addCapitalExpenseBtn" class="add-btn"><i class="fa-solid fa-plus"></i> Ongeza</button>
+                    </div>
+                    <ul id="capital-expense-date-list" class="item-list"></ul>
+                    <div id="daily-capital-expenses-detail" style="display: none;">
+                        <h4 id="daily-capital-expenses-title"></h4>
+                        <table class="expenses-table">
+                            <thead>
+                                <tr>
+                                    <th>Matumizi</th>
+                                    <th>Kiasi</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="daily-capital-expenses-table-body"></tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td colspan="1" class="total-label">Jumla ya Siku:</td>
+                                    <td id="daily-capital-expenses-total" class="total-amount">TZS 0</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <button onclick="goBackToCapitalExpenseDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
+                    </div>
+                </div>
+                <div class="section">
+                    <div class="section-header">
+                        <h2>Orodha ya Mauzo (Tarehe)</h2>
+                        <button id="backToSalesDatesBtn" class="back-button" style="display: none;"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
+                    </div>
+                    <ul id="sales-date-list" class="item-list">
+                        </ul>
+                    <div id="daily-sales-detail" style="display: none;">
+                        <h4 id="daily-sales-title"></h4>
+                        <table class="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Bidhaa</th>
+                                    <th>Idadi</th>
+                                    <th>Jumla ya Mauzo</th>
+                                    <th>Faida</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="daily-sales-table-body">
+                                </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td colspan="2" class="total-label">Jumla ya Siku:</td>
+                                    <td id="daily-sales-total" class="total-amount">TZS 0</td>
+                                    <td id="daily-profit-total" class="total-amount">TZS 0</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <button onclick="goBackToDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
+                    </div>
+                </div>
+                <div class="section">
+                    <div class="section-header">
+                        <h2>Matumizi ya Kila Siku</h2>
+                        <button id="addDailyExpenseBtn" class="add-btn"><i class="fa-solid fa-plus"></i> Ongeza</button>
+                    </div>
+                    <ul id="daily-expense-date-list" class="item-list">
+                        </ul>
+                    <div id="daily-expenses-detail" style="display: none;">
+                        <h4 id="daily-expenses-title"></h4>
+                        <table class="expenses-table">
+                            <thead>
+                                <tr>
+                                    <th>Matumizi</th>
+                                    <th>Kiasi</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="daily-expenses-table-body">
+                                </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td colspan="1" class="total-label">Jumla ya Siku:</td>
+                                    <td id="daily-expenses-total" class="total-amount">TZS 0</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <button onclick="goBackToDailyExpenseDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
+                    </div>
+                </div>
+            </div>
+        
+            <div id="stock-system-content" class="hidden">
+                <div class="section">
+                    <h2>Usimamizi wa Stoo</h2>
+                    <button id="addStockCountBtn" class="add-sale-btn"><i class="fa-solid fa-boxes-stacked"></i> Weka Hesabu ya Stoo</button>
+                </div>
+                <div class="section">
+                    <div class="section-header">
+                        <h2>Ripoti za Hesabu ya Stoo</h2>
+                    </div>
+                    <ul id="stock-count-date-list" class="item-list">
+                        </ul>
+                    <div id="daily-stock-count-detail" style="display: none;">
+                        <h4 id="daily-stock-count-title"></h4>
+                        <table class="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Bidhaa</th>
+                                    <th>Idadi Iliyobaki</th>
+                                    <th>Bidhaa Zilizouzwa</th>
+                                    <th>Jumla ya Mauzo</th>
+                                    <th>Faida</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="daily-stock-count-table-body">
+                                </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td colspan="2" class="total-label">Jumla ya Siku:</td>
+                                    <td id="daily-stock-count-sold-total">0</td>
+                                    <td id="daily-stock-count-sales-total">TZS 0</td>
+                                    <td id="daily-stock-count-profit-total">TZS 0</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <button onclick="goBackToStockCountDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="addCapitalModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeCapitalModal">&times;</span>
+            <h2 id="capitalModalTitle">Weka Mtaji Mpya</h2>
+            <div id="addCapitalForm">
+                <input type="hidden" id="capitalIndex">
+                <input type="text" id="capitalName" placeholder="Jina la Mtaji (Mfano: Biashara ya Viatu)" required>
+                <input type="number" id="capitalAmount" placeholder="Kiasi (TZS)" required>
+                <textarea id="capitalDescription" placeholder="Maelezo (hiari)" rows="3"></textarea>
+                <button id="saveCapitalBtn" class="btn-modal">Hifadhi</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeProductModal">&times;</span>
+            <h3 id="productModalTitle">Ongeza Bidhaa Mpya</h3>
+            <input type="hidden" id="productIndex">
+            <input type="text" id="productName" placeholder="Jina la Bidhaa" required>
+            <input type="number" id="costPriceTotal" placeholder="Bei ya Kununulia (Jumla)" required>
+            <input type="number" id="productQuantity" placeholder="Idadi (Vingapi?)" required>
+            <input type="number" id="costPriceRetail" placeholder="Bei ya Kununulia (Rejareja)" required readonly>
+            <input type="number" id="sellingPriceRetail" placeholder="Bei ya Kuuzia (Rejareja)" required>
+            <div class="profit-info">
+                <p>Faida ya Jumla: <span id="projectedProfitTotal">TZS 0</span></p>
+                <p>Faida kwa Bidhaa Moja: <span id="projectedProfitRetail">TZS 0</span></p>
+            </div>
+            <button id="saveProductBtn" class="btn-modal">Hifadhi Bidhaa</button>
+        </div>
+    </div>
+
+    <div id="addSaleModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeSaleModal">&times;</span>
+            <h3 id="saleModalTitle">Weka Mauzo</h3>
+            <input type="hidden" id="saleIndex">
+            <input type="date" id="saleDate" placeholder="weka tarehe" required>
+            <div class="input-group">
+                <label for="saleProductName">Chagua Bidhaa Iliyouzwa</label>
+                <select id="saleProductName" required>
+                    <option value="">-- Chagua Bidhaa --</option>
+                </select>
+            </div>
+            <input type="number" id="saleQuantity" placeholder="Idadi Iliyouzwa" required>
+            <p class="alert-message" id="quantityAlert" style="display: none;">Idadi uliyoweka inazidi stoo.</p>
+            <hr style="border: 0; height: 1px; background: #ddd; margin: 15px 0;">
+            <input type="number" id="actualSalePrice" placeholder="Bei Halisi Uliyouza (Hiari)">
+            <button id="saveSaleBtn" class="btn-modal">Hifadhi Mauzo</button>
+        </div>
+    </div>
+
+    <div id="addStockCountModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeStockCountModal">&times;</span>
+            <h3>Weka Idadi Iliyobaki</h3>
+            <input type="date" id="stockCountDate" required>
+            <div class="input-group">
+                <label for="stockProductName">Chagua Bidhaa</label>
+                <select id="stockProductName" required>
+                    <option value="">-- Chagua Bidhaa --</option>
+                </select>
+            </div>
+            <input type="number" id="remainingQuantity" placeholder="Idadi Iliyobaki" required>
+            <p class="alert-message" id="remainingQuantityAlert" style="display: none;">Idadi uliyoweka inazidi stoo.</p>
+            <button id="saveStockCountBtn" class="btn-modal">Hifadhi Hesabu</button>
+        </div>
+    </div>
+
+    <div id="addDailyExpenseModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeDailyExpenseModal">&times;</span>
+            <h3 id="dailyExpenseModalTitle">Ongeza Matumizi ya Kila Siku</h3>
+            <input type="hidden" id="dailyExpenseIndex">
+            <input type="date" id="dailyExpenseDate" required>
+            <input type="text" id="dailyExpenseName" placeholder="Aina ya Matumizi (Mfano: Chakula)" required>
+            <input type="number" id="dailyExpenseAmount" placeholder="Kiasi cha Pesa" required>
+            <button id="saveDailyExpenseBtn" class="btn-modal">Hifadhi Matumizi</button>
+        </div>
+    </div>
+
+    <div id="addCapitalExpenseModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeCapitalExpenseModal">&times;</span>
+            <h3 id="capitalExpenseModalTitle">Ongeza Matumizi ya Mtaji</h3>
+            <input type="hidden" id="capitalExpenseIndex">
+            <input type="date" id="capitalExpenseDate" required>
+            <input type="text" id="capitalExpenseName" placeholder="Aina ya Matumizi (Mfano: Usafiri)" required>
+            <input type="number" id="capitalExpenseAmount" placeholder="Kiasi cha Pesa" required>
+            <p class="alert-message" id="capitalExpenseAlert" style="display: none;">Kiasi ulichoweka kinazidi mtaji ulionao.</p>
+            <button id="saveCapitalExpenseBtn" class="btn-modal">Hifadhi Matumizi</button>
+        </div>
+    </div>
+
+    <div id="purchaseHistoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn red" id="closePurchaseHistoryModal">&times;</span>
+            <h3>Kumbukumbu ya Ununuzi</h3>
+            <table class="purchase-table">
+                <thead>
+                    <tr>
+                        <th>Tarehe</th>
+                        <th>Bidhaa</th>
+                        <th>Idadi</th>
+                        <th>Kiasi</th>
+                    </tr>
+                </thead>
+                <tbody id="purchaseHistoryTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M';
+
+       
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- Admin Context ---
+        // Get business ID from Supabase (assuming it's passed via URL or a global state)
+        // For this example, we'll use a placeholder. In a real app, this would come from authentication.
+        let currentBusinessId = 'default_business_id'; // Placeholder for the current business ID
+
+        // If business ID is missing, redirect to the login/registration page
+        // This part needs to be handled by your authentication flow, not directly here.
+        // For now, we'll assume currentBusinessId is set.
+        // if (!currentBusinessId) {
+        //     window.location.href = 'usajili.html';
+        // }
+
+        // DATA
+        let capitalSystems = []; // This will hold all capital systems (businesses)
+        let currentBusinessIndex = null; // Index of the currently selected business
+        let saleBeingEdited = null;
+        let dailyExpenseBeingEdited = null;
+        let capitalExpenseBeingEdited = null;
+        let stockCountBeingEdited = null;
+
+        // DOM ELEMENTS
+        const splashScreen = document.getElementById('splash-screen');
+        const mainContent = document.getElementById('main-content');
+        const capitalPage = document.getElementById('capital-page');
+        const businessPage = document.getElementById('business-page');
+        const capitalList = document.getElementById('capital-list');
+        const addCapitalBtn = document.getElementById('addCapitalBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const addCapitalModal = document.getElementById('addCapitalModal');
+        const closeCapitalModal = document.getElementById('closeCapitalModal');
+        const saveCapitalBtn = document.getElementById('saveCapitalBtn');
+        const capitalNameInput = document.getElementById('capitalName');
+        const capitalAmountInput = document.getElementById('capitalAmount');
+        const capitalDescriptionInput = document.getElementById('capitalDescription');
+        const capitalModalTitle = document.getElementById('capitalModalTitle');
+        const capitalIndexInput = document.getElementById('capitalIndex');
+        const backToCapitalBtn = document.getElementById('backToCapitalBtn');
+        const businessTitle = document.getElementById('business-title');
+        const capitalBalanceSpan = document.getElementById('capital-balance');
+        const salesBtn = document.getElementById('salesBtn');
+        const stockBtn = document.getElementById('stockBtn');
+        const salesSystemContent = document.getElementById('sales-system-content');
+        const stockSystemContent = document.getElementById('stock-system-content');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const addSaleBtn = document.getElementById('addSaleBtn');
+        const addDailyExpenseBtn = document.getElementById('addDailyExpenseBtn');
+        const addCapitalExpenseBtn = document.getElementById('addCapitalExpenseBtn');
+        const addStockCountBtn = document.getElementById('addStockCountBtn');
+        const showPurchaseHistoryBtn = document.getElementById('showPurchaseHistoryBtn');
+        const addProductModal = document.getElementById('addProductModal');
+        const addSaleModal = document.getElementById('addSaleModal');
+        const addDailyExpenseModal = document.getElementById('addDailyExpenseModal');
+        const addCapitalExpenseModal = document.getElementById('addCapitalExpenseModal');
+        const addStockCountModal = document.getElementById('addStockCountModal');
+        const purchaseHistoryModal = document.getElementById('purchaseHistoryModal');
+        const closeProductModal = document.getElementById('closeProductModal');
+        const closeSaleModal = document.getElementById('closeSaleModal');
+        const closeDailyExpenseModal = document.getElementById('closeDailyExpenseModal');
+        const closeCapitalExpenseModal = document.getElementById('closeCapitalExpenseModal');
+        const closeStockCountModal = document.getElementById('closeStockCountModal');
+        const closePurchaseHistoryModal = document.getElementById('closePurchaseHistoryModal');
+        const saveProductBtn = document.getElementById('saveProductBtn');
+        const saveSaleBtn = document.getElementById('saveSaleBtn');
+        const saveDailyExpenseBtn = document.getElementById('saveDailyExpenseBtn');
+        const saveCapitalExpenseBtn = document.getElementById('saveCapitalExpenseBtn');
+        const saveStockCountBtn = document.getElementById('saveStockCountBtn');
+        const costPriceTotalInput = document.getElementById('costPriceTotal');
+        const costPriceRetailInput = document.getElementById('costPriceRetail');
+        const sellingPriceRetailInput = document.getElementById('sellingPriceRetail');
+        const productQuantityInput = document.getElementById('productQuantity');
+        const projectedProfitTotalSpan = document.getElementById('projectedProfitTotal');
+        const projectedProfitRetailSpan = document.getElementById('projectedProfitRetail');
+        const productModalTitle = document.getElementById('productModalTitle');
+        const productIndexInput = document.getElementById('productIndex');
+        const productList = document.getElementById('product-list');
+        const salesDateList = document.getElementById('sales-date-list');
+        const dailySalesDetail = document.getElementById('daily-sales-detail');
+        const dailySalesTitle = document.getElementById('daily-sales-title');
+        const dailySalesTableBody = document.getElementById('daily-sales-table-body');
+        const dailySalesTotalSpan = document.getElementById('daily-sales-total');
+        const dailyProfitTotalSpan = document.getElementById('daily-profit-total');
+        const backToSalesDatesBtn = document.getElementById('backToSalesDatesBtn');
+        const saleProductNameSelect = document.getElementById('saleProductName');
+        const saleQuantityInput = document.getElementById('saleQuantity');
+        const saleDateInput = document.getElementById('saleDate');
+        const quantityAlert = document.getElementById('quantityAlert');
+        const actualSalePriceInput = document.getElementById('actualSalePrice');
+        const dailyExpenseDateInput = document.getElementById('dailyExpenseDate');
+        const dailyExpenseNameInput = document.getElementById('dailyExpenseName');
+        const dailyExpenseAmountInput = document.getElementById('dailyExpenseAmount');
+        const dailyExpenseModalTitle = document.getElementById('dailyExpenseModalTitle');
+        const dailyExpenseIndexInput = document = document.getElementById('dailyExpenseIndex');
+        const dailyExpenseDateList = document.getElementById('daily-expense-date-list');
+        const dailyExpensesDetail = document.getElementById('daily-expenses-detail');
+        const dailyExpensesTitle = document.getElementById('daily-expenses-title');
+        const dailyExpensesTableBody = document.getElementById('daily-expenses-table-body');
+        const dailyExpensesTotalSpan = document.getElementById('daily-expenses-total');
+        const capitalExpenseDateInput = document.getElementById('capitalExpenseDate');
+        const capitalExpenseNameInput = document.getElementById('capitalExpenseName');
+        const capitalExpenseAmountInput = document.getElementById('capitalExpenseAmount');
+        const capitalExpenseAlert = document.getElementById('capitalExpenseAlert');
+        const capitalExpenseModalTitle = document.getElementById('capitalExpenseModalTitle');
+        const capitalExpenseIndexInput = document.getElementById('capitalExpenseIndex');
+        const capitalExpenseDateList = document.getElementById('capital-expense-date-list');
+        const dailyCapitalExpensesDetail = document.getElementById('daily-capital-expenses-detail');
+        const dailyCapitalExpensesTitle = document.getElementById('daily-capital-expenses-title');
+        const dailyCapitalExpensesTableBody = document.getElementById('daily-capital-expenses-table-body');
+        const dailyCapitalExpensesTotalSpan = document.getElementById('daily-capital-expenses-total');
+        const purchaseHistoryTableBody = document.getElementById('purchaseHistoryTableBody');
+        const stockCountDateList = document.getElementById('stock-count-date-list');
+        const dailyStockCountDetail = document.getElementById('daily-stock-count-detail');
+        const dailyStockCountTitle = document.getElementById('daily-stock-count-title');
+        const dailyStockCountTableBody = document.getElementById('daily-stock-count-table-body');
+        const stockCountDateInput = document.getElementById('stockCountDate');
+        const stockProductNameSelect = document.getElementById('stockProductName');
+        const remainingQuantityInput = document.getElementById('remainingQuantity');
+        const remainingQuantityAlert = document.getElementById('remainingQuantityAlert');
+        const dailyStockCountSoldTotal = document.getElementById('daily-stock-count-sold-total');
+        const dailyStockCountSalesTotal = document.getElementById('daily-stock-count-sales-total');
+        const dailyStockCountProfitTotal = document.getElementById('daily-stock-count-profit-total');
+
+        // FUNCTIONS
+        async function loadData() {
+            try {
+                // Fetch all capital systems for the current user (assuming user_id is available)
+                // For this example, we'll fetch all and filter by currentBusinessId later.
+                // In a real app, you'd likely query based on the authenticated user's businesses.
+                const { data, error } = await supabase
+                    .from('capital_systems')
+                    .select('*'); // Fetch all columns, including 'data'
+
+                if (error) {
+                    console.error('Error loading capital systems:', error.message);
+                    capitalSystems = []; // Reset if error
+                } else {
+                    capitalSystems = data.map(row => ({
+                        id: row.id, // Assuming 'id' is the unique identifier for each business
+                        name: row.name,
+                        capital: row.capital,
+                        description: row.description,
+                        products: row.products || [],
+                        sales: row.sales || [],
+                        dailyExpenses: row.dailyExpenses || [],
+                        capitalExpenses: row.capitalExpenses || [],
+                        stockCounts: row.stockCounts || []
+                    }));
+
+                    // Set currentBusinessId to the first business found, or handle selection
+                    if (capitalSystems.length > 0) {
+                        currentBusinessId = capitalSystems[0].id; // Or get from URL/session
+                        currentBusinessIndex = 0; // Set initial index
+                    } else {
+                        currentBusinessId = null;
+                        currentBusinessIndex = null;
+                    }
+                }
+            } catch (e) {
+                console.error('Error fetching data from Supabase:', e);
+                capitalSystems = []; // Reset if error
+            }
+            renderCapitalList();
+            if (currentBusinessIndex !== null) {
+                renderBusinessDetails();
+            }
+        }
+  
+        async function saveData(systemData) {
+            if (!systemData || !systemData.id) {
+                console.error('Cannot save data: systemData or systemData.id is missing.');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('capital_systems')
+                    .upsert({
+                        id: systemData.id,
+                        name: systemData.name,
+                        capital: systemData.capital,
+                        description: systemData.description,
+                        products: systemData.products,
+                        sales: systemData.sales,
+                        dailyExpenses: systemData.dailyExpenses,
+                        capitalExpenses: systemData.capitalExpenses,
+                        stockCounts: systemData.stockCounts
+                    }, { onConflict: 'id' });
+  
+                if (error) {
+                    console.error('Error saving to Supabase:', error.message);
+                } else {
+                    console.log('Data saved to Supabase:', data);
+                }
+            } catch (e) {
+                console.error('Supabase save failed:', e);
+            }
+        }
+
+        function formatNumber(number) {
+            return Number(number).toLocaleString('en-US');
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date(dateString + 'T00:00:00');
+            return date.toLocaleDateString('sw-TZ', options);
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        function renderCapitalList() {
+            capitalList.innerHTML = '';
+            capitalSystems.forEach((system, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item clickable-capital';
+                li.dataset.index = index;
+                li.innerHTML = `
+                    <div class="capital-clickable-area">
+                        <div class="item-info">
+                            <strong>${system.name}</strong>
+                            <span>Mtaji: TZS ${formatNumber(system.capital)}</span>
+                            <span>${system.description}</span>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                        <div class="dropdown-content">
+                            <button onclick="editCapital(${index})">Badilisha</button>
+                            <button onclick="deleteCapital(${index})">Futa</button>
+                        </div>
+                    </div>
+                `;
+                li.querySelector('.capital-clickable-area').onclick = () => showBusinessPage(index);
+                capitalList.appendChild(li);
+            });
+        }
+
+        function showBusinessPage(index) {
+            currentBusinessIndex = index;
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            businessTitle.textContent = currentSystem.name;
+            capitalPage.classList.add('hidden');
+            businessPage.classList.remove('hidden');
+            renderBusinessDetails();
+        }
+
+        function goBackToCapitalList() {
+            currentBusinessIndex = null;
+            businessPage.classList.add('hidden');
+            capitalPage.classList.remove('hidden');
+            renderCapitalList();
+        }
+        
+        function renderBusinessDetails() {
+            if (currentBusinessIndex === null) return;
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            capitalBalanceSpan.textContent = `Mtaji: TZS ${formatNumber(currentSystem.capital)}`;
+            renderProductList();
+            renderSalesDates();
+            renderDailyExpenseDates();
+            renderCapitalExpenseDates();
+            renderStockCountDates();
+        }
+
+        function renderProductList() {
+            productList.innerHTML = '';
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            currentSystem.products.forEach((product, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.innerHTML = `
+                    <div class="item-info">
+                        <strong>${product.name}</strong>
+                        <span>Idadi: ${product.currentQuantity}</span>
+                        <span>Bei ya Kuuzia: TZS ${formatNumber(product.sellingPriceRetail)}</span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                        <div class="dropdown-content">
+                            <button onclick="editProduct(${index})">Badilisha</button>
+                            <button onclick="deleteProduct(${index})">Futa</button>
+                        </div>
+                    </div>
+                `;
+                productList.appendChild(li);
+            });
+        }
+
+        function renderSalesDates() {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const salesByDate = currentSystem.sales.reduce((acc, sale) => {
+                if (!acc[sale.date]) {
+                    acc[sale.date] = [];
+                }
+                acc[sale.date].push(sale);
+                return acc;
+            }, {});
+
+            salesDateList.innerHTML = '';
+            const sortedDates = Object.keys(salesByDate).sort().reverse();
+            sortedDates.forEach(date => {
+                const totalDailySales = salesByDate[date].reduce((sum, sale) => sum + sale.totalPrice, 0);
+                const totalDailyProfit = salesByDate[date].reduce((sum, sale) => {
+                    const product = currentSystem.products[sale.productIndex];
+                    const profitPerItem = product.sellingPriceRetail - product.costPriceRetail;
+                    return sum + (profitPerItem * sale.quantity);
+                }, 0);
+
+                const li = document.createElement('li');
+                li.className = 'list-item date-item';
+                li.onclick = () => showDailySales(date);
+                li.innerHTML = `
+                    <div class="item-info">
+                        <strong>${formatDate(date)}</strong>
+                        <span>Mauzo: TZS ${formatNumber(totalDailySales)}</span>
+                        <span>Faida: <span class="item-profit">TZS ${formatNumber(totalDailyProfit)}</span></span>
+                    </div>
+                `;
+                salesDateList.appendChild(li);
+            });
+            salesDateList.style.display = 'block';
+            dailySalesDetail.style.display = 'none';
+        }
+        
+        function showDailySales(date) {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const salesForDate = currentSystem.sales.filter(sale => sale.date === date);
+
+            dailySalesTitle.textContent = `Mauzo ya Tarehe ${formatDate(date)}`;
+            dailySalesTableBody.innerHTML = '';
+            let totalSales = 0;
+            let totalProfit = 0;
+
+            salesForDate.forEach((sale, index) => {
+                const product = currentSystem.products[sale.productIndex];
+                const profitPerItem = product.sellingPriceRetail - product.costPriceRetail;
+                const profit = profitPerItem * sale.quantity;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${sale.quantity}</td>
+                    <td>TZS ${formatNumber(sale.totalPrice)}</td>
+                    <td><span class="item-profit">TZS ${formatNumber(profit)}</span></td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                            <div class="dropdown-content">
+                                <button onclick="editSale(${currentSystem.sales.indexOf(sale)})">Badilisha</button>
+                                <button onclick="deleteSale(${currentSystem.sales.indexOf(sale)})">Futa</button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                dailySalesTableBody.appendChild(tr);
+                totalSales += sale.totalPrice;
+                totalProfit += profit;
+            });
+
+            dailySalesTotalSpan.textContent = `TZS ${formatNumber(totalSales)}`;
+            dailyProfitTotalSpan.textContent = `TZS ${formatNumber(totalProfit)}`;
+
+            salesDateList.style.display = 'none';
+            dailySalesDetail.style.display = 'block';
+        }
+
+        function goBackToDateList() {
+            salesDateList.style.display = 'block';
+            dailySalesDetail.style.display = 'none';
+        }
+
+        function renderDailyExpenseDates() {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const expensesByDate = currentSystem.dailyExpenses.reduce((acc, exp) => {
+                if (!acc[exp.date]) {
+                    acc[exp.date] = [];
+                }
+                acc[exp.date].push(exp);
+                return acc;
+            }, {});
+
+            dailyExpenseDateList.innerHTML = '';
+            const sortedDates = Object.keys(expensesByDate).sort().reverse();
+            sortedDates.forEach(date => {
+                const totalDailyExpense = expensesByDate[date].reduce((sum, exp) => sum + exp.amount, 0);
+                const li = document.createElement('li');
+                li.className = 'list-item date-item';
+                li.onclick = () => showDailyExpenses(date);
+                li.innerHTML = `
+                    <div class="item-info">
+                        <strong>${formatDate(date)}</strong>
+                        <span>Matumizi: <span class="item-expense">TZS ${formatNumber(totalDailyExpense)}</span></span>
+                    </div>
+                `;
+                dailyExpenseDateList.appendChild(li);
+            });
+            dailyExpenseDateList.style.display = 'block';
+            dailyExpensesDetail.style.display = 'none';
+        }
+        
+        function showDailyExpenses(date) {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const expensesForDate = currentSystem.dailyExpenses.filter(exp => exp.date === date);
+
+            dailyExpensesTitle.textContent = `Matumizi ya Kila Siku ya Tarehe ${formatDate(date)}`;
+            dailyExpensesTableBody.innerHTML = '';
+            let totalExpenses = 0;
+
+            expensesForDate.forEach((exp, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${exp.name}</td>
+                    <td><span class="item-expense">TZS ${formatNumber(exp.amount)}</span></td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                            <div class="dropdown-content">
+                                <button onclick="editDailyExpense(${currentSystem.dailyExpenses.indexOf(exp)})">Badilisha</button>
+                                <button onclick="deleteDailyExpense(${currentSystem.dailyExpenses.indexOf(exp)})">Futa</button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                dailyExpensesTableBody.appendChild(tr);
+                totalExpenses += exp.amount;
+            });
+
+            dailyExpensesTotalSpan.textContent = `TZS ${formatNumber(totalExpenses)}`;
+            dailyExpenseDateList.style.display = 'none';
+            dailyExpensesDetail.style.display = 'block';
+        }
+
+        function goBackToDailyExpenseDateList() {
+            dailyExpenseDateList.style.display = 'block';
+            dailyExpensesDetail.style.display = 'none';
+        }
+
+        function renderCapitalExpenseDates() {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const expensesByDate = currentSystem.capitalExpenses.reduce((acc, exp) => {
+                if (!acc[exp.date]) {
+                    acc[exp.date] = [];
+                }
+                acc[exp.date].push(exp);
+                return acc;
+            }, {});
+
+            capitalExpenseDateList.innerHTML = '';
+            const sortedDates = Object.keys(expensesByDate).sort().reverse();
+            sortedDates.forEach(date => {
+                const totalDailyExpense = expensesByDate[date].reduce((sum, exp) => sum + exp.amount, 0);
+                const li = document.createElement('li');
+                li.className = 'list-item date-item';
+                li.onclick = () => showDailyCapitalExpenses(date);
+                li.innerHTML = `
+                    <div class="item-info">
+                        <strong>${formatDate(date)}</strong>
+                        <span>Matumizi: <span class="item-expense">TZS ${formatNumber(totalDailyExpense)}</span></span>
+                    </div>
+                `;
+                capitalExpenseDateList.appendChild(li);
+            });
+            capitalExpenseDateList.style.display = 'block';
+            dailyCapitalExpensesDetail.style.display = 'none';
+        }
+        
+        function showDailyCapitalExpenses(date) {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const expensesForDate = currentSystem.capitalExpenses.filter(exp => exp.date === date);
+
+            dailyCapitalExpensesTitle.textContent = `Matumizi ya Mtaji ya Tarehe ${formatDate(date)}`;
+            dailyCapitalExpensesTableBody.innerHTML = '';
+            let totalExpenses = 0;
+
+            expensesForDate.forEach((exp, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${exp.name}</td>
+                    <td><span class="item-expense">TZS ${formatNumber(exp.amount)}</span></td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                            <div class="dropdown-content">
+                                <button onclick="editCapitalExpense(${currentSystem.capitalExpenses.indexOf(exp)})">Badilisha</button>
+                                <button onclick="deleteCapitalExpense(${currentSystem.capitalExpenses.indexOf(exp)})">Futa</button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                dailyCapitalExpensesTableBody.appendChild(tr);
+                totalExpenses += exp.amount;
+            });
+
+            dailyCapitalExpensesTotalSpan.textContent = `TZS ${formatNumber(totalExpenses)}`;
+            capitalExpenseDateList.style.display = 'none';
+            dailyCapitalExpensesDetail.style.display = 'block';
+        }
+
+        function goBackToCapitalExpenseDateList() {
+            capitalExpenseDateList.style.display = 'block';
+            dailyCapitalExpensesDetail.style.display = 'none';
+        }
+        
+        function renderStockCountDates() {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const stockCountsByDate = currentSystem.stockCounts.reduce((acc, count) => {
+                if (!acc[count.date]) {
+                    acc[count.date] = [];
+                }
+                acc[count.date].push(count);
+                return acc;
+            }, {});
+
+            stockCountDateList.innerHTML = '';
+            const sortedDates = Object.keys(stockCountsByDate).sort().reverse();
+            sortedDates.forEach(date => {
+                const li = document.createElement('li');
+                li.className = 'list-item date-item';
+                li.onclick = () => showDailyStockCounts(date);
+                li.innerHTML = `
+                    <div class="item-info">
+                        <strong>${formatDate(date)}</strong>
+                        <span>Ripoti ya Hesabu ya Stoo</span>
+                    </div>
+                `;
+                stockCountDateList.appendChild(li);
+            });
+            stockCountDateList.style.display = 'block';
+            dailyStockCountDetail.style.display = 'none';
+        }
+
+        function showDailyStockCounts(date) {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const countsForDate = currentSystem.stockCounts.filter(count => count.date === date);
+
+            dailyStockCountTitle.textContent = `Hesabu ya Stoo ya Tarehe ${formatDate(date)}`;
+            dailyStockCountTableBody.innerHTML = '';
+            let totalSold = 0;
+            let totalSales = 0;
+            let totalProfit = 0;
+
+            countsForDate.forEach((count, index) => {
+                const product = currentSystem.products[count.productIndex];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${count.remainingQuantity}</td>
+                    <td>${count.soldQuantity}</td>
+                    <td>TZS ${formatNumber(count.totalSales)}</td>
+                    <td><span class="item-profit">TZS ${formatNumber(count.totalProfit)}</span></td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                            <div class="dropdown-content">
+                                <button onclick="deleteStockCount(${currentSystem.stockCounts.indexOf(count)})">Futa</button>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                dailyStockCountTableBody.appendChild(tr);
+                totalSold += count.soldQuantity;
+                totalSales += count.totalSales;
+                totalProfit += count.totalProfit;
+            });
+            
+            dailyStockCountSoldTotal.textContent = totalSold;
+            dailyStockCountSalesTotal.textContent = `TZS ${formatNumber(totalSales)}`;
+            dailyStockCountProfitTotal.textContent = `TZS ${formatNumber(totalProfit)}`;
+
+            stockCountDateList.style.display = 'none';
+            dailyStockCountDetail.style.display = 'block';
+        }
+        
+        function goBackToStockCountDateList() {
+            stockCountDateList.style.display = 'block';
+            dailyStockCountDetail.style.display = 'none';
+        }
+
+       
+    // Function ya kutoa UUID kwa kutumia crypto API
+    function generateUUID() {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        } else {
+            // Fallback kwa browsers zisizosupport crypto.randomUUID()
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+    }
+
+    // Badilisha sehemu ya kuunda ID mpya
+    async function addCapital() {
+        capitalModalTitle.textContent = 'Weka Mtaji Mpya';
+        capitalIndexInput.value = '';
+        capitalNameInput.value = '';
+        capitalAmountInput.value = '';
+        capitalDescriptionInput.value = '';
+        openModal('addCapitalModal');
+    }
+
+    async function saveCapital() {
+        const name = capitalNameInput.value;
+        const amount = parseFloat(capitalAmountInput.value);
+        const description = capitalDescriptionInput.value;
+        const index = capitalIndexInput.value;
+
+        if (name && !isNaN(amount)) {
+            if (index === '') {
+                // Add new capital - tumia UUID halali
+                const newSystem = {
+                    id: generateUUID(),  // TUMIA UUID HALALI
+                    name: name,
+                    capital: amount,
+                    description: description,
+                    products: [],
+                    sales: [],
+                    dailyExpenses: [],
+                    capitalExpenses: [],
+                    stockCounts: []
+                };
+                capitalSystems.push(newSystem);
+                await saveData(newSystem);
+            } else {
+                // Edit existing capital
+                const system = capitalSystems[parseInt(index)];
+                system.capital = amount;
+                system.name = name;
+                system.description = description;
+                await saveData(system);
+            }
+            renderCapitalList();
+            closeModal('addCapitalModal');
+        } else {
+            alert('Tafadhali jaza jina la mtaji na kiasi sahihi.');
+        }
+    }
+
+        function editCapital(index) {
+            const system = capitalSystems[index];
+            capitalModalTitle.textContent = 'Badilisha Mtaji';
+            capitalIndexInput.value = index;
+            capitalNameInput.value = system.name;
+            capitalAmountInput.value = system.capital;
+            capitalDescriptionInput.value = system.description;
+            openModal('addCapitalModal');
+        }
+
+        async function deleteCapital(index) {
+            if (confirm('Una uhakika unataka kufuta biashara hii na data zake zote?')) {
+                const systemToDelete = capitalSystems[index];
+                capitalSystems.splice(index, 1);
+                
+                try {
+                    const { error } = await supabase
+                        .from('capital_systems')
+                        .delete()
+                        .eq('id', systemToDelete.id); // Use the unique ID for deletion
+
+                    if (error) {
+                        console.error('Error deleting from Supabase:', error.message);
+                    } else {
+                        console.log('System deleted from Supabase.');
+                    }
+                } catch (e) {
+                    console.error('Supabase delete operation failed:', e);
+                }
+                renderCapitalList();
+            }
+        }
+
+        function addProduct() {
+            productModalTitle.textContent = 'Ongeza Bidhaa Mpya';
+            productIndexInput.value = '';
+            document.getElementById('productName').value = '';
+            costPriceTotalInput.value = '';
+            productQuantityInput.value = '';
+            costPriceRetailInput.value = '';
+            sellingPriceRetailInput.value = '';
+            projectedProfitTotalSpan.textContent = 'TZS 0';
+            projectedProfitRetailSpan.textContent = 'TZS 0';
+            openModal('addProductModal');
+        }
+        
+        async function saveProduct() {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const name = document.getElementById('productName').value;
+            const costPriceTotal = parseFloat(costPriceTotalInput.value);
+            const quantity = parseInt(productQuantityInput.value);
+            const sellingPriceRetail = parseFloat(sellingPriceRetailInput.value);
+            const costPriceRetail = parseFloat(costPriceRetailInput.value);
+            const index = productIndexInput.value;
+
+            if (name && !isNaN(costPriceTotal) && !isNaN(quantity) && !isNaN(sellingPriceRetail)) {
+                if (index === '') {
+                    // Add new product
+                    const newProduct = {
+                        name: name,
+                        costPriceTotal: costPriceTotal,
+                        initialQuantity: quantity,
+                        currentQuantity: quantity,
+                        costPriceRetail: costPriceRetail,
+                        sellingPriceRetail: sellingPriceRetail,
+                        dateAdded: new Date().toISOString().slice(0, 10)
+                    };
+                    currentSystem.products.push(newProduct);
+                    // Capital decreases when recording product purchases (adding new stock)
+                    currentSystem.capital -= costPriceTotal;
+                } else {
+                    // Edit existing product
+                    const product = currentSystem.products[parseInt(index)];
+                    const oldTotalCost = product.costPriceTotal;
+                    const newTotalCost = costPriceTotal;
+                    const costDifference = newTotalCost - oldTotalCost; // Difference in cost
+
+                    // Adjust capital based on the change in product cost
+                    currentSystem.capital -= costDifference;
+                    
+                    product.name = name;
+                    product.costPriceTotal = newTotalCost;
+                    product.initialQuantity = quantity;
+                    product.currentQuantity = quantity;
+                    product.costPriceRetail = costPriceRetail;
+                    product.sellingPriceRetail = sellingPriceRetail;
+                }
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                closeModal('addProductModal');
+            } else {
+                alert('Tafadhali jaza taarifa zote za bidhaa.');
+            }
+        }
+
+        function editProduct(index) {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const product = currentSystem.products[index];
+            productModalTitle.textContent = 'Badilisha Bidhaa';
+            productIndexInput.value = index;
+            document.getElementById('productName').value = product.name;
+            costPriceTotalInput.value = product.costPriceTotal;
+            productQuantityInput.value = product.initialQuantity;
+            costPriceRetailInput.value = product.costPriceRetail;
+            sellingPriceRetailInput.value = product.sellingPriceRetail;
+            calculatePricesAndProfit();
+            openModal('addProductModal');
+        }
+
+        async function deleteProduct(index) {
+            if (confirm('Una uhakika unataka kufuta bidhaa hii?')) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                const product = currentSystem.products[index];
+                
+                currentSystem.products.splice(index, 1);
+                
+                // Also remove any sales and stock counts related to this product
+                currentSystem.sales = currentSystem.sales.filter(sale => sale.productIndex !== index);
+                currentSystem.stockCounts = currentSystem.stockCounts.filter(count => count.productIndex !== index);
+
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+            }
+        }
+
+        function addSale() {
+            saleBeingEdited = null;
+            document.getElementById('saleIndex').value = '';
+            document.getElementById('saleDate').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('saleQuantity').value = '';
+            document.getElementById('actualSalePrice').value = '';
+            quantityAlert.style.display = 'none';
+
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const select = saleProductNameSelect;
+            select.innerHTML = '<option value="">-- Chagua Bidhaa --</option>';
+            currentSystem.products.forEach((product, index) => {
+                if (product.currentQuantity > 0) {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${product.name} (Stoo: ${product.currentQuantity})`;
+                    select.appendChild(option);
+                }
+            });
+            openModal('addSaleModal');
+        }
+
+        async function saveSale() {
+            const date = saleDateInput.value;
+            const productIndex = parseInt(saleProductNameSelect.value);
+            const quantity = parseInt(saleQuantityInput.value);
+            const actualSalePrice = parseFloat(actualSalePriceInput.value) || 0;
+
+            if (date && !isNaN(productIndex) && quantity > 0) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                const product = currentSystem.products[productIndex];
+                const totalCalculatedPrice = product.sellingPriceRetail * quantity;
+                const finalSalePrice = actualSalePrice > 0 ? actualSalePrice : totalCalculatedPrice;
+                
+                const profitPerItem = product.sellingPriceRetail - product.costPriceRetail;
+                const totalProfit = profitPerItem * quantity;
+                
+                if (quantity > product.currentQuantity && saleBeingEdited === null) {
+                    quantityAlert.style.display = 'block';
+                    return;
+                }
+                quantityAlert.style.display = 'none';
+
+                if (saleBeingEdited) {
+                    // Edit existing sale
+                    const oldSale = currentSystem.sales[saleBeingEdited.index];
+                    const oldProduct = currentSystem.products[oldSale.productIndex];
+                    
+                    // Revert old changes
+                    oldProduct.currentQuantity += oldSale.quantity;
+
+                    // Apply new changes
+                    product.currentQuantity -= quantity;
+
+                    oldSale.date = date;
+                    oldSale.productIndex = productIndex;
+                    oldSale.quantity = quantity;
+                    oldSale.totalPrice = finalSalePrice;
+                } else {
+                    // Add new sale
+                    const newSale = {
+                        date,
+                        productIndex,
+                        quantity,
+                        totalPrice: finalSalePrice
+                    };
+                    currentSystem.sales.push(newSale);
+                    product.currentQuantity -= quantity;
+                }
+                
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                closeModals();
+            } else {
+                alert('Tafadhali jaza taarifa zote za mauzo.');
+            }
+        }
+        
+        function editSale(index) {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            saleBeingEdited = { index: index };
+            const sale = currentSystem.sales[index];
+            const product = currentSystem.products[sale.productIndex];
+
+            document.getElementById('saleIndex').value = index;
+            document.getElementById('saleDate').value = sale.date;
+
+            const select = saleProductNameSelect;
+            select.innerHTML = '<option value="">-- Chagua Bidhaa --</option>';
+            currentSystem.products.forEach((p, pIndex) => {
+                const option = document.createElement('option');
+                option.value = pIndex;
+                let displayQuantity = p.currentQuantity;
+                if (pIndex === sale.productIndex) {
+                    displayQuantity += sale.quantity; // Add back the quantity of the sale being edited
+                }
+                option.textContent = `${p.name} (Stoo: ${displayQuantity})`;
+                if (pIndex === sale.productIndex) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+            document.getElementById('saleQuantity').value = sale.quantity;
+            document.getElementById('actualSalePrice').value = sale.totalPrice;
+            
+            openModal('addSaleModal');
+        }
+
+        
+        async function deleteSale(index) {
+            if (confirm('Una uhakika unataka kufuta mauzo haya?')) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                const sale = currentSystem.sales[index];
+                const product = currentSystem.products[sale.productIndex];
+
+                product.currentQuantity += sale.quantity;
+                currentSystem.sales.splice(index, 1);
+                
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                if (dailySalesDetail.style.display === 'block') {
+                    showDailySales(sale.date);
+                }
+            }
+        }
+
+        function addDailyExpense() {
+            dailyExpenseBeingEdited = null;
+            document.getElementById('dailyExpenseIndex').value = '';
+            document.getElementById('dailyExpenseDate').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('dailyExpenseName').value = '';
+            document.getElementById('dailyExpenseAmount').value = '';
+            dailyExpenseModalTitle.textContent = 'Ongeza Matumizi ya Kila Siku';
+            openModal('addDailyExpenseModal');
+        }
+
+        async function saveDailyExpense() {
+            const date = dailyExpenseDateInput.value;
+            const name = dailyExpenseNameInput.value;
+            const amount = parseFloat(dailyExpenseAmountInput.value);
+            const index = dailyExpenseIndexInput.value;
+
+            if (date && name && !isNaN(amount) && amount > 0) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                if (index === '') {
+                    // Add new expense
+                    const newExpense = { date, name, amount };
+                    currentSystem.dailyExpenses.push(newExpense);
+                } else {
+                    // Edit existing expense
+                    const oldExpense = currentSystem.dailyExpenses[parseInt(index)];
+                    oldExpense.date = date;
+                    oldExpense.name = name;
+                    oldExpense.amount = amount;
+                }
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                closeModals();
+            } else {
+                alert('Tafadhali jaza taarifa zote.');
+            }
+        }
+
+        function editDailyExpense(index) {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const expense = currentSystem.dailyExpenses[index];
+            dailyExpenseBeingEdited = { index: index };
+            dailyExpenseModalTitle.textContent = 'Badilisha Matumizi ya Kila Siku';
+            document.getElementById('dailyExpenseIndex').value = index;
+            document.getElementById('dailyExpenseDate').value = expense.date;
+            document.getElementById('dailyExpenseName').value = expense.name;
+            document.getElementById('dailyExpenseAmount').value = expense.amount;
+            openModal('addDailyExpenseModal');
+        }
+
+        async function deleteDailyExpense(index) {
+            if (confirm('Una uhakika unataka kufuta matumizi haya?')) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                const expense = currentSystem.dailyExpenses[index];
+                currentSystem.dailyExpenses.splice(index, 1);
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                if (dailyExpensesDetail.style.display === 'block') {
+                    showDailyExpenses(expense.date);
+                }
+            }
+        }
+
+        function addCapitalExpense() {
+            capitalExpenseBeingEdited = null;
+            document.getElementById('capitalExpenseIndex').value = '';
+            document.getElementById('capitalExpenseDate').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('capitalExpenseName').value = '';
+            document.getElementById('capitalExpenseAmount').value = '';
+            capitalExpenseAlert.style.display = 'none';
+            capitalExpenseModalTitle.textContent = 'Ongeza Matumizi ya Mtaji';
+            openModal('addCapitalExpenseModal');
+        }
+
+        async function saveCapitalExpense() {
+            const date = capitalExpenseDateInput.value;
+            const name = capitalExpenseNameInput.value;
+            const amount = parseFloat(capitalExpenseAmountInput.value);
+            const index = capitalExpenseIndexInput.value;
+
+            if (date && name && !isNaN(amount) && amount > 0) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                if (amount > currentSystem.capital && capitalExpenseBeingEdited === null) {
+                    capitalExpenseAlert.style.display = 'block';
+                    return;
+                }
+                capitalExpenseAlert.style.display = 'none';
+
+                if (capitalExpenseBeingEdited) {
+                    // Edit existing expense
+                    const oldExpense = currentSystem.capitalExpenses[capitalExpenseBeingEdited.index];
+                    const oldAmount = oldExpense.amount;
+                    currentSystem.capital += oldAmount; // Return old amount to capital
+                    
+                    oldExpense.date = date;
+                    oldExpense.name = name;
+                    oldExpense.amount = amount;
+
+                    currentSystem.capital -= amount; // Deduct new amount
+                } else {
+                    // Add new expense
+                    const newExpense = { date, name, amount };
+                    currentSystem.capitalExpenses.push(newExpense);
+                    currentSystem.capital -= amount; // Capital decreases when recording capital expenses
+                }
+                
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                closeModals();
+            } else {
+                alert('Tafadhali jaza taarifa zote.');
+            }
+        }
+        
+        function editCapitalExpense(index) {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const expense = currentSystem.capitalExpenses[index];
+            capitalExpenseBeingEdited = { index: index };
+            capitalExpenseModalTitle.textContent = 'Badilisha Matumizi ya Mtaji';
+            document.getElementById('capitalExpenseIndex').value = index;
+            document.getElementById('capitalExpenseDate').value = expense.date;
+            document.getElementById('capitalExpenseName').value = expense.name;
+            document.getElementById('capitalExpenseAmount').value = expense.amount;
+            openModal('addCapitalExpenseModal');
+        }
+
+        async function deleteCapitalExpense(index) {
+            if (confirm('Una uhakika unataka kufuta matumizi haya?')) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                const expense = currentSystem.capitalExpenses[index];
+                currentSystem.capital += expense.amount; // Refund the capital
+                currentSystem.capitalExpenses.splice(index, 1);
+                
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                if (dailyCapitalExpensesDetail.style.display === 'block') {
+                    showDailyCapitalExpenses(expense.date);
+                }
+            }
+        }
+        
+        function addStockCount() {
+            stockCountBeingEdited = null;
+            document.getElementById('stockCountDate').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('remainingQuantity').value = '';
+            remainingQuantityAlert.style.display = 'none';
+
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            const select = stockProductNameSelect;
+            select.innerHTML = '<option value="">-- Chagua Bidhaa --</option>';
+            currentSystem.products.forEach((product, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${product.name} (Stoo: ${product.currentQuantity})`;
+                select.appendChild(option);
+            });
+            openModal('addStockCountModal');
+        }
+
+        async function saveStockCount() {
+            const date = stockCountDateInput.value;
+            const productIndex = parseInt(stockProductNameSelect.value);
+            const remainingQuantity = parseInt(remainingQuantityInput.value);
+
+            if (date && !isNaN(productIndex) && !isNaN(remainingQuantity)) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                const product = currentSystem.products[productIndex];
+                
+                if (remainingQuantity > product.currentQuantity) {
+                    remainingQuantityAlert.style.display = 'block';
+                    return;
+                }
+                remainingQuantityAlert.style.display = 'none';
+
+                const soldQuantity = product.currentQuantity - remainingQuantity;
+                const totalSales = soldQuantity * product.sellingPriceRetail;
+                const totalProfit = soldQuantity * (product.sellingPriceRetail - product.costPriceRetail);
+
+                const newStockCount = {
+                    date,
+                    productIndex,
+                    remainingQuantity,
+                    soldQuantity,
+                    totalSales,
+                    totalProfit
+                };
+
+                capitalSystems[currentBusinessIndex].stockCounts.push(newStockCount);
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                closeModal('addStockCountModal');
+            } else {
+                alert('Tafadhali jaza taarifa zote za hesabu ya stoo.');
+            }
+        }
+        
+        async function deleteStockCount(index) {
+            if (confirm('Una uhakika unataka kufuta rekodi hii ya hesabu ya stoo?')) {
+                const currentSystem = capitalSystems[currentBusinessIndex];
+                const stockCount = currentSystem.stockCounts[index];
+                
+                currentSystem.stockCounts.splice(index, 1);
+                
+                await saveData(currentSystem); // Save changes to Supabase
+                renderBusinessDetails();
+                if (dailyStockCountDetail.style.display === 'block') {
+                    showDailyStockCounts(stockCount.date);
+                }
+            }
+        }
+
+        function renderPurchaseHistory() {
+            const purchases = capitalSystems[currentBusinessIndex].products;
+            purchaseHistoryTableBody.innerHTML = '';
+            purchases.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatDate(product.dateAdded)}</td>
+                    <td>${product.name}</td>
+                    <td>${product.initialQuantity}</td>
+                    <td>TZS ${formatNumber(product.costPriceTotal)}</td>
+                `;
+                purchaseHistoryTableBody.appendChild(tr);
+            });
+            openModal('purchaseHistoryModal');
+        }
+
+        function calculatePricesAndProfit() {
+            const costTotal = parseFloat(costPriceTotalInput.value);
+            const quantity = parseInt(productQuantityInput.value);
+            const sellingPrice = parseFloat(sellingPriceRetailInput.value);
+
+            if (!isNaN(costTotal) && !isNaN(quantity) && quantity > 0) {
+                const costRetail = costTotal / quantity;
+                costPriceRetailInput.value = costRetail.toFixed(2);
+                
+                if (!isNaN(sellingPrice)) {
+                    const profitTotal = (sellingPrice - costRetail) * quantity;
+                    const profitRetail = sellingPrice - costRetail;
+                    projectedProfitTotalSpan.textContent = `TZS ${profitTotal.toFixed(2)}`;
+                    projectedProfitRetailSpan.textContent = `TZS ${profitRetail.toFixed(2)}`;
+                }
+            } else {
+                costPriceRetailInput.value = '';
+                projectedProfitTotalSpan.textContent = 'TZS 0';
+                projectedProfitRetailSpan.textContent = 'TZS 0';
+            }
+        }
+
+        // Logout Function
+        function logout() {
+            if (confirm('Una uhakika unataka kutoka?')) {
+                // In a real application, you would handle Supabase authentication logout here
+                // For this example, we'll just redirect.
+                window.location.href = 'indexa.html'; // Redirect to login/registration page
+            }
+        }
+
+        // EVENT LISTENERS
+        addCapitalBtn.onclick = addCapital;
+        logoutBtn.onclick = logout;
+        saveCapitalBtn.onclick = saveCapital;
+        closeCapitalModal.onclick = closeModals;
+        backToCapitalBtn.onclick = goBackToCapitalList;
+        salesBtn.onclick = () => {
+            salesSystemContent.classList.remove('hidden');
+            stockSystemContent.classList.add('hidden');
+            salesBtn.classList.add('active');
+            stockBtn.classList.remove('active');
+            renderBusinessDetails();
+        };
+        stockBtn.onclick = () => {
+            stockSystemContent.classList.remove('hidden');
+            salesSystemContent.classList.add('hidden');
+            stockBtn.classList.add('active');
+            salesBtn.classList.remove('active');
+            renderBusinessDetails();
+        };
+        addProductBtn.onclick = addProduct;
+        addSaleBtn.onclick = addSale;
+        addDailyExpenseBtn.onclick = addDailyExpense;
+        addCapitalExpenseBtn.onclick = addCapitalExpense;
+        addStockCountBtn.onclick = addStockCount;
+        showPurchaseHistoryBtn.onclick = renderPurchaseHistory;
+        closeProductModal.onclick = closeModals;
+        closeSaleModal.onclick = closeModals;
+        closeDailyExpenseModal.onclick = closeModals;
+        closeCapitalExpenseModal.onclick = closeModals;
+        closeStockCountModal.onclick = closeModals;
+        closePurchaseHistoryModal.onclick = closeModals;
+        saveProductBtn.onclick = saveProduct;
+        saveSaleBtn.onclick = saveSale;
+        saveDailyExpenseBtn.onclick = saveDailyExpense;
+        saveCapitalExpenseBtn.onclick = saveCapitalExpense;
+        saveStockCountBtn.onclick = saveStockCount;
+        backToCapitalBtn.onclick = goBackToCapitalList;
+        
+        document.addEventListener('click', function(event) {
+            const isDropdownBtn = event.target.matches('.dropdown-btn, .dropdown-btn *');
+            
+            // Close all dropdowns
+            document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                if (dropdown.style.display === 'block') {
+                    dropdown.style.display = 'none';
+                }
+            });
+
+            // Open the clicked dropdown if a button was clicked
+            if (isDropdownBtn) {
+                const dropdownBtn = event.target.closest('.dropdown-btn');
+                const dropdownContent = dropdownBtn.nextElementSibling;
+                if (dropdownContent && dropdownContent.classList.contains('dropdown-content')) {
+                    dropdownContent.style.display = 'block';
+                }
+            }
+        });
+
+        costPriceTotalInput.addEventListener('input', calculatePricesAndProfit);
+        productQuantityInput.addEventListener('input', calculatePricesAndProfit);
+        sellingPriceRetailInput.addEventListener('input', calculatePricesAndProfit);
+
+        // Initial loading of data
+        window.addEventListener('load', async () => {
+            setTimeout(async () => {
+                splashScreen.style.opacity = '0';
+                setTimeout(async () => {
+                    splashScreen.style.display = 'none';
+                    mainContent.classList.remove('hidden');
+                    await loadData();
+                }, 500);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

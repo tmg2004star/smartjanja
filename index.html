@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karibu SmartJanja</title>
+    <style>
+        /* CSS kwa ajili ya Muonekano wa Intro */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+    /* Intro Screen */
+#intro-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(135deg, #0f4c81, #1263a8); /* Blue Gradient */
+  color: #ffd700; /* Golden text color */
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1s ease-out;
+}
+
+/* Vitu vinavyohusika na uhuishaji */
+#welcome-text {
+  font-size: 3em;
+  font-weight: 700;
+  margin: 0;
+  color: #ffd700;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+#app-name-text {
+  font-size: 4em;
+  font-weight: 700;
+  color: #ffd700; /* Golden color */
+  margin-top: 10px;
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out 1.5s forwards;
+}
+
+#icon-and-slogan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-in-out;
+}
+
+#app-icon {
+  width: 100px;
+  height: 100px;
+  margin-top: 20px;
+}
+
+#slogan-text {
+  font-size: 1.5em;
+  margin-top: 10px;
+  color: #ffd700; /* Golden color */
+}
+
+/* Uhuishaji */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOutUp {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-50px); }
+}
+
+@keyframes moveUpAndFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+    </style>
+</head>
+<body>
+    <div id="intro-screen">
+        <h1 id="welcome-text">Karibu</h1>
+        <h2 id="app-name-text">SmartJanja</h2>
+        <div id="icon-and-slogan">
+           
+            <p id="slogan-text">TMG DIGITECH</p>
+        </div>
+    </div>
+
+    <script>
+        const introScreen = document.getElementById('intro-screen');
+        const welcomeText = document.getElementById('welcome-text');
+        const appNameText = document.getElementById('app-name-text');
+        const iconAndSlogan = document.getElementById('icon-and-slogan');
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                appNameText.style.opacity = '1';
+
+                setTimeout(() => {
+                    welcomeText.style.animation = 'fadeOutUp 0.5s ease-in-out forwards';
+                    
+                    setTimeout(() => {
+                        iconAndSlogan.style.animation = 'moveUpAndFadeIn 0.5s ease-in-out forwards';
+
+                        setTimeout(() => {
+                            introScreen.style.opacity = '0';
+                            setTimeout(() => {
+                                // Redirect to the main page after the intro
+                                window.location.href = 'indexa.html';
+                            }, 1000);
+                        }, 1000);
+                    }, 500);
+                }, 1500);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
