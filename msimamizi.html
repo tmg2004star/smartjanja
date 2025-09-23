@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biashara Yangu</title>
+    <title>SmartJanja</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
@@ -727,17 +727,18 @@
        
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- Admin Context ---
-        // Get business ID from Supabase (assuming it's passed via URL or a global state)
-        // For this example, we'll use a placeholder. In a real app, this would come from authentication.
-        let currentBusinessId = 'default_business_id'; // Placeholder for the current business ID
+       // Function to get the business ID from the URL query parameter
+function getBusinessIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('businessId');
+}
 
-        // If business ID is missing, redirect to the login/registration page
-        // This part needs to be handled by your authentication flow, not directly here.
-        // For now, we'll assume currentBusinessId is set.
-        // if (!currentBusinessId) {
-        //     window.location.href = 'usajili.html';
-        // }
+let currentBusinessId = getBusinessIdFromUrl();
+
+// If business ID is missing, redirect to the login/registration page
+if (!currentBusinessId) {
+    window.location.href = 'indexa.html'; 
+}
 
         // DATA
         let capitalSystems = []; // This will hold all capital systems (businesses)
@@ -850,70 +851,86 @@
 
         // FUNCTIONS
         async function loadData() {
-            try {
-                // Fetch all capital systems for the current user (assuming user_id is available)
-                // For this example, we'll fetch all and filter by currentBusinessId later.
-                // In a real app, you'd likely query based on the authenticated user's businesses.
-                const { data, error } = await supabase
-                    .from('capital_systems')
-                    .select('*'); // Fetch all columns, including 'data'
-
-                if (error) {
-                    console.error('Error loading capital systems:', error.message);
-                    capitalSystems = []; // Reset if error
-                } else {
-                    capitalSystems = data.map(row => ({
-                        id: row.id, // Assuming 'id' is the unique identifier for each business
-                        name: row.name,
-                        capital: row.capital,
-                        description: row.description,
-                        products: row.products || [],
-                        sales: row.sales || [],
-                        dailyExpenses: row.dailyExpenses || [],
-                        capitalExpenses: row.capitalExpenses || [],
-                        stockCounts: row.stockCounts || []
-                    }));
-
-                    // Set currentBusinessId to the first business found, or handle selection
-                    if (capitalSystems.length > 0) {
-                        currentBusinessId = capitalSystems[0].id; // Or get from URL/session
-                        currentBusinessIndex = 0; // Set initial index
-                    } else {
-                        currentBusinessId = null;
-                        currentBusinessIndex = null;
-                    }
-                }
-            } catch (e) {
-                console.error('Error fetching data from Supabase:', e);
-                capitalSystems = []; // Reset if error
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'indexa.html'; 
+                return;
             }
-            renderCapitalList();
-            if (currentBusinessIndex !== null) {
-                renderBusinessDetails();
+            
+            try {
+                // Pakua business profile ya admin
+                const { data: businessProfile, error } = await supabase
+                    .from('business_profiles')
+                    .select('*')
+                    .eq('admin_id', session.user.id)
+                    .single();
+        
+                if (error) {
+                    console.error('Hitilafu wakati wa kusoma data:', error.message);
+                    alert('Hitilafu wakati wa kupakia data. Tafadhali jaribu tena.');
+                    return;
+                }
+        
+                // Hifadhi business info
+                currentBusinessId = businessProfile.id;
+                businessName = businessProfile.business_name;
+        
+                // 🔥 Pakua mitaji yote ya biashara hii kutoka Supabase
+                const { data: capitalData, error: capitalError } = await supabase
+                    .from('capital_systems')
+                    .select('*')
+                    .eq('business_id', currentBusinessId);
+        
+                if (capitalError) {
+                    console.error('Hitilafu wakati wa kupakua mitaji:', capitalError.message);
+                    alert('Imeshindikana kupakia mitaji. Tafadhali jaribu tena.');
+                } else {
+                    capitalSystems = capitalData || [];
+                    renderCapitalList(); // Onyesha mitaji kwenye UI
+                }
+        
+                mainContent.classList.remove('hidden');
+        
+            } catch (e) {
+                console.error('Hitilafu ya jumla:', e);
+                alert('Hitilafu wakati wa kupakia data. Tafadhali jaribu tena.');
+            } finally {
+                // Ondoa splash screen
+                setTimeout(() => {
+                    splashScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        splashScreen.style.display = 'none';
+                    }, 500);
+                }, 1000);
             }
         }
+        
   
         async function saveData(systemData) {
             if (!systemData || !systemData.id) {
                 console.error('Cannot save data: systemData or systemData.id is missing.');
                 return;
             }
-
+        
+            // Ongeza businessId kwenye data kabla ya kuihifadhi
+            const dataToSave = {
+                id: systemData.id,
+                name: systemData.name,
+                capital: systemData.capital,
+                description: systemData.description,
+                products: systemData.products,
+                sales: systemData.sales,
+                dailyExpenses: systemData.dailyExpenses,
+                capitalExpenses: systemData.capitalExpenses,
+                stockCounts: systemData.stockCounts,
+                business_id: currentBusinessId // <--- Umeongeza mstari huu
+            };
+        
             try {
                 const { data, error } = await supabase
                     .from('capital_systems')
-                    .upsert({
-                        id: systemData.id,
-                        name: systemData.name,
-                        capital: systemData.capital,
-                        description: systemData.description,
-                        products: systemData.products,
-                        sales: systemData.sales,
-                        dailyExpenses: systemData.dailyExpenses,
-                        capitalExpenses: systemData.capitalExpenses,
-                        stockCounts: systemData.stockCounts
-                    }, { onConflict: 'id' });
-  
+                    .upsert(dataToSave, { onConflict: 'id' });
+        
                 if (error) {
                     console.error('Error saving to Supabase:', error.message);
                 } else {
