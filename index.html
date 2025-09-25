@@ -3,12 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karibu SmartJanja</title>
+    <link rel="icon" type="image/jpg" href="C:\Users\Lenovo\trust code\CODE\mchinga\smart.png">
+
+    <title> SmartJanja</title>
     <style>
         /* CSS kwa ajili ya Muonekano wa Intro */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
     /* Intro Screen */
+
+    
+        /* Global body styling for full-page background and centering */
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: 'Open Sans', sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          /* Blue background as seen in Canva-style gradients */
+          background: linear-gradient(to right top, #6a11cb, #2575fc); /* Deep purple to bright blue */
+          color: #ffffff; /* White text for contrast */
+          overflow-y: auto; /* Allow scrolling for content overflow */
+          overflow-x: hidden; /* Prevent horizontal scroll */
+          position: relative; /* Needed for pseudo-elements */
+      }
+
+      /* Optional: Particles/Bubbles effect for the background */
+      body::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: 
+              radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+          background-size: 800px 800px;
+          animation: moveBubbles 30s linear infinite alternate;
+          z-index: -1; /* Hakikisha bubbles zipo nyuma ya content */
+      }
+
+      /* Keyframes for moving background bubbles */
+      @keyframes moveBubbles {
+          0% { background-position: 0 0, 800px 800px; }
+          100% { background-position: 800px 800px, 0 0; }
+      }
+
 #intro-screen {
   position: fixed;
   top: 0;
@@ -19,7 +62,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-image: linear-gradient(135deg, #0f4c81, #1263a8); /* Blue Gradient */
+ /* background-image: linear-gradient(135deg, #0f4c81, #1263a8); /* Blue Gradient */
   color: #ffd700; /* Golden text color */
   z-index: 9999;
   opacity: 1;
@@ -98,7 +141,7 @@
         <h2 id="app-name-text">SmartJanja</h2>
         <div id="icon-and-slogan">
           <div>
-            <img class="logo-img" src="smart.png">
+            <img class="logo-img" src="c:\Users\Lenovo\trust code\CODE\mchinga\smart.png">
 
           </div>
            
@@ -136,4 +179,3 @@
     </script>
 </body>
 </html>
-
