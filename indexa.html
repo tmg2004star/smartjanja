@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SmartJanja</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-      <link rel="icon" type="image/jpg" href="C:\Users\Lenovo\trust code\CODE\mchinga\smart.png">
+    <link rel="icon" type="image/jpg" href="smart.png">
     <style>
         /* Combined CSS from original usajili.html */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
@@ -154,11 +154,118 @@
             font-weight: bold;
             color: #474545;
         }
+        #aboutBtn {
+            position: fixed;
+            bottom: 590px;
+            right: 20px;
+            background: linear-gradient(to right, #4267b2, #365899);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        #aboutBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        #aboutBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+
+        /* Modal Styles (Rules & About Us) */
+        #rulesModal, #aboutModal {
+            display: none; /* Default hidden */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000; /* Juu ya vipengele vyote */
+            display: flex; /* Tumia flexbox kwa centering */
+            align-items: center;
+            justify-content: center;
+        }
+        #rulesModal > div, #aboutModal > div {
+            background: white;
+            max-width: 90%; /* Upana wa max kwa mobile */
+            width: 500px; /* Max width kwa desktop */
+            margin: 20px; /* Margin pande zote */
+            padding: 25px 30px;
+            border-radius: 15px; /* Rounded corners zaidi */
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+        #rulesModal h2, #aboutModal h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #333;
+        }
+        #rulesModal p, #aboutModal p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #555;
+            font-size: 1rem;
+        }
+        #rulesModal button, #aboutModal button {
+            display: block;
+            margin: 20px auto 0; /* Centering button */
+            padding: 12px 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #rulesModal button {
+            background: linear-gradient(to right, #dc3545, #a71d2a);
+            color: white;
+        }
+        #rulesModal button:hover {
+            background: linear-gradient(to right, #a71d2a, #7d151f);
+        }
+        #aboutModal #closeAbout {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dc3545;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 50%; /* Make it round */
+            font-size: 1rem;
+            width: 40px; /* Fixed size */
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #aboutModal #closeAbout:hover {
+            background: #a71d2a;
+        }
+
+
+        
     </style>
 </head>
 <body>
     <div id="splash" class="auth-container">
-         <h1 class="logo-img">SmartJanja</h1>
+       
+         <h1 class="logo-img">Smart Janja</h1>
+   
         <div class="auth-tabs">
             <span class="auth-tab active" id="signup-tab">Jisajili</span>
             <span class="auth-tab" id="login-tab">Ingia</span>
@@ -216,11 +323,12 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+       
     
         // DOM Elements
+
+
+        
         const signupTab = document.getElementById('signup-tab');
         const loginTab = document.getElementById('login-tab');
         const signupForm = document.getElementById('signup-form');
@@ -363,6 +471,76 @@
                
             }
         });
+        document.addEventListener('DOMContentLoaded', () => {
+          // About Us Modal Listeners
+          const aboutBtn = document.getElementById('aboutBtn');
+          const aboutModal = document.getElementById('aboutModal');
+          const closeAboutBtn = document.getElementById('closeAbout'); 
+
+          aboutBtn.addEventListener('click', () => {
+              showAbout(); // Tumia function mpya ya showAbout
+          });
+
+          closeAboutBtn.addEventListener('click', () => {
+              closeAbout(); // Tumia function mpya ya closeAbout
+          });
+
+          window.addEventListener('click', (event) => {
+              if (event.target === aboutModal) {
+                  closeAbout(); // Tumia function mpya ya closeAbout
+              }
+          });
+        });
+
+
+        function showAbout() {
+            document.getElementById('aboutModal').style.display = 'flex';
+        }
+
+        // Hii inafunga About Modal
+        function closeAbout() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
+
+        // Hii inafungua Rules Modal
+        function showRules() {
+            document.getElementById('rulesModal').style.display = 'flex';
+        }
+        // Hii inafunga Rules Modal
+        function closeRules() {
+            document.getElementById('rulesModal').style.display = 'none';
+        }
+
+        // Hii inafunga About Modal kisha inafungua Rules Modal
+        function showRulesFromAbout() {
+            closeAbout(); // Funga About Modal kwanza
+            showRules();  // Kisha fungua Rules Modal
+        }
+
+        // Hii inafungua Rules Modal (kwa link ya consent)
+        function showRulesFromConsent() {
+            showRules();
+        }
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
