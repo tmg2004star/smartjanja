@@ -324,7 +324,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
        
-    
+     const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; // <--- BADILISHA HAPA NA URL YAKO HALISI
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M'
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        console.log('Supabase connected:', supabase);
         // DOM Elements
 
 
@@ -544,3 +548,4 @@
 
 
  
+
