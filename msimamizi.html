@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartJanja</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-      <link rel="icon" type="image/jpg" href="C:\Users\Lenovo\trust code\CODE\mchinga\smart.png">
+    <link rel="icon" type="image/jpg" href="smart.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
@@ -722,11 +722,15 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Supabase Configuration
-        const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M';
-
+        const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; // <--- BADILISHA HAPA NA URL YAKO HALISI
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M'
        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+          );
+        
+                console.log("Supabase client:", supabaseClient);
 
        // Function to get the business ID from the URL query parameter
 function getBusinessIdFromUrl() {
@@ -852,7 +856,7 @@ if (!currentBusinessId) {
 
         // FUNCTIONS
         async function loadData() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
                 window.location.href = 'indexa.html'; 
                 return;
@@ -860,7 +864,7 @@ if (!currentBusinessId) {
             
             try {
                 // Pakua business profile ya admin
-                const { data: businessProfile, error } = await supabase
+                const { data: businessProfile, error } = await supabaseClient
                     .from('business_profiles')
                     .select('*')
                     .eq('admin_id', session.user.id)
@@ -877,7 +881,7 @@ if (!currentBusinessId) {
                 businessName = businessProfile.business_name;
         
                 // 🔥 Pakua mitaji yote ya biashara hii kutoka Supabase
-                const { data: capitalData, error: capitalError } = await supabase
+                const { data: capitalData, error: capitalError } = await supabaseClient
                     .from('capital_systems')
                     .select('*')
                     .eq('business_id', currentBusinessId);
@@ -1980,3 +1984,4 @@ if (!currentBusinessId) {
     </script>
 </body>
 </html>
+
