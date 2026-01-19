@@ -932,7 +932,7 @@ if (!currentBusinessId) {
             };
         
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('capital_systems')
                     .upsert(dataToSave, { onConflict: 'id' });
         
@@ -1984,4 +1984,3 @@ if (!currentBusinessId) {
     </script>
 </body>
 </html>
-
