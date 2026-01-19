@@ -1,1 +1,513 @@
+
+
 <!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartJanja</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="icon" type="image/jpg" href="smart.png">
+    <style>
+        /* Combined CSS from original usajili.html */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-color: #007BFF;
+            --secondary-color: #28a745;
+            --background-light: #f4f7f9;
+            --card-background: #ffffff;
+            --text-dark: #333;
+            --text-muted: #6c757d;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background-color: var(--card-background);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+
+        .logo-img {
+           /* max-width: 180px; /* Max width for responsiveness */
+           /* height: auto; /* Maintain aspect ratio */
+            margin-bottom: 40px;
+            animation: bounce 2s infinite ease-in-out; /* Bouncing animation */
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)); /* Soft glow effect */
+          }
+          
+          /* Keyframes for bouncing logo animation */
+          @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); } /* Bounce up */
+            60% { transform: translateY(-15px); } /* Slight bounce down */
+          }
+        .auth-container h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .auth-form {
+            display: none;
+            text-align: left;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 40px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+
+        .alert {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            display: none;
+        }
+        .para{
+            font-weight: bold;
+            color: #474545;
+        }
+        #aboutBtn {
+            position: fixed;
+            bottom: 590px;
+            right: 20px;
+            background: linear-gradient(to right, #4267b2, #365899);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        #aboutBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        #aboutBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+
+        /* Modal Styles (Rules & About Us) */
+        #rulesModal, #aboutModal {
+            display: none; /* Default hidden */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000; /* Juu ya vipengele vyote */
+            display: flex; /* Tumia flexbox kwa centering */
+            align-items: center;
+            justify-content: center;
+        }
+        #rulesModal > div, #aboutModal > div {
+            background: white;
+            max-width: 90%; /* Upana wa max kwa mobile */
+            width: 500px; /* Max width kwa desktop */
+            margin: 20px; /* Margin pande zote */
+            padding: 25px 30px;
+            border-radius: 15px; /* Rounded corners zaidi */
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: left;
+        }
+        #rulesModal h2, #aboutModal h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #333;
+        }
+        #rulesModal p, #aboutModal p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #555;
+            font-size: 1rem;
+        }
+        #rulesModal button, #aboutModal button {
+            display: block;
+            margin: 20px auto 0; /* Centering button */
+            padding: 12px 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #rulesModal button {
+            background: linear-gradient(to right, #dc3545, #a71d2a);
+            color: white;
+        }
+        #rulesModal button:hover {
+            background: linear-gradient(to right, #a71d2a, #7d151f);
+        }
+        #aboutModal #closeAbout {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dc3545;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 50%; /* Make it round */
+            font-size: 1rem;
+            width: 40px; /* Fixed size */
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #aboutModal #closeAbout:hover {
+            background: #a71d2a;
+        }
+
+
+        
+    </style>
+</head>
+<body>
+    <div id="splash" class="auth-container">
+       
+         <h1 class="logo-img">Smart Janja</h1>
+   
+        <div class="auth-tabs">
+            <span class="auth-tab active" id="signup-tab">Jisajili</span>
+            <span class="auth-tab" id="login-tab">Ingia</span>
+        </div>
+
+        <div id="signup-form" class="auth-form active">
+            <h2>Usajili wa Msimamizi</h2>
+            <form id="admin-signup-form">
+                <div class="form-group">
+                    <label for="owner-fullname">Jina Kamili la Mmiliki</label>
+                    <input type="text" id="owner-fullname" required />
+                </div>
+                <div class="form-group">
+                    <label for="business-name">Jina la Biashara</label>
+                    <input type="text" id="business-name" required />
+                </div>
+                <div class="form-group">
+                    <label for="admin-email">Barua Pepe ya Msimamizi</label>
+                    <input type="email" id="admin-email" required />
+                </div>
+                <div class="form-group">
+                    <label for="phone-number">Namba ya Simu</label>
+                    <input type="tel" id="phone-number" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Neno la Siri la Msimamizi</label>
+                    <input type="password" id="admin-password" required />
+                    <span class="password-toggle" onclick="togglePasswordVisibility('admin-password')"><i class="fa-solid fa-eye"></i></span>
+                </div>
+                <p class="para">Kwa msaada tupigie au tuma ujumbe mfupi kupita namba: 0786701705</p>
+                <button type="submit" class="btn-submit">Jisajili</button>
+            </form>
+        </div>
+
+        <div id="login-form" class="auth-form">
+            <h2>Ingia kama Msimamizi</h2>
+            <form id="login-admin-form">
+                <div class="form-group">
+                    <label for="admin-login-business-name">Jina la Biashara</label>
+                    <input type="text" id="admin-login-business-name" required />
+                </div>
+                <div class="form-group">
+                    <label for="admin-login-email">Barua Pepe</label>
+                    <input type="email" id="admin-login-email" required />
+                </div>
+                <div class="form-group">
+                    <label for="admin-login-password">Neno la Siri</label>
+                    <input type="password" id="admin-login-password" required />
+                    <span class="password-toggle" onclick="togglePasswordVisibility('admin-login-password')"><i class="fa-solid fa-eye"></i></span>
+                </div>
+                <p class="para">Kwa msaada tupigie au tuma ujumbe mfupi kupita namba: 0786701705</p>
+                <button type="submit" class="btn-submit">Ingia</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+ 
+
+   <script>
+    
+        const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; // <--- BADILISHA HAPA NA URL YAKO HALISI
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M'
+       
+        const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+        console.log("Supabase client:", supabaseClient);
+        // DOM Elements
+        
+
+
+        const signupTab = document.getElementById('signup-tab');
+        const loginTab = document.getElementById('login-tab');
+        const signupForm = document.getElementById('signup-form');
+        const loginForm = document.getElementById('login-form');
+    
+        // Tab switching
+        signupTab.addEventListener('click', () => {
+            signupTab.classList.add('active');
+            loginTab.classList.remove('active');
+            signupForm.classList.add('active');
+            loginForm.classList.remove('active');
+        });
+    
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            signupTab.classList.remove('active');
+            loginForm.classList.add('active');
+            signupForm.classList.remove('active');
+        });
+    
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const inputField = document.getElementById(inputId);
+            const icon = inputField.nextElementSibling.querySelector('i');
+            if (inputField.type === 'password') {
+                inputField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                inputField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    
+        // Sign up handler
+        document.getElementById('admin-signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const ownerFullName = document.getElementById('owner-fullname').value.trim();
+            const businessName = document.getElementById('business-name').value.trim();
+            const phoneNumber = document.getElementById('phone-number').value.trim(); // Mstari mpya
+            const adminEmail = document.getElementById('admin-email').value.trim();
+            const adminPassword = document.getElementById('admin-password').value;
+
+            if (adminPassword.length < 6) {
+                alert('Neno la siri la msimamizi lazima liwe na angalau herufi 6.');
+                return;
+            }
+    
+            try {
+                // Sign up user
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: adminEmail,
+                    password: adminPassword,
+                });
+    
+                if (error) {
+                    alert(`Hitilafu wakati wa usajili: ${error.message}`);
+                    return;
+                }
+    
+                // Insert business profile with owner name
+                const { error: insertError } = await supabaseClient
+                    .from('business_profiles')
+                    .insert({
+                        owner_fullname: ownerFullName,
+                        business_name: businessName,
+                        phone_number: phoneNumber, // Ongeza mstari huu
+                        admin_email: adminEmail,
+                        admin_id: data.user.id
+                    });
+    
+                if (insertError) {
+                    alert(`Hitilafu wakati wa kuhifadhi maelezo ya biashara: ${insertError.message}`);
+                    return;
+                }
+    
+                // Fetch business profile to store in localStorage
+                const { data: businessProfile, error: fetchError } = await supabaseClient
+                    .from('business_profiles')
+                    .select('id')
+                    .eq('admin_id', data.user.id)
+                    .single();
+    
+                if (fetchError || !businessProfile) {
+                    alert(`Hitilafu wakati wa kupakua data ya biashara: ${fetchError ? fetchError.message : 'Hakuna data ya biashara iliyopatikana.'}`);
+                    return;
+                }
+    
+                // Redirect to msimamizi.html with the businessId
+                window.location.href = `msimamizi.html?businessId=${businessProfile.id}`;
+    
+            } catch (err) {
+                alert(`Hitilafu isiyojulikana: ${err.message}`);
+            }
+        });
+    
+       // Admin login handler - Tumeshaondoa kodi ya kuanzisha supabase hapa kuzuia error
+document.getElementById('login-admin-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Kuchukua data kutoka kwenye fomu
+    const businessNameInput = document.getElementById('admin-login-business-name').value.trim();
+    const adminEmail = document.getElementById('admin-login-email').value.trim();
+    const adminPassword = document.getElementById('admin-login-password').value;
+
+    try {
+        // 1. Kuingia kwa kutumia Email na Password (Supabase Auth)
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: adminEmail,
+            password: adminPassword,
+        });
+
+        if (error) {
+            alert(`Hitilafu: Email au Neno la siri si sahihi.`);
+            return;
+        }
+
+        // 2. Kuhakiki Jina la Biashara kwenye table ya 'business_profiles'
+        const { data: businessProfile, error: fetchError } = await supabaseClient
+            .from('business_profiles')
+            .select('id, business_name')
+            .eq('admin_id', data.user.id)
+            .eq('business_name', businessNameInput)
+            .single();
+
+        if (fetchError || !businessProfile) {
+            alert('Jina la biashara halilingani na akaunti hii. Tafadhali kagua tena.');
+            // Tunamtoa nje mtumiaji kwa usalama kwa sababu jina la biashara limekosewa
+            await supabaseClient.auth.signOut(); 
+            return;
+        }
+        
+        // 3. Kila kitu kiko sawa, mpeleke kwenye dashboard
+        window.location.href = `msimamizi.html?businessId=${businessProfile.id}`;
+
+    } catch (err) {
+        console.error('Error ya Login:', err);
+        alert(`Kuna tatizo limetokea: ${err.message}`);
+    }
+});
+
+   
+
+
+        
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
