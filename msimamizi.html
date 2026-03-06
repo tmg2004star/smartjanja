@@ -3,21 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartJanja</title>
+    <title>SmartJanja - Msimamizi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" type="image/jpg" href="smart.png">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --primary-color: #007BFF;
-            --secondary-color: #28a745;
-            --danger-color: #dc3545;
-            --background-light: #f4f7f9;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --warning-color: #f59e0b;
+            --background-light: #f8fafc;
             --card-background: #ffffff;
-            --text-dark: #333;
-            --text-muted: #6c757d;
-            --purchase-color: #ffc107;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --btn-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
         }
 
         body {
@@ -27,417 +39,181 @@
             padding: 0;
             color: var(--text-dark);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Splash Screen */
         #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--primary-color);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease-in-out;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary-gradient); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        #splash-screen h1 { font-size: 3em; margin-bottom: 5px; font-weight: 700; letter-spacing: -1px; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #splash-screen p { font-size: 1.2em; font-weight: 300; opacity: 0.9; }
 
-        #splash-screen h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+        .container { padding: 24px; max-width: 800px; margin: 0 auto; }
 
-        #splash-screen p {
-            font-size: 1.2em;
+        .network-badge {
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+            border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-bottom: 15px; width: fit-content;
         }
+        .network-online { background-color: #d1fae5; color: #059669; }
+        .network-offline { background-color: #fee2e2; color: #dc2626; }
+        .network-syncing { background-color: #fef3c7; color: #d97706; }
 
-        .container {
-            padding: 20px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .header h1, .header h2 {
-            margin: 0;
-            font-size: 1.8em;
-            font-weight: 700;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
+        .header-actions { display: flex; gap: 12px; width: 100%; }
+        .header h1 { margin: 0; font-size: 1.6em; font-weight: 700; color: var(--text-dark); width: 100%; }
         
         #capital-balance {
-            background-color: var(--primary-color);
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-top: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: var(--primary-gradient); color: #fff; padding: 24px; border-radius: 20px;
+            font-weight: 600; font-size: 1.5em; width: 100%; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+            position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px;
         }
+        #capital-balance::before { content: "Jumla ya Mtaji"; font-size: 0.55em; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+        #capital-balance::after { content: '\f51e'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 2.5em; opacity: 0.1; }
 
-        .section {
-            background-color: var(--card-background);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-        }
+        .scroll-navigator-wrapper { margin: 20px -24px 20px -24px; padding: 10px 24px; overflow: hidden; }
+        .scroll-navigator { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none; }
+        .scroll-navigator::-webkit-scrollbar { display: none; }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+        .nav-item {
+            flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100px; height: 100px; background-color: var(--card-background); border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border-light); cursor: pointer;
+            transition: all 0.2s ease; text-align: center; padding: 10px; box-sizing: border-box; color: var(--text-dark); text-decoration: none;
         }
+        .nav-item:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(37, 99, 235, 0.15); border-color: var(--primary-color); }
+        .nav-item:active { transform: scale(0.95); }
+        .nav-item i { font-size: 24px; margin-bottom: 8px; color: var(--primary-color); }
+        .nav-item.highlight { background: var(--primary-gradient); color: white; border: none; }
+        .nav-item.highlight i { color: white; }
+        .nav-item span { font-size: 0.75em; font-weight: 600; line-height: 1.2; }
 
-        .section-header h2 {
-            margin: 0;
-            font-size: 1.4em;
-            color: var(--text-dark);
-        }
+        .section { background-color: var(--card-background); padding: 24px; border-radius: 20px; box-shadow: var(--card-shadow); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.8); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 15px; }
+        .section-header h2 { margin: 0; font-size: 1.2em; font-weight: 600; color: var(--text-dark); }
 
-        .add-btn {
-            background-color: var(--secondary-color);
-            color: #fff;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .add-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
+        .accordion-btn { width: 100%; padding: 16px; background-color: #f1f5f9; color: var(--text-dark); border: 1px solid var(--border-light); border-radius: 12px; font-size: 1em; font-weight: 600; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; margin-bottom: 15px; }
+        .accordion-btn:hover { background-color: #e2e8f0; }
+        .accordion-btn.active i { transform: rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #fafbfc; border-radius: 12px; }
+        .accordion-content.show { max-height: 2000px; border: 1px solid var(--border-light); padding: 10px; margin-bottom: 15px; }
 
-        .add-sale-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--primary-color);
-            color: #fff;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.2em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .add-sale-btn:hover {
-            background-color: #0056b3;
-        }
+        .add-btn { background-color: var(--card-background); color: var(--primary-color); border: 1px solid var(--border-light); border-radius: 12px; padding: 10px 16px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .add-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-2px); box-shadow: var(--btn-shadow); }
+        .btn-danger { color: var(--danger-color); }
+        .btn-danger:hover { background-color: var(--danger-color); border-color: var(--danger-color); box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39); }
+        .back-button { background-color: #f1f5f9; padding: 10px 18px; border-radius: 12px; font-weight: 500; color: var(--text-dark); border: none; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .back-button:hover { background-color: #e2e8f0; }
         
-        .main-menu {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            background-color: var(--card-background);
-            padding: 10px;
-            border-radius: 15px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .menu-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background-color: var(--background-light);
-            color: var(--text-dark);
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .menu-btn.active {
-            background-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+        ul.item-list, ul#capital-list { list-style: none; padding: 0; margin: 0; }
+        .list-item { background-color: #fff; padding: 16px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-light); transition: all 0.2s ease; }
+        .list-item:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .list-item.clickable-capital:active, .list-item.date-item:active { transform: scale(0.98); background-color: var(--background-light); }
+        .list-item.clickable-capital, .list-item.date-item { cursor: pointer; }
+        .item-info { font-size: 0.95em; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
+        .item-info strong { color: var(--text-dark); font-size: 1.1em; font-weight: 600; }
+        .item-profit { font-weight: 600; color: var(--secondary-color); background: #d1fae5; padding: 2px 8px; border-radius: 6px; font-size: 0.9em; }
+        .item-expense { font-weight: 600; color: var(--danger-color); background: #fee2e2; padding: 2px 8px; border-radius: 6px; font-size: 0.9em; }
+        .item-debt { font-weight: 600; color: var(--warning-color); background: #fef3c7; padding: 2px 8px; border-radius: 6px; font-size: 0.9em; }
         
-        .list-item {
-            background-color: #f9f9fc;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s;
-        }
+        .checkbox-container { background: #fffdf2; padding: 15px; border-radius: 12px; border: 1px solid #fde68a; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .checkbox-container input { width: 22px; height: 22px; margin: 0; accent-color: var(--warning-color); cursor: pointer; }
+        .checkbox-container span { font-weight: 600; color: #d97706; font-size: 1.05em; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: flex-end; }
+        .modal-content { background-color: var(--card-background); padding: 30px 24px 40px; border-top-left-radius: 24px; border-top-right-radius: 24px; width: 100%; max-width: 500px; box-sizing: border-box; text-align: left; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-content::before { content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; background-color: #cbd5e1; border-radius: 10px; }
+        @keyframes slideInUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-content h2, .modal-content h3 { margin-top: 10px; margin-bottom: 24px; color: var(--text-dark); font-weight: 700; text-align: center; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border-light); background-color: #f8fafc; border-radius: 12px; box-sizing: border-box; font-size: 1em; font-family: inherit; color: var(--text-dark); transition: all 0.2s ease; }
+        .modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus { outline: none; border-color: var(--primary-color); background-color: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .modal-content input[readonly] { background-color: #e2e8f0; color: var(--text-muted); cursor: not-allowed; }
+        .modal-content label { display: block; margin-bottom: 8px; font-size: 0.9em; font-weight: 500; color: var(--text-dark); }
+        .modal-content .btn-modal { width: 100%; background: var(--primary-gradient); color: #fff; border: none; padding: 16px; border-radius: 14px; cursor: pointer; font-size: 1.1em; font-weight: 600; margin-top: 10px; box-shadow: var(--btn-shadow); transition: transform 0.2s ease; }
+        .modal-content .btn-modal:active { transform: scale(0.98); }
+        .modal-content .close-btn { position: absolute; top: 20px; right: 24px; font-size: 28px; font-weight: 400; cursor: pointer; color: var(--text-muted); line-height: 1; }
+        .modal-content .close-btn:hover { color: var(--danger-color); }
+        .alert-message { color: var(--danger-color); font-size: 0.85em; margin-top: -10px; margin-bottom: 15px; background: #fee2e2; padding: 8px 12px; border-radius: 8px; }
+        .profit-info { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.95em; color: #166534; }
+        .profit-info p { margin: 5px 0; display: flex; justify-content: space-between; }
+        .profit-info span { font-weight: 700; }
         
-        .list-item.clickable-capital:active, .list-item.date-item:active {
-            transform: scale(0.98);
-        }
-
-        .list-item.clickable-capital {
-            cursor: pointer;
-        }
-        .list-item.date-item {
-            cursor: pointer;
-        }
-
-        .item-info {
-            font-size: 1em;
-            color: var(--text-dark);
-        }
-
-        .item-profit {
-            font-weight: 600;
-            color: var(--secondary-color);
-        }
-
-        .item-expense {
-            font-weight: 600;
-            color: var(--danger-color);
-        }
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-btn { background-color: #f1f5f9; border: none; font-size: 18px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; color: var(--text-muted); display: flex; justify-content: center; align-items: center; transition: background 0.2s; }
+        .dropdown-btn:hover { background-color: #e2e8f0; color: var(--text-dark); }
+        .dropdown-content { display: none; position: absolute; background-color: var(--card-background); min-width: 140px; box-shadow: 0px 10px 25px rgba(0,0,0,0.1); z-index: 10; right: 0; top: 40px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-light); animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .dropdown-content button { color: var(--text-dark); padding: 14px 16px; text-decoration: none; display: block; background-color: transparent; border: none; width: 100%; text-align: left; cursor: pointer; font-size: 0.95em; font-family: inherit; }
+        .dropdown-content button:hover { background-color: #f8fafc; color: var(--primary-color); }
+        .dropdown-content button:last-child:hover { color: var(--danger-color); }
         
-        .total-row {
-            font-weight: bold;
-            background-color: #eaf4ff;
-        }
+        .hidden { display: none !important; }
+        .capital-item-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .capital-clickable-area { flex-grow: 1; padding: 5px 0; }
         
-        /* Mitindo ya Pop-up (Modal) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            justify-content: center;
-            align-items: flex-end;
-        }
+        .sales-table, .expenses-table, .purchase-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; background-color: var(--card-background); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-light); }
+        .sales-table th, .sales-table td, .expenses-table th, .expenses-table td, .purchase-table th, .purchase-table td { padding: 14px 16px; text-align: left; font-size: 0.9em; border-bottom: 1px solid var(--border-light); }
+        .sales-table th, .expenses-table th, .purchase-table th { background-color: #f8fafc; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.8em; letter-spacing: 0.5px; }
+        .sales-table tr:last-child td, .expenses-table tr:last-child td, .purchase-table tr:last-child td { border-bottom: none; }
+        .sales-table tr:hover, .expenses-table tr:hover, .purchase-table tr:hover { background-color: #f8fafc; }
+        .total-row { font-weight: 700; background-color: #eff6ff !important; }
+        .total-amount { color: var(--primary-color); font-size: 1.1em; }
+        h4 { color: var(--text-dark); margin-top: 0; font-size: 1.1em; }
 
-        .modal-content {
-            background-color: #fefefe;
-            padding: 25px;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            animation: slideInUp 0.3s ease-out;
-            position: relative; /* Kurekebisha kwa ajili ya X */
-        }
-        @keyframes slideInUp {
-            from {
-                transform: translateY(100%);
-            }
-            to {
-                transform: translateY(0);
-            }
-        }
+        .format-btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .format-btn { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border-light); background: #f1f5f9; cursor: pointer; font-weight: 600; color: var(--text-dark); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .format-btn i { font-size: 20px; }
+        .format-btn:hover { background: #e2e8f0; border-color: var(--primary-color); }
+        .format-btn.pdf-btn { color: #dc2626; }
+        .format-btn.excel-btn { color: #16a34a; }
+        .format-btn.doc-btn { color: #2563eb; }
 
-        .modal-content h3 {
-            margin-top: 0;
-            color: var(--text-dark);
-            font-weight: 600;
-        }
-
-        .modal-content input, .modal-content select, .modal-content textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1em;
-        }
-        .modal-content input[readonly] {
-            background-color: #e9ecef;
-        }
-
-        .modal-content .btn-modal {
-            width: 100%;
-            background-color: var(--primary-color);
-            color: #fff;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-        }
-
-        .modal-content .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-        .modal-content .close-btn.red {
-            color: var(--danger-color);
-        }
-
-        .alert-message {
-            color: var(--danger-color);
-            font-size: 0.9em;
-            margin-top: -10px;
-            margin-bottom: 10px;
-            text-align: left;
-        }
-        .profit-info {
-            font-size: 1em;
-            text-align: left;
-            margin-bottom: 15px;
-        }
-        .profit-info p {
-            margin: 5px 0;
-        }
-
-        /* Mitindo ya Menyu ya Vidoti Vitatu */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-btn {
-            background-color: transparent;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-muted);
-            padding: 0 8px;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: var(--card-background);
-            min-width: 150px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 10;
-            right: 0;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .dropdown-content button {
-            color: var(--text-dark);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            background-color: transparent;
-            border: none;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .dropdown-content button:hover {
-            background-color: #f1f1f1;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .back-button {
-            background-color: #ccc;
-            padding: 10px 15px;
-            border-radius: 25px;
-            font-weight: 600;
-            color: var(--text-dark);
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .capital-item-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-        .capital-clickable-area {
-            flex-grow: 1;
-            padding: 10px 0;
-        }
-        .capital-item-info span {
-            display: block;
-            font-size: 0.9em;
-        }
-        
-        .sales-table, .expenses-table, .purchase-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            background-color: var(--card-background);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-        .sales-table th, .sales-table td, .expenses-table th, .expenses-table td, .purchase-table th, .purchase-table td {
-            border: 1px solid #eee;
-            padding: 12px;
-            text-align: left;
-            font-size: 0.9em;
-        }
-        .sales-table th, .expenses-table th, .purchase-table th {
-            background-color: #f8f9fa;
-            color: var(--text-dark);
-            font-weight: 600;
-        }
-        .sales-table tr:nth-child(even), .expenses-table tr:nth-child(even), .purchase-table tr:nth-child(even) {
-            background-color: #fbfbfc;
-        }
-        .sales-table tr:hover, .expenses-table tr:hover, .purchase-table tr:hover {
-            background-color: #eaf4ff;
-        }
-        .total-row {
-            font-weight: bold;
-            background-color: #eaf4ff;
-        }
+        .custom-date-fields { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary-color); display: none; }
+        .custom-date-fields label { font-size: 0.85em; color: var(--text-muted); margin-bottom: 5px;}
+        .custom-date-fields input { padding: 10px; font-size: 0.9em; margin-bottom: 10px;}
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
-        <h1>Biashara Yangu</h1>
-        <p>SmartJanja</p>
+        <h1>SmartJanja</h1>
+        <p>Meneja wa Biashara Yako</p>
     </div>
 
     <div id="main-content" class="hidden">
         <div id="capital-page" class="container">
+            <div id="networkStatus" class="network-badge network-online">
+                <i class="fa-solid fa-wifi"></i> Mtandaoni
+            </div>
+
             <div class="header">
-                <div>
+                <h1>Karibu, Msimamizi 👋</h1>
+                <div class="header-actions">
                     <button id="addCapitalBtn" class="add-btn">
-                        <i class="fa-solid fa-plus"></i> Weka Mtaji
+                        <i class="fa-solid fa-plus"></i> Mtaji
                     </button>
-                    <button id="logoutBtn" class="add-btn" style="background-color: var(--danger-color); margin-left: 10px;">
+                    <button id="logoutBtn" class="add-btn btn-danger">
                         <i class="fa-solid fa-right-from-bracket"></i> Toka
                     </button>
                 </div>
             </div>
             <div class="section">
-                <h2>Historia ya Mitaji</h2>
+                <div class="section-header">
+                    <h2>Historia ya Biashara/Mitaji</h2>
+                </div>
                 <ul id="capital-list">
                 </ul>
             </div>
         </div>
 
         <div id="business-page" class="hidden container">
+            <div id="networkStatusBiz" class="network-badge network-online">
+                <i class="fa-solid fa-wifi"></i> Mtandaoni
+            </div>
+
             <div class="header">
                 <button id="backToCapitalBtn" class="back-button"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
                 <h1 id="business-title"></h1>
@@ -445,163 +221,165 @@
                     Mtaji: TZS 0
                 </div>
             </div>
-        
-            <div class="main-menu">
-                <button id="salesBtn" class="menu-btn active"><i class="fa-solid fa-chart-line"></i> Mauzo</button>
-                <button id="stockBtn" class="menu-btn"><i class="fa-solid fa-boxes-stacked"></i> Stoo</button>
+
+            <div class="scroll-navigator-wrapper">
+                <div class="scroll-navigator">
+                    <div class="nav-item highlight" onclick="addSale()">
+                        <i class="fa-solid fa-cart-arrow-down"></i>
+                        <span>Weka Mauzo</span>
+                    </div>
+                    <div class="nav-item" onclick="addProduct()">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Ingiza Mzigo</span>
+                    </div>
+                    <div class="nav-item" onclick="scrollToElement('debt-section')" style="border-color: #fcd34d;">
+                        <i class="fa-solid fa-hand-holding-dollar" style="color: #d97706;"></i>
+                        <span style="color: #d97706;">Madeni</span>
+                    </div>
+                    <div class="nav-item" onclick="addDailyExpense()">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                        <span>Matumizi Siku</span>
+                    </div>
+                    <div class="nav-item" onclick="addCapitalExpense()">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Matumizi Mtaji</span>
+                    </div>
+                    <div class="nav-item" onclick="renderPurchaseHistory()">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>Kumbukumbu</span>
+                    </div>
+                    <div class="nav-item" onclick="openReportModal()" style="border-color: #3b82f6; background: #eff6ff;">
+                        <i class="fa-solid fa-file-invoice" style="color: #2563eb;"></i>
+                        <span style="color: #2563eb;">Toa Ripoti</span>
+                    </div>
+                </div>
             </div>
         
             <div id="sales-system-content">
-                <div class="section">
-                    <div class="section-header">
-                        <h2>Bidhaa</h2>
-                        <button id="addProductBtn" class="add-btn"><i class="fa-solid fa-plus"></i> Ongeza</button>
-                    </div>
-                    <ul id="product-list" class="item-list">
-                        </ul>
-                </div>
-                <div class="section">
-                    <button id="addSaleBtn" class="add-sale-btn"><i class="fa-solid fa-cart-shopping"></i> Weka Mauzo Yako</button>
-                </div>
                 
                 <div class="section">
-                    <button id="showPurchaseHistoryBtn" class="add-sale-btn">
-                        <i class="fa-solid fa-history"></i> Kumbukumbu ya Ununuzi
+                    <div class="section-header" style="margin-bottom: 5px; border-bottom: none; padding-bottom: 0;">
+                        <h2>Usimamizi wa Stoo</h2>
+                    </div>
+                    
+                    <button class="accordion-btn" id="toggleProductsBtn">
+                        <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-color);"></i> Tazama Orodha ya Bidhaa</span>
+                        <i class="fa-solid fa-chevron-down"></i>
                     </button>
+                    
+                    <div class="accordion-content" id="productsAccordion">
+                        <ul id="product-list" class="item-list"></ul>
+                        <button onclick="addProduct()" class="add-btn" style="width: 100%; justify-content: center; margin-top: 10px; background-color: #eff6ff; border-color: #bfdbfe;">
+                            <i class="fa-solid fa-plus"></i> Ingiza Bidhaa Mpya
+                        </button>
+                    </div>
                 </div>
 
                 <div class="section">
                     <div class="section-header">
-                        <h2>Matumizi ya Mtaji</h2>
-                        <button id="addCapitalExpenseBtn" class="add-btn"><i class="fa-solid fa-plus"></i> Ongeza</button>
+                        <h2>Ripoti ya Mauzo (Taslimu)</h2>
+                        <button id="backToSalesDatesBtn" class="back-button" style="display: none;"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
+                    </div>
+                    <ul id="sales-date-list" class="item-list"></ul>
+                    <div id="daily-sales-detail" style="display: none;">
+                        <h4 id="daily-sales-title"></h4>
+                        <div style="overflow-x: auto;">
+                            <table class="sales-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bidhaa</th>
+                                        <th>Idadi</th>
+                                        <th>Jumla</th>
+                                        <th>Faida</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="daily-sales-table-body"></tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td colspan="2" class="total-label">Jumla ya Siku:</td>
+                                        <td id="daily-sales-total" class="total-amount">TZS 0</td>
+                                        <td id="daily-profit-total" class="item-profit">TZS 0</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <button onclick="goBackToDateList()" class="back-button" style="margin-top: 20px;">Rudi Kwenye Tarehe</button>
+                    </div>
+                </div>
+
+                <div class="section" id="debt-section" style="border: 2px solid #fde68a; background: #fffdf2;">
+                    <div class="section-header" style="border-bottom: 1px solid #fcd34d;">
+                        <h2 style="color: #d97706;"><i class="fa-solid fa-book-open"></i> Madeni ya Wateja</h2>
+                    </div>
+                    <div style="background: #fee2e2; color: #dc2626; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; font-size: 1.1em; display: flex; justify-content: space-between; border: 1px solid #fca5a5;">
+                        <span>Jumla Unayodaiwa:</span>
+                        <span id="total-debts-amount">TZS 0</span>
+                    </div>
+                    <ul id="debts-list" class="item-list"></ul>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h2>Matumizi ya Kila Siku (Kwenye Faida)</h2>
+                    </div>
+                    <ul id="daily-expense-date-list" class="item-list"></ul>
+                    <div id="daily-expenses-detail" style="display: none;">
+                        <h4 id="daily-expenses-title"></h4>
+                        <div style="overflow-x: auto;">
+                            <table class="expenses-table">
+                                <thead>
+                                    <tr>
+                                        <th>Matumizi</th>
+                                        <th>Kiasi</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="daily-expenses-table-body"></tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td colspan="1" class="total-label">Jumla ya Siku:</td>
+                                        <td id="daily-expenses-total" class="item-expense">TZS 0</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <button onclick="goBackToDailyExpenseDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h2>Matumizi Kwenye Mtaji Halisi</h2>
                     </div>
                     <ul id="capital-expense-date-list" class="item-list"></ul>
                     <div id="daily-capital-expenses-detail" style="display: none;">
                         <h4 id="daily-capital-expenses-title"></h4>
-                        <table class="expenses-table">
-                            <thead>
-                                <tr>
-                                    <th>Matumizi</th>
-                                    <th>Kiasi</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="daily-capital-expenses-table-body"></tbody>
-                            <tfoot>
-                                <tr class="total-row">
-                                    <td colspan="1" class="total-label">Jumla ya Siku:</td>
-                                    <td id="daily-capital-expenses-total" class="total-amount">TZS 0</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        <div style="overflow-x: auto;">
+                            <table class="expenses-table">
+                                <thead>
+                                    <tr>
+                                        <th>Matumizi</th>
+                                        <th>Kiasi</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="daily-capital-expenses-table-body"></tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td colspan="1" class="total-label">Jumla ya Siku:</td>
+                                        <td id="daily-capital-expenses-total" class="total-amount">TZS 0</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                         <button onclick="goBackToCapitalExpenseDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
                     </div>
                 </div>
-                <div class="section">
-                    <div class="section-header">
-                        <h2>Orodha ya Mauzo (Tarehe)</h2>
-                        <button id="backToSalesDatesBtn" class="back-button" style="display: none;"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
-                    </div>
-                    <ul id="sales-date-list" class="item-list">
-                        </ul>
-                    <div id="daily-sales-detail" style="display: none;">
-                        <h4 id="daily-sales-title"></h4>
-                        <table class="sales-table">
-                            <thead>
-                                <tr>
-                                    <th>Bidhaa</th>
-                                    <th>Idadi</th>
-                                    <th>Jumla ya Mauzo</th>
-                                    <th>Faida</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="daily-sales-table-body">
-                                </tbody>
-                            <tfoot>
-                                <tr class="total-row">
-                                    <td colspan="2" class="total-label">Jumla ya Siku:</td>
-                                    <td id="daily-sales-total" class="total-amount">TZS 0</td>
-                                    <td id="daily-profit-total" class="total-amount">TZS 0</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        <button onclick="goBackToDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
-                    </div>
-                </div>
-                <div class="section">
-                    <div class="section-header">
-                        <h2>Matumizi ya Kila Siku</h2>
-                        <button id="addDailyExpenseBtn" class="add-btn"><i class="fa-solid fa-plus"></i> Ongeza</button>
-                    </div>
-                    <ul id="daily-expense-date-list" class="item-list">
-                        </ul>
-                    <div id="daily-expenses-detail" style="display: none;">
-                        <h4 id="daily-expenses-title"></h4>
-                        <table class="expenses-table">
-                            <thead>
-                                <tr>
-                                    <th>Matumizi</th>
-                                    <th>Kiasi</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="daily-expenses-table-body">
-                                </tbody>
-                            <tfoot>
-                                <tr class="total-row">
-                                    <td colspan="1" class="total-label">Jumla ya Siku:</td>
-                                    <td id="daily-expenses-total" class="total-amount">TZS 0</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        <button onclick="goBackToDailyExpenseDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
-                    </div>
-                </div>
-            </div>
-        
-            <div id="stock-system-content" class="hidden">
-                <div class="section">
-                    <h2>Usimamizi wa Stoo</h2>
-                    <button id="addStockCountBtn" class="add-sale-btn"><i class="fa-solid fa-boxes-stacked"></i> Weka Hesabu ya Stoo</button>
-                </div>
-                <div class="section">
-                    <div class="section-header">
-                        <h2>Ripoti za Hesabu ya Stoo</h2>
-                    </div>
-                    <ul id="stock-count-date-list" class="item-list">
-                        </ul>
-                    <div id="daily-stock-count-detail" style="display: none;">
-                        <h4 id="daily-stock-count-title"></h4>
-                        <table class="sales-table">
-                            <thead>
-                                <tr>
-                                    <th>Bidhaa</th>
-                                    <th>Idadi Iliyobaki</th>
-                                    <th>Bidhaa Zilizouzwa</th>
-                                    <th>Jumla ya Mauzo</th>
-                                    <th>Faida</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="daily-stock-count-table-body">
-                                </tbody>
-                            <tfoot>
-                                <tr class="total-row">
-                                    <td colspan="2" class="total-label">Jumla ya Siku:</td>
-                                    <td id="daily-stock-count-sold-total">0</td>
-                                    <td id="daily-stock-count-sales-total">TZS 0</td>
-                                    <td id="daily-stock-count-profit-total">TZS 0</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        <button onclick="goBackToStockCountDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
@@ -612,10 +390,10 @@
             <h2 id="capitalModalTitle">Weka Mtaji Mpya</h2>
             <div id="addCapitalForm">
                 <input type="hidden" id="capitalIndex">
-                <input type="text" id="capitalName" placeholder="Jina la Mtaji (Mfano: Biashara ya Viatu)" required>
-                <input type="number" id="capitalAmount" placeholder="Kiasi (TZS)" required>
-                <textarea id="capitalDescription" placeholder="Maelezo (hiari)" rows="3"></textarea>
-                <button id="saveCapitalBtn" class="btn-modal">Hifadhi</button>
+                <input type="text" id="capitalName" placeholder="Jina la Biashara (Mfano: Duka la Nguo)" required>
+                <input type="number" id="capitalAmount" placeholder="Kiasi cha Mtaji (TZS)" required>
+                <textarea id="capitalDescription" placeholder="Maelezo mafupi (hiari)" rows="3"></textarea>
+                <button id="saveCapitalBtn" class="btn-modal">Hifadhi Mtaji</button>
             </div>
         </div>
     </div>
@@ -623,15 +401,20 @@
     <div id="addProductModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeProductModal">&times;</span>
-            <h3 id="productModalTitle">Ongeza Bidhaa Mpya</h3>
+            <h3 id="productModalTitle">Sajili Bidhaa Mpya</h3>
             <input type="hidden" id="productIndex">
-            <input type="text" id="productName" placeholder="Jina la Bidhaa" required>
-            <input type="number" id="costPriceTotal" placeholder="Bei ya Kununulia (Jumla)" required>
-            <input type="number" id="productQuantity" placeholder="Idadi (Vingapi?)" required>
-            <input type="number" id="costPriceRetail" placeholder="Bei ya Kununulia (Rejareja)" required readonly>
-            <input type="number" id="sellingPriceRetail" placeholder="Bei ya Kuuzia (Rejareja)" required>
+            <label>Jina la Bidhaa</label>
+            <input type="text" id="productName" placeholder="Mfano: Simu aina ya Samsung" required>
+            <label>Jumla ya Bei Uliyonunulia (Mzigo wote)</label>
+            <input type="number" id="costPriceTotal" placeholder="TZS" required>
+            <label>Idadi ya Bidhaa (Pcs)</label>
+            <input type="number" id="productQuantity" placeholder="Ziko ngapi?" required>
+            <label>Bei ya Kununulia (Kwa Moja) - Inajipiga</label>
+            <input type="number" id="costPriceRetail" placeholder="TZS" required readonly>
+            <label>Bei ya Kuuzia (Kwa Moja)</label>
+            <input type="number" id="sellingPriceRetail" placeholder="TZS" required>
             <div class="profit-info">
-                <p>Faida ya Jumla: <span id="projectedProfitTotal">TZS 0</span></p>
+                <p>Faida ya Jumla (Mzigo ukiisha): <span id="projectedProfitTotal">TZS 0</span></p>
                 <p>Faida kwa Bidhaa Moja: <span id="projectedProfitRetail">TZS 0</span></p>
             </div>
             <button id="saveProductBtn" class="btn-modal">Hifadhi Bidhaa</button>
@@ -641,48 +424,51 @@
     <div id="addSaleModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeSaleModal">&times;</span>
-            <h3 id="saleModalTitle">Weka Mauzo</h3>
+            <h3 id="saleModalTitle">Weka Mauzo Mpya</h3>
             <input type="hidden" id="saleIndex">
-            <input type="date" id="saleDate" placeholder="weka tarehe" required>
-            <div class="input-group">
-                <label for="saleProductName">Chagua Bidhaa Iliyouzwa</label>
-                <select id="saleProductName" required>
-                    <option value="">-- Chagua Bidhaa --</option>
-                </select>
+            <label>Tarehe ya Mauzo</label>
+            <input type="date" id="saleDate" required>
+            <label>Chagua Bidhaa Iliyouzwa</label>
+            <select id="saleProductName" required>
+                <option value="">-- Chagua Bidhaa --</option>
+            </select>
+            <label>Idadi Iliyouzwa</label>
+            <input type="number" id="saleQuantity" placeholder="Mfano: 2" required>
+            <p class="alert-message" id="quantityAlert" style="display: none;"><i class="fa-solid fa-circle-exclamation"></i> Idadi uliyoweka inazidi stoo.</p>
+            
+            <div id="debtToggleContainer">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="isDebtCheck">
+                    <span>Hili ni Deni (Mteja Anakopa)</span>
+                </label>
             </div>
-            <input type="number" id="saleQuantity" placeholder="Idadi Iliyouzwa" required>
-            <p class="alert-message" id="quantityAlert" style="display: none;">Idadi uliyoweka inazidi stoo.</p>
-            <hr style="border: 0; height: 1px; background: #ddd; margin: 15px 0;">
-            <input type="number" id="actualSalePrice" placeholder="Bei Halisi Uliyouza (Hiari)">
-            <button id="saveSaleBtn" class="btn-modal">Hifadhi Mauzo</button>
-        </div>
-    </div>
+            
+            <div id="debtCustomerNameDiv" style="display: none; background: #fffdf2; padding: 15px; border-radius: 12px; border-left: 4px solid #f59e0b; margin-bottom: 15px;">
+                <label style="color: #d97706; font-weight: bold; margin-bottom: 5px;">Andika Jina la Mteja / Namba yake</label>
+                <input type="text" id="debtCustomerName" placeholder="Mfano: Juma - 07123..." style="margin-bottom: 0; background: white;">
+            </div>
 
-    <div id="addStockCountModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeStockCountModal">&times;</span>
-            <h3>Weka Idadi Iliyobaki</h3>
-            <input type="date" id="stockCountDate" required>
-            <div class="input-group">
-                <label for="stockProductName">Chagua Bidhaa</label>
-                <select id="stockProductName" required>
-                    <option value="">-- Chagua Bidhaa --</option>
-                </select>
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid var(--primary-color);">
+                <label style="margin-bottom: 5px;">Bei Halisi Uliyouza (Hiari)</label>
+                <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">Jaza hapa tu kama umemuuzia mteja kwa bei ya punguzo au tofauti na bei uliyopanga.</p>
+                <input type="number" id="actualSalePrice" placeholder="TZS" style="margin-bottom: 0;">
             </div>
-            <input type="number" id="remainingQuantity" placeholder="Idadi Iliyobaki" required>
-            <p class="alert-message" id="remainingQuantityAlert" style="display: none;">Idadi uliyoweka inazidi stoo.</p>
-            <button id="saveStockCountBtn" class="btn-modal">Hifadhi Hesabu</button>
+            
+            <button id="saveSaleBtn" class="btn-modal">Hifadhi</button>
         </div>
     </div>
 
     <div id="addDailyExpenseModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeDailyExpenseModal">&times;</span>
-            <h3 id="dailyExpenseModalTitle">Ongeza Matumizi ya Kila Siku</h3>
+            <h3 id="dailyExpenseModalTitle">Matumizi ya Kila Siku</h3>
             <input type="hidden" id="dailyExpenseIndex">
+            <label>Tarehe</label>
             <input type="date" id="dailyExpenseDate" required>
-            <input type="text" id="dailyExpenseName" placeholder="Aina ya Matumizi (Mfano: Chakula)" required>
-            <input type="number" id="dailyExpenseAmount" placeholder="Kiasi cha Pesa" required>
+            <label>Aina ya Matumizi</label>
+            <input type="text" id="dailyExpenseName" placeholder="Mfano: Nauli, Chakula, n.k" required>
+            <label>Kiasi</label>
+            <input type="number" id="dailyExpenseAmount" placeholder="TZS" required>
             <button id="saveDailyExpenseBtn" class="btn-modal">Hifadhi Matumizi</button>
         </div>
     </div>
@@ -690,70 +476,132 @@
     <div id="addCapitalExpenseModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeCapitalExpenseModal">&times;</span>
-            <h3 id="capitalExpenseModalTitle">Ongeza Matumizi ya Mtaji</h3>
+            <h3 id="capitalExpenseModalTitle">Matumizi ya Mtaji</h3>
             <input type="hidden" id="capitalExpenseIndex">
+            <label>Tarehe</label>
             <input type="date" id="capitalExpenseDate" required>
-            <input type="text" id="capitalExpenseName" placeholder="Aina ya Matumizi (Mfano: Usafiri)" required>
-            <input type="number" id="capitalExpenseAmount" placeholder="Kiasi cha Pesa" required>
-            <p class="alert-message" id="capitalExpenseAlert" style="display: none;">Kiasi ulichoweka kinazidi mtaji ulionao.</p>
+            <label>Maelezo ya Matumizi</label>
+            <input type="text" id="capitalExpenseName" placeholder="Mfano: Kodi ya Fremu" required>
+            <label>Kiasi kilichotumika</label>
+            <input type="number" id="capitalExpenseAmount" placeholder="TZS" required>
+            <p class="alert-message" id="capitalExpenseAlert" style="display: none;"><i class="fa-solid fa-circle-exclamation"></i> Kiasi ulichoweka kinazidi mtaji ulionao.</p>
             <button id="saveCapitalExpenseBtn" class="btn-modal">Hifadhi Matumizi</button>
         </div>
     </div>
 
     <div id="purchaseHistoryModal" class="modal">
         <div class="modal-content">
-            <span class="close-btn red" id="closePurchaseHistoryModal">&times;</span>
-            <h3>Kumbukumbu ya Ununuzi</h3>
-            <table class="purchase-table">
-                <thead>
-                    <tr>
-                        <th>Tarehe</th>
-                        <th>Bidhaa</th>
-                        <th>Idadi</th>
-                        <th>Kiasi</th>
-                    </tr>
-                </thead>
-                <tbody id="purchaseHistoryTableBody">
-                </tbody>
-            </table>
+            <span class="close-btn" id="closePurchaseHistoryModal">&times;</span>
+            <h3>Kumbukumbu ya Ununuzi wa Mzigo</h3>
+            <div style="overflow-x: auto;">
+                <table class="purchase-table">
+                    <thead>
+                        <tr>
+                            <th>Tarehe</th>
+                            <th>Bidhaa</th>
+                            <th>Idadi</th>
+                            <th>Gharama</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseHistoryTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeReportModal">&times;</span>
+            <h3 style="color: var(--primary-color);"><i class="fa-solid fa-file-invoice"></i> Tengeneza Ripoti</h3>
+            <p style="text-align:center; font-size:0.9em; color:var(--text-muted); margin-bottom: 20px;">Ripoti itaonyesha mchanganuo wa kila bidhaa, madeni, na faida kamili (Faida - Matumizi).</p>
+            
+            <label>Chagua Muda wa Ripoti</label>
+            <select id="reportTimeframe" onchange="toggleCustomDates()">
+                <option value="siku">Siku ya Leo</option>
+                <option value="wiki">Wiki Hii</option>
+                <option value="mwezi">Mwezi Huu</option>
+                <option value="mwaka">Mwaka Huu</option>
+                <option value="custom">Chagua Tarehe (Custom)</option>
+            </select>
+            
+            <div id="customDateDiv" class="custom-date-fields">
+                <label>Kuanzia Tarehe:</label>
+                <input type="date" id="startDateFilter">
+                <label>Mpaka Tarehe:</label>
+                <input type="date" id="endDateFilter">
+            </div>
+            
+            <label style="margin-top: 15px;">Chagua Aina ya Faili (Format) Kisha Pakua:</label>
+            <div class="format-btn-group">
+                <button class="format-btn pdf-btn" onclick="generateReport('pdf')">
+                    <i class="fa-solid fa-file-pdf"></i> PDF
+                </button>
+                <button class="format-btn excel-btn" onclick="generateReport('excel')">
+                    <i class="fa-solid fa-file-excel"></i> Excel
+                </button>
+                <button class="format-btn doc-btn" onclick="generateReport('doc')">
+                    <i class="fa-solid fa-file-word"></i> Word
+                </button>
+            </div>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; // <--- BADILISHA HAPA NA URL YAKO HALISI
+        const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M'
        
-        const supabaseClient = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_ANON_KEY
-          );
-        
-                console.log("Supabase client:", supabaseClient);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-       // Function to get the business ID from the URL query parameter
-function getBusinessIdFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('businessId');
-}
+        function getBusinessIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('businessId');
+        }
 
-let currentBusinessId = getBusinessIdFromUrl();
+        // Helper kwa kusogeza screen
+        function scrollToElement(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
-// If business ID is missing, redirect to the login/registration page
-if (!currentBusinessId) {
-    window.location.href = 'indexa.html'; 
-}
+        // Kuficha/Kuonyesha fomu ya jina la mkopaji
+        document.getElementById('isDebtCheck').addEventListener('change', function() {
+            document.getElementById('debtCustomerNameDiv').style.display = this.checked ? 'block' : 'none';
+        });
 
-        // DATA
-        let capitalSystems = []; // This will hold all capital systems (businesses)
-        let currentBusinessIndex = null; // Index of the currently selected business
+        // Network Status
+        function updateNetworkStatusUI() {
+            const badges = [document.getElementById('networkStatus'), document.getElementById('networkStatusBiz')];
+            const isOnline = navigator.onLine;
+            
+            badges.forEach(badge => {
+                if(badge){
+                    if (isOnline) {
+                        badge.className = 'network-badge network-online';
+                        badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Mtandaoni';
+                    } else {
+                        badge.className = 'network-badge network-offline';
+                        badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Nje ya Mtandao (Offline)';
+                    }
+                }
+            });
+            
+            if (isOnline && localStorage.getItem('sj_pending_sync') === 'true') {
+                syncDataToSupabase();
+            }
+        }
+
+        window.addEventListener('online', updateNetworkStatusUI);
+        window.addEventListener('offline', updateNetworkStatusUI);
+
+        let currentBusinessId = getBusinessIdFromUrl();
+
+        let capitalSystems = [];
+        let currentBusinessIndex = null;
         let saleBeingEdited = null;
         let dailyExpenseBeingEdited = null;
         let capitalExpenseBeingEdited = null;
-        let stockCountBeingEdited = null;
 
-        // DOM ELEMENTS
         const splashScreen = document.getElementById('splash-screen');
         const mainContent = document.getElementById('main-content');
         const capitalPage = document.getElementById('capital-page');
@@ -772,33 +620,27 @@ if (!currentBusinessId) {
         const backToCapitalBtn = document.getElementById('backToCapitalBtn');
         const businessTitle = document.getElementById('business-title');
         const capitalBalanceSpan = document.getElementById('capital-balance');
-        const salesBtn = document.getElementById('salesBtn');
-        const stockBtn = document.getElementById('stockBtn');
-        const salesSystemContent = document.getElementById('sales-system-content');
-        const stockSystemContent = document.getElementById('stock-system-content');
-        const addProductBtn = document.getElementById('addProductBtn');
-        const addSaleBtn = document.getElementById('addSaleBtn');
-        const addDailyExpenseBtn = document.getElementById('addDailyExpenseBtn');
-        const addCapitalExpenseBtn = document.getElementById('addCapitalExpenseBtn');
-        const addStockCountBtn = document.getElementById('addStockCountBtn');
-        const showPurchaseHistoryBtn = document.getElementById('showPurchaseHistoryBtn');
+        
+        // Accordion Element
+        const toggleProductsBtn = document.getElementById('toggleProductsBtn');
+        const productsAccordion = document.getElementById('productsAccordion');
+
         const addProductModal = document.getElementById('addProductModal');
         const addSaleModal = document.getElementById('addSaleModal');
         const addDailyExpenseModal = document.getElementById('addDailyExpenseModal');
         const addCapitalExpenseModal = document.getElementById('addCapitalExpenseModal');
-        const addStockCountModal = document.getElementById('addStockCountModal');
         const purchaseHistoryModal = document.getElementById('purchaseHistoryModal');
+        const reportModal = document.getElementById('reportModal'); 
         const closeProductModal = document.getElementById('closeProductModal');
         const closeSaleModal = document.getElementById('closeSaleModal');
         const closeDailyExpenseModal = document.getElementById('closeDailyExpenseModal');
         const closeCapitalExpenseModal = document.getElementById('closeCapitalExpenseModal');
-        const closeStockCountModal = document.getElementById('closeStockCountModal');
         const closePurchaseHistoryModal = document.getElementById('closePurchaseHistoryModal');
+        const closeReportModal = document.getElementById('closeReportModal');
         const saveProductBtn = document.getElementById('saveProductBtn');
         const saveSaleBtn = document.getElementById('saveSaleBtn');
         const saveDailyExpenseBtn = document.getElementById('saveDailyExpenseBtn');
         const saveCapitalExpenseBtn = document.getElementById('saveCapitalExpenseBtn');
-        const saveStockCountBtn = document.getElementById('saveStockCountBtn');
         const costPriceTotalInput = document.getElementById('costPriceTotal');
         const costPriceRetailInput = document.getElementById('costPriceRetail');
         const sellingPriceRetailInput = document.getElementById('sellingPriceRetail');
@@ -824,7 +666,7 @@ if (!currentBusinessId) {
         const dailyExpenseNameInput = document.getElementById('dailyExpenseName');
         const dailyExpenseAmountInput = document.getElementById('dailyExpenseAmount');
         const dailyExpenseModalTitle = document.getElementById('dailyExpenseModalTitle');
-        const dailyExpenseIndexInput = document = document.getElementById('dailyExpenseIndex');
+        const dailyExpenseIndexInput = document.getElementById('dailyExpenseIndex');
         const dailyExpenseDateList = document.getElementById('daily-expense-date-list');
         const dailyExpensesDetail = document.getElementById('daily-expenses-detail');
         const dailyExpensesTitle = document.getElementById('daily-expenses-title');
@@ -842,82 +684,103 @@ if (!currentBusinessId) {
         const dailyCapitalExpensesTableBody = document.getElementById('daily-capital-expenses-table-body');
         const dailyCapitalExpensesTotalSpan = document.getElementById('daily-capital-expenses-total');
         const purchaseHistoryTableBody = document.getElementById('purchaseHistoryTableBody');
-        const stockCountDateList = document.getElementById('stock-count-date-list');
-        const dailyStockCountDetail = document.getElementById('daily-stock-count-detail');
-        const dailyStockCountTitle = document.getElementById('daily-stock-count-title');
-        const dailyStockCountTableBody = document.getElementById('daily-stock-count-table-body');
-        const stockCountDateInput = document.getElementById('stockCountDate');
-        const stockProductNameSelect = document.getElementById('stockProductName');
-        const remainingQuantityInput = document.getElementById('remainingQuantity');
-        const remainingQuantityAlert = document.getElementById('remainingQuantityAlert');
-        const dailyStockCountSoldTotal = document.getElementById('daily-stock-count-sold-total');
-        const dailyStockCountSalesTotal = document.getElementById('daily-stock-count-sales-total');
-        const dailyStockCountProfitTotal = document.getElementById('daily-stock-count-profit-total');
 
-        // FUNCTIONS
+        // Accordion Logic
+        toggleProductsBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            productsAccordion.classList.toggle('show');
+            
+            const textSpan = this.querySelector('span');
+            if(productsAccordion.classList.contains('show')) {
+                textSpan.innerHTML = '<i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-color);"></i> Ficha Orodha ya Bidhaa';
+            } else {
+                textSpan.innerHTML = '<i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-color);"></i> Tazama Orodha ya Bidhaa';
+            }
+        });
+
+        // Load Data
         async function loadData() {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
+            if (!session && navigator.onLine) {
                 window.location.href = 'indexa.html'; 
                 return;
             }
             
-            try {
-                // Pakua business profile ya admin
-                const { data: businessProfile, error } = await supabaseClient
-                    .from('business_profiles')
-                    .select('*')
-                    .eq('admin_id', session.user.id)
-                    .single();
-        
-                if (error) {
-                    console.error('Hitilafu wakati wa kusoma data:', error.message);
-                    alert('Hitilafu wakati wa kupakia data. Tafadhali jaribu tena.');
-                    return;
+            let bId = getBusinessIdFromUrl() || localStorage.getItem('sj_current_biz_id');
+
+            if (!bId && navigator.onLine && session) {
+                try {
+                    const { data: businessProfile } = await supabaseClient
+                        .from('business_profiles')
+                        .select('*')
+                        .eq('admin_id', session.user.id)
+                        .single();
+                    if(businessProfile) {
+                        bId = businessProfile.id;
+                        localStorage.setItem('sj_current_biz_id', bId);
+                    }
+                } catch(e) { console.error(e); }
+            }
+
+            if (!bId) {
+                window.location.href = 'indexa.html'; 
+                return;
+            }
+
+            currentBusinessId = bId;
+            localStorage.setItem('sj_current_biz_id', currentBusinessId);
+            
+            if (navigator.onLine) {
+                try {
+                    const { data: capitalData, error: capitalError } = await supabaseClient
+                        .from('capital_systems')
+                        .select('*')
+                        .eq('business_id', currentBusinessId);
+            
+                    if (!capitalError) {
+                        capitalSystems = capitalData || [];
+                        localStorage.setItem(`sj_systems_${currentBusinessId}`, JSON.stringify(capitalSystems));
+                    } else {
+                        loadLocalData();
+                    }
+                } catch (e) {
+                    loadLocalData();
                 }
-        
-                // Hifadhi business info
-                currentBusinessId = businessProfile.id;
-                businessName = businessProfile.business_name;
-        
-                // 🔥 Pakua mitaji yote ya biashara hii kutoka Supabase
-                const { data: capitalData, error: capitalError } = await supabaseClient
-                    .from('capital_systems')
-                    .select('*')
-                    .eq('business_id', currentBusinessId);
-        
-                if (capitalError) {
-                    console.error('Hitilafu wakati wa kupakua mitaji:', capitalError.message);
-                    alert('Imeshindikana kupakia mitaji. Tafadhali jaribu tena.');
-                } else {
-                    capitalSystems = capitalData || [];
-                    renderCapitalList(); // Onyesha mitaji kwenye UI
-                }
-        
-                mainContent.classList.remove('hidden');
-        
-            } catch (e) {
-                console.error('Hitilafu ya jumla:', e);
-                alert('Hitilafu wakati wa kupakia data. Tafadhali jaribu tena.');
-            } finally {
-                // Ondoa splash screen
-                setTimeout(() => {
-                    splashScreen.style.opacity = '0';
-                    setTimeout(() => {
-                        splashScreen.style.display = 'none';
-                    }, 500);
-                }, 1000);
+            } else {
+                loadLocalData();
+            }
+            
+            // Hakikisha muundo wa madeni upo kwa kila mtaji
+            capitalSystems.forEach(sys => { sys.debts = sys.debts || []; });
+
+            renderCapitalList();
+            updateNetworkStatusUI();
+        }
+
+        // Local Data
+        function loadLocalData() {
+            const localData = localStorage.getItem(`sj_systems_${currentBusinessId}`);
+            if (localData) {
+                capitalSystems = JSON.parse(localData);
+            } else {
+                capitalSystems = [];
             }
         }
         
-  
+        // Save Data
         async function saveData(systemData) {
-            if (!systemData || !systemData.id) {
-                console.error('Cannot save data: systemData or systemData.id is missing.');
-                return;
+            if (!systemData || !systemData.id) return;
+            systemData.debts = systemData.debts || [];
+
+            const index = capitalSystems.findIndex(s => s.id === systemData.id);
+            if(index !== -1) {
+                capitalSystems[index] = systemData;
+            } else if(!capitalSystems.some(s => s.id === systemData.id)) {
+                capitalSystems.push(systemData);
             }
+            
+            localStorage.setItem(`sj_systems_${currentBusinessId}`, JSON.stringify(capitalSystems));
         
-            // Ongeza businessId kwenye data kabla ya kuihifadhi
             const dataToSave = {
                 id: systemData.id,
                 name: systemData.name,
@@ -927,23 +790,53 @@ if (!currentBusinessId) {
                 sales: systemData.sales,
                 dailyExpenses: systemData.dailyExpenses,
                 capitalExpenses: systemData.capitalExpenses,
-                stockCounts: systemData.stockCounts,
-                business_id: currentBusinessId // <--- Umeongeza mstari huu
+                debts: systemData.debts, // Okoa madeni
+                business_id: currentBusinessId
             };
         
-            try {
-                const { data, error } = await supabaseClient
-                    .from('capital_systems')
-                    .upsert(dataToSave, { onConflict: 'id' });
-        
-                if (error) {
-                    console.error('Error saving to Supabase:', error.message);
-                } else {
-                    console.log('Data saved to Supabase:', data);
+            if (navigator.onLine) {
+                try {
+                    await supabaseClient.from('capital_systems').upsert(dataToSave, { onConflict: 'id' });
+                    localStorage.setItem('sj_pending_sync', 'false');
+                } catch (e) {
+                    localStorage.setItem('sj_pending_sync', 'true');
                 }
-            } catch (e) {
-                console.error('Supabase save failed:', e);
+            } else {
+                localStorage.setItem('sj_pending_sync', 'true');
             }
+        }
+
+        // Sync Data
+        async function syncDataToSupabase() {
+            const badges = [document.getElementById('networkStatus'), document.getElementById('networkStatusBiz')];
+            badges.forEach(b => { 
+                if(b) {
+                    b.className = 'network-badge network-syncing'; 
+                    b.innerHTML = '<i class="fa-solid fa-rotate"></i> Inasawazisha...'; 
+                }
+            });
+
+            let deletedItems = JSON.parse(localStorage.getItem('sj_deleted_items') || '[]');
+            for (let id of deletedItems) {
+                 await supabaseClient.from('capital_systems').delete().eq('id', id);
+            }
+            localStorage.setItem('sj_deleted_items', '[]');
+
+            const localData = localStorage.getItem(`sj_systems_${currentBusinessId}`);
+            if (localData) {
+                const systems = JSON.parse(localData);
+                for (let sys of systems) {
+                    const dataToSave = {
+                        id: sys.id, name: sys.name, capital: sys.capital, description: sys.description,
+                        products: sys.products, sales: sys.sales, dailyExpenses: sys.dailyExpenses,
+                        capitalExpenses: sys.capitalExpenses, debts: sys.debts, business_id: currentBusinessId
+                    };
+                    await supabaseClient.from('capital_systems').upsert(dataToSave, { onConflict: 'id' });
+                }
+            }
+            
+            localStorage.setItem('sj_pending_sync', 'false');
+            setTimeout(updateNetworkStatusUI, 1000);
         }
 
         function formatNumber(number) {
@@ -951,7 +844,7 @@ if (!currentBusinessId) {
         }
 
         function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
             const date = new Date(dateString + 'T00:00:00');
             return date.toLocaleDateString('sw-TZ', options);
         }
@@ -980,15 +873,14 @@ if (!currentBusinessId) {
                     <div class="capital-clickable-area">
                         <div class="item-info">
                             <strong>${system.name}</strong>
-                            <span>Mtaji: TZS ${formatNumber(system.capital)}</span>
-                            <span>${system.description}</span>
+                            <span style="color: var(--primary-color); font-weight: 600;">TZS ${formatNumber(system.capital)}</span>
                         </div>
                     </div>
                     <div class="dropdown">
-                        <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                        <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                         <div class="dropdown-content">
-                            <button onclick="editCapital(${index})">Badilisha</button>
-                            <button onclick="deleteCapital(${index})">Futa</button>
+                            <button onclick="editCapital(${index})"><i class="fa-solid fa-pen-to-square" style="width:20px;"></i> Badilisha</button>
+                            <button onclick="deleteCapital(${index})"><i class="fa-solid fa-trash-can" style="width:20px;"></i> Futa</button>
                         </div>
                     </div>
                 `;
@@ -1016,31 +908,37 @@ if (!currentBusinessId) {
         function renderBusinessDetails() {
             if (currentBusinessIndex === null) return;
             const currentSystem = capitalSystems[currentBusinessIndex];
-            capitalBalanceSpan.textContent = `Mtaji: TZS ${formatNumber(currentSystem.capital)}`;
+            capitalBalanceSpan.textContent = `TZS ${formatNumber(currentSystem.capital)}`;
             renderProductList();
             renderSalesDates();
             renderDailyExpenseDates();
             renderCapitalExpenseDates();
-            renderStockCountDates();
+            renderDebts(); // Weka wateja wanaodaiwa
         }
 
         function renderProductList() {
             productList.innerHTML = '';
             const currentSystem = capitalSystems[currentBusinessIndex];
+            
+            if (currentSystem.products.length === 0) {
+                productList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">Hakuna bidhaa zilizosajiliwa bado.</li>';
+                return;
+            }
+
             currentSystem.products.forEach((product, index) => {
                 const li = document.createElement('li');
                 li.className = 'list-item';
                 li.innerHTML = `
                     <div class="item-info">
                         <strong>${product.name}</strong>
-                        <span>Idadi: ${product.currentQuantity}</span>
-                        <span>Bei ya Kuuzia: TZS ${formatNumber(product.sellingPriceRetail)}</span>
+                        <span>Stoo ipo: <b style="color:var(--text-dark);">${product.currentQuantity}</b> pcs</span>
+                        <span>Bei: TZS ${formatNumber(product.sellingPriceRetail)}</span>
                     </div>
                     <div class="dropdown">
-                        <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                        <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                         <div class="dropdown-content">
-                            <button onclick="editProduct(${index})">Badilisha</button>
-                            <button onclick="deleteProduct(${index})">Futa</button>
+                            <button onclick="editProduct(${index})"><i class="fa-solid fa-pen-to-square" style="width:20px;"></i> Badilisha</button>
+                            <button onclick="deleteProduct(${index})"><i class="fa-solid fa-trash-can" style="width:20px;"></i> Futa</button>
                         </div>
                     </div>
                 `;
@@ -1048,22 +946,100 @@ if (!currentBusinessId) {
             });
         }
 
+        // ==========================================
+        // KURENDER NA KULIPA MADENI
+        // ==========================================
+        function renderDebts() {
+            const sys = capitalSystems[currentBusinessIndex];
+            sys.debts = sys.debts || [];
+            const list = document.getElementById('debts-list'); list.innerHTML = '';
+            let totalDeni = 0;
+
+            if(sys.debts.length === 0){
+                list.innerHTML = '<li style="text-align:center; padding: 15px; border:none; color: var(--text-muted);">Hakuna mteja anayedaiwa kwa sasa.</li>';
+            } else {
+                sys.debts.forEach((debt, index) => {
+                    totalDeni += debt.totalPrice;
+                    const productName = sys.products[debt.productIndex] ? sys.products[debt.productIndex].name : 'Bidhaa Imefutwa';
+                    list.innerHTML += `
+                        <li class="list-item">
+                            <div class="item-info">
+                                <strong><i class="fa-solid fa-user" style="color:#d97706; margin-right:5px;"></i> ${debt.customerName}</strong>
+                                <span>${productName} (Idadi: ${debt.quantity})</span>
+                                <span class="item-debt">Kopeshwa: TZS ${formatNumber(debt.totalPrice)}</span>
+                                <span style="font-size:0.8em; color:#94a3b8;">Tarehe: ${formatDate(debt.date)}</span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                <div class="dropdown-content" style="min-width: 150px; right:0;">
+                                    <button onclick="payDebt(${index})" style="color: #059669; font-weight:bold;"><i class="fa-solid fa-check" style="width:20px;"></i> Amelipa Deni</button>
+                                    <button onclick="deleteDebt(${index})"><i class="fa-solid fa-trash" style="width:20px;"></i> Futa (Rudisha Stoo)</button>
+                                </div>
+                            </div>
+                        </li>
+                    `;
+                });
+            }
+            document.getElementById('total-debts-amount').textContent = `TZS ${formatNumber(totalDeni)}`;
+        }
+
+        async function payDebt(index) {
+            const sys = capitalSystems[currentBusinessIndex];
+            const debt = sys.debts[index];
+            if(confirm(`Je, unathibitisha kuwa mteja "${debt.customerName}" AMELIPA deni la TZS ${formatNumber(debt.totalPrice)}? \n\nHela hii itaingizwa kwenye mauzo ya leo.`)) {
+                
+                // Ingiza kwenye mauzo ya leo
+                sys.sales.push({
+                    date: new Date().toISOString().slice(0, 10), 
+                    productIndex: debt.productIndex,
+                    quantity: debt.quantity,
+                    totalPrice: debt.totalPrice,
+                    wasDebt: true // Kitambulisho kuwa hii ilikuwa deni
+                });
+                
+                // Futa kwenye orodha ya madeni
+                sys.debts.splice(index, 1);
+                
+                await saveData(sys);
+                renderBusinessDetails();
+                alert("Deni limelipwa na hela imeingia kwenye Mauzo ya Leo kikamilifu!");
+            }
+        }
+
+        async function deleteDebt(index) {
+            if(confirm('Kufuta deni hili bila kulipa KUTAMRUDISHIA bidhaa kwenye stoo. Una uhakika?')) {
+                const sys = capitalSystems[currentBusinessIndex];
+                const debt = sys.debts[index];
+                if(sys.products[debt.productIndex]) {
+                    sys.products[debt.productIndex].currentQuantity += debt.quantity;
+                }
+                sys.debts.splice(index, 1);
+                await saveData(sys);
+                renderBusinessDetails();
+            }
+        }
+
+
         function renderSalesDates() {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const salesByDate = currentSystem.sales.reduce((acc, sale) => {
-                if (!acc[sale.date]) {
-                    acc[sale.date] = [];
-                }
+                if (!acc[sale.date]) acc[sale.date] = [];
                 acc[sale.date].push(sale);
                 return acc;
             }, {});
 
             salesDateList.innerHTML = '';
             const sortedDates = Object.keys(salesByDate).sort().reverse();
+            
+            if(sortedDates.length === 0) {
+                 salesDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent;">Hakuna mauzo yaliyofanyika bado.</li>';
+            }
+
             sortedDates.forEach(date => {
                 const totalDailySales = salesByDate[date].reduce((sum, sale) => sum + sale.totalPrice, 0);
                 const totalDailyProfit = salesByDate[date].reduce((sum, sale) => {
                     const product = currentSystem.products[sale.productIndex];
+                    if(!product) return sum;
                     const profitPerItem = product.sellingPriceRetail - product.costPriceRetail;
                     return sum + (profitPerItem * sale.quantity);
                 }, 0);
@@ -1073,10 +1049,11 @@ if (!currentBusinessId) {
                 li.onclick = () => showDailySales(date);
                 li.innerHTML = `
                     <div class="item-info">
-                        <strong>${formatDate(date)}</strong>
-                        <span>Mauzo: TZS ${formatNumber(totalDailySales)}</span>
-                        <span>Faida: <span class="item-profit">TZS ${formatNumber(totalDailyProfit)}</span></span>
+                        <strong><i class="fa-regular fa-calendar" style="margin-right: 5px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
+                        <span style="margin-top:5px;">Mauzo Taslimu: <b>TZS ${formatNumber(totalDailySales)}</b></span>
+                        <span>Faida ya Bidhaa: <span class="item-profit" style="margin-left: 5px;">TZS ${formatNumber(totalDailyProfit)}</span></span>
                     </div>
+                    <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
                 `;
                 salesDateList.appendChild(li);
             });
@@ -1088,26 +1065,30 @@ if (!currentBusinessId) {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const salesForDate = currentSystem.sales.filter(sale => sale.date === date);
 
-            dailySalesTitle.textContent = `Mauzo ya Tarehe ${formatDate(date)}`;
+            dailySalesTitle.textContent = `Mauzo (${formatDate(date)})`;
             dailySalesTableBody.innerHTML = '';
             let totalSales = 0;
             let totalProfit = 0;
 
             salesForDate.forEach((sale, index) => {
                 const product = currentSystem.products[sale.productIndex];
+                if(!product) return;
                 const profitPerItem = product.sellingPriceRetail - product.costPriceRetail;
                 const profit = profitPerItem * sale.quantity;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${product.name}</td>
+                    <td>
+                        ${product.name}
+                        ${sale.wasDebt ? '<br><small style="color:#d97706;">(Lipo Deni)</small>' : ''}
+                    </td>
                     <td>${sale.quantity}</td>
                     <td>TZS ${formatNumber(sale.totalPrice)}</td>
                     <td><span class="item-profit">TZS ${formatNumber(profit)}</span></td>
                     <td>
                         <div class="dropdown">
-                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
-                            <div class="dropdown-content">
+                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <div class="dropdown-content" style="right: 0; min-width: 100px;">
                                 <button onclick="editSale(${currentSystem.sales.indexOf(sale)})">Badilisha</button>
                                 <button onclick="deleteSale(${currentSystem.sales.indexOf(sale)})">Futa</button>
                             </div>
@@ -1134,15 +1115,18 @@ if (!currentBusinessId) {
         function renderDailyExpenseDates() {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const expensesByDate = currentSystem.dailyExpenses.reduce((acc, exp) => {
-                if (!acc[exp.date]) {
-                    acc[exp.date] = [];
-                }
+                if (!acc[exp.date]) acc[exp.date] = [];
                 acc[exp.date].push(exp);
                 return acc;
             }, {});
 
             dailyExpenseDateList.innerHTML = '';
             const sortedDates = Object.keys(expensesByDate).sort().reverse();
+            
+            if(sortedDates.length === 0) {
+                 dailyExpenseDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent;">Hakuna matumizi yaliyowekwa.</li>';
+            }
+
             sortedDates.forEach(date => {
                 const totalDailyExpense = expensesByDate[date].reduce((sum, exp) => sum + exp.amount, 0);
                 const li = document.createElement('li');
@@ -1150,9 +1134,10 @@ if (!currentBusinessId) {
                 li.onclick = () => showDailyExpenses(date);
                 li.innerHTML = `
                     <div class="item-info">
-                        <strong>${formatDate(date)}</strong>
-                        <span>Matumizi: <span class="item-expense">TZS ${formatNumber(totalDailyExpense)}</span></span>
+                        <strong><i class="fa-regular fa-calendar" style="margin-right: 5px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
+                        <span style="margin-top:5px;">Jumla Imetumika: <span class="item-expense" style="margin-left: 5px;">TZS ${formatNumber(totalDailyExpense)}</span></span>
                     </div>
+                    <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
                 `;
                 dailyExpenseDateList.appendChild(li);
             });
@@ -1164,7 +1149,7 @@ if (!currentBusinessId) {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const expensesForDate = currentSystem.dailyExpenses.filter(exp => exp.date === date);
 
-            dailyExpensesTitle.textContent = `Matumizi ya Kila Siku ya Tarehe ${formatDate(date)}`;
+            dailyExpensesTitle.textContent = `Matumizi (${formatDate(date)})`;
             dailyExpensesTableBody.innerHTML = '';
             let totalExpenses = 0;
 
@@ -1175,7 +1160,7 @@ if (!currentBusinessId) {
                     <td><span class="item-expense">TZS ${formatNumber(exp.amount)}</span></td>
                     <td>
                         <div class="dropdown">
-                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                             <div class="dropdown-content">
                                 <button onclick="editDailyExpense(${currentSystem.dailyExpenses.indexOf(exp)})">Badilisha</button>
                                 <button onclick="deleteDailyExpense(${currentSystem.dailyExpenses.indexOf(exp)})">Futa</button>
@@ -1200,15 +1185,18 @@ if (!currentBusinessId) {
         function renderCapitalExpenseDates() {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const expensesByDate = currentSystem.capitalExpenses.reduce((acc, exp) => {
-                if (!acc[exp.date]) {
-                    acc[exp.date] = [];
-                }
+                if (!acc[exp.date]) acc[exp.date] = [];
                 acc[exp.date].push(exp);
                 return acc;
             }, {});
 
             capitalExpenseDateList.innerHTML = '';
             const sortedDates = Object.keys(expensesByDate).sort().reverse();
+            
+            if(sortedDates.length === 0) {
+                 capitalExpenseDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent;">Hakuna matumizi ya mtaji yaliyowekwa.</li>';
+            }
+
             sortedDates.forEach(date => {
                 const totalDailyExpense = expensesByDate[date].reduce((sum, exp) => sum + exp.amount, 0);
                 const li = document.createElement('li');
@@ -1216,9 +1204,10 @@ if (!currentBusinessId) {
                 li.onclick = () => showDailyCapitalExpenses(date);
                 li.innerHTML = `
                     <div class="item-info">
-                        <strong>${formatDate(date)}</strong>
-                        <span>Matumizi: <span class="item-expense">TZS ${formatNumber(totalDailyExpense)}</span></span>
+                        <strong><i class="fa-regular fa-calendar" style="margin-right: 5px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
+                        <span style="margin-top:5px;">Jumla Imetumika: <span class="item-expense" style="margin-left: 5px;">TZS ${formatNumber(totalDailyExpense)}</span></span>
                     </div>
+                    <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
                 `;
                 capitalExpenseDateList.appendChild(li);
             });
@@ -1230,7 +1219,7 @@ if (!currentBusinessId) {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const expensesForDate = currentSystem.capitalExpenses.filter(exp => exp.date === date);
 
-            dailyCapitalExpensesTitle.textContent = `Matumizi ya Mtaji ya Tarehe ${formatDate(date)}`;
+            dailyCapitalExpensesTitle.textContent = `Matumizi Mtaji (${formatDate(date)})`;
             dailyCapitalExpensesTableBody.innerHTML = '';
             let totalExpenses = 0;
 
@@ -1241,7 +1230,7 @@ if (!currentBusinessId) {
                     <td><span class="item-expense">TZS ${formatNumber(exp.amount)}</span></td>
                     <td>
                         <div class="dropdown">
-                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
+                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                             <div class="dropdown-content">
                                 <button onclick="editCapitalExpense(${currentSystem.capitalExpenses.indexOf(exp)})">Badilisha</button>
                                 <button onclick="deleteCapitalExpense(${currentSystem.capitalExpenses.indexOf(exp)})">Futa</button>
@@ -1263,141 +1252,60 @@ if (!currentBusinessId) {
             dailyCapitalExpensesDetail.style.display = 'none';
         }
         
-        function renderStockCountDates() {
-            const currentSystem = capitalSystems[currentBusinessIndex];
-            const stockCountsByDate = currentSystem.stockCounts.reduce((acc, count) => {
-                if (!acc[count.date]) {
-                    acc[count.date] = [];
-                }
-                acc[count.date].push(count);
-                return acc;
-            }, {});
-
-            stockCountDateList.innerHTML = '';
-            const sortedDates = Object.keys(stockCountsByDate).sort().reverse();
-            sortedDates.forEach(date => {
-                const li = document.createElement('li');
-                li.className = 'list-item date-item';
-                li.onclick = () => showDailyStockCounts(date);
-                li.innerHTML = `
-                    <div class="item-info">
-                        <strong>${formatDate(date)}</strong>
-                        <span>Ripoti ya Hesabu ya Stoo</span>
-                    </div>
-                `;
-                stockCountDateList.appendChild(li);
-            });
-            stockCountDateList.style.display = 'block';
-            dailyStockCountDetail.style.display = 'none';
-        }
-
-        function showDailyStockCounts(date) {
-            const currentSystem = capitalSystems[currentBusinessIndex];
-            const countsForDate = currentSystem.stockCounts.filter(count => count.date === date);
-
-            dailyStockCountTitle.textContent = `Hesabu ya Stoo ya Tarehe ${formatDate(date)}`;
-            dailyStockCountTableBody.innerHTML = '';
-            let totalSold = 0;
-            let totalSales = 0;
-            let totalProfit = 0;
-
-            countsForDate.forEach((count, index) => {
-                const product = currentSystem.products[count.productIndex];
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${count.remainingQuantity}</td>
-                    <td>${count.soldQuantity}</td>
-                    <td>TZS ${formatNumber(count.totalSales)}</td>
-                    <td><span class="item-profit">TZS ${formatNumber(count.totalProfit)}</span></td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-v"></i></button>
-                            <div class="dropdown-content">
-                                <button onclick="deleteStockCount(${currentSystem.stockCounts.indexOf(count)})">Futa</button>
-                            </div>
-                        </div>
-                    </td>
-                `;
-                dailyStockCountTableBody.appendChild(tr);
-                totalSold += count.soldQuantity;
-                totalSales += count.totalSales;
-                totalProfit += count.totalProfit;
-            });
-            
-            dailyStockCountSoldTotal.textContent = totalSold;
-            dailyStockCountSalesTotal.textContent = `TZS ${formatNumber(totalSales)}`;
-            dailyStockCountProfitTotal.textContent = `TZS ${formatNumber(totalProfit)}`;
-
-            stockCountDateList.style.display = 'none';
-            dailyStockCountDetail.style.display = 'block';
-        }
-        
-        function goBackToStockCountDateList() {
-            stockCountDateList.style.display = 'block';
-            dailyStockCountDetail.style.display = 'none';
-        }
-
-       
-    // Function ya kutoa UUID kwa kutumia crypto API
-    function generateUUID() {
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            return crypto.randomUUID();
-        } else {
-            // Fallback kwa browsers zisizosupport crypto.randomUUID()
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-    }
-
-    // Badilisha sehemu ya kuunda ID mpya
-    async function addCapital() {
-        capitalModalTitle.textContent = 'Weka Mtaji Mpya';
-        capitalIndexInput.value = '';
-        capitalNameInput.value = '';
-        capitalAmountInput.value = '';
-        capitalDescriptionInput.value = '';
-        openModal('addCapitalModal');
-    }
-
-    async function saveCapital() {
-        const name = capitalNameInput.value;
-        const amount = parseFloat(capitalAmountInput.value);
-        const description = capitalDescriptionInput.value;
-        const index = capitalIndexInput.value;
-
-        if (name && !isNaN(amount)) {
-            if (index === '') {
-                // Add new capital - tumia UUID halali
-                const newSystem = {
-                    id: generateUUID(),  // TUMIA UUID HALALI
-                    name: name,
-                    capital: amount,
-                    description: description,
-                    products: [],
-                    sales: [],
-                    dailyExpenses: [],
-                    capitalExpenses: [],
-                    stockCounts: []
-                };
-                capitalSystems.push(newSystem);
-                await saveData(newSystem);
+        function generateUUID() {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return crypto.randomUUID();
             } else {
-                // Edit existing capital
-                const system = capitalSystems[parseInt(index)];
-                system.capital = amount;
-                system.name = name;
-                system.description = description;
-                await saveData(system);
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
             }
-            renderCapitalList();
-            closeModal('addCapitalModal');
-        } else {
-            alert('Tafadhali jaza jina la mtaji na kiasi sahihi.');
         }
-    }
+
+        async function addCapital() {
+            capitalModalTitle.textContent = 'Weka Mtaji Mpya';
+            capitalIndexInput.value = '';
+            capitalNameInput.value = '';
+            capitalAmountInput.value = '';
+            capitalDescriptionInput.value = '';
+            openModal('addCapitalModal');
+        }
+
+        async function saveCapital() {
+            const name = capitalNameInput.value;
+            const amount = parseFloat(capitalAmountInput.value);
+            const description = capitalDescriptionInput.value;
+            const index = capitalIndexInput.value;
+
+            if (name && !isNaN(amount)) {
+                if (index === '') {
+                    const newSystem = {
+                        id: generateUUID(), 
+                        name: name,
+                        capital: amount,
+                        description: description,
+                        products: [],
+                        sales: [],
+                        dailyExpenses: [],
+                        capitalExpenses: [],
+                        debts: [] // Hakikisha deni array ipo
+                    };
+                    capitalSystems.push(newSystem);
+                    await saveData(newSystem);
+                } else {
+                    const system = capitalSystems[parseInt(index)];
+                    system.capital = amount;
+                    system.name = name;
+                    system.description = description;
+                    await saveData(system);
+                }
+                renderCapitalList();
+                closeModal('addCapitalModal');
+            } else {
+                alert('Tafadhali jaza jina la mtaji na kiasi sahihi.');
+            }
+        }
 
         function editCapital(index) {
             const system = capitalSystems[index];
@@ -1405,7 +1313,7 @@ if (!currentBusinessId) {
             capitalIndexInput.value = index;
             capitalNameInput.value = system.name;
             capitalAmountInput.value = system.capital;
-            capitalDescriptionInput.value = system.description;
+            capitalDescriptionInput.value = system.description || '';
             openModal('addCapitalModal');
         }
 
@@ -1414,26 +1322,30 @@ if (!currentBusinessId) {
                 const systemToDelete = capitalSystems[index];
                 capitalSystems.splice(index, 1);
                 
-                try {
-                    const { error } = await supabase
-                        .from('capital_systems')
-                        .delete()
-                        .eq('id', systemToDelete.id); // Use the unique ID for deletion
-
-                    if (error) {
-                        console.error('Error deleting from Supabase:', error.message);
-                    } else {
-                        console.log('System deleted from Supabase.');
+                localStorage.setItem(`sj_systems_${currentBusinessId}`, JSON.stringify(capitalSystems));
+                
+                if (navigator.onLine) {
+                    try {
+                        await supabaseClient.from('capital_systems').delete().eq('id', systemToDelete.id);
+                    } catch (e) {
+                        markAsDeleted(systemToDelete.id);
                     }
-                } catch (e) {
-                    console.error('Supabase delete operation failed:', e);
+                } else {
+                    markAsDeleted(systemToDelete.id);
                 }
                 renderCapitalList();
             }
         }
+        
+        function markAsDeleted(id) {
+            let deleted = JSON.parse(localStorage.getItem('sj_deleted_items') || '[]'); 
+            deleted.push(id); 
+            localStorage.setItem('sj_deleted_items', JSON.stringify(deleted));
+            localStorage.setItem('sj_pending_sync', 'true');
+        }
 
         function addProduct() {
-            productModalTitle.textContent = 'Ongeza Bidhaa Mpya';
+            productModalTitle.textContent = 'Sajili Bidhaa Mpya';
             productIndexInput.value = '';
             document.getElementById('productName').value = '';
             costPriceTotalInput.value = '';
@@ -1442,6 +1354,11 @@ if (!currentBusinessId) {
             sellingPriceRetailInput.value = '';
             projectedProfitTotalSpan.textContent = 'TZS 0';
             projectedProfitRetailSpan.textContent = 'TZS 0';
+            
+            if (!productsAccordion.classList.contains('show')) {
+                toggleProductsBtn.click();
+            }
+            
             openModal('addProductModal');
         }
         
@@ -1456,7 +1373,6 @@ if (!currentBusinessId) {
 
             if (name && !isNaN(costPriceTotal) && !isNaN(quantity) && !isNaN(sellingPriceRetail)) {
                 if (index === '') {
-                    // Add new product
                     const newProduct = {
                         name: name,
                         costPriceTotal: costPriceTotal,
@@ -1467,16 +1383,13 @@ if (!currentBusinessId) {
                         dateAdded: new Date().toISOString().slice(0, 10)
                     };
                     currentSystem.products.push(newProduct);
-                    // Capital decreases when recording product purchases (adding new stock)
                     currentSystem.capital -= costPriceTotal;
                 } else {
-                    // Edit existing product
                     const product = currentSystem.products[parseInt(index)];
                     const oldTotalCost = product.costPriceTotal;
                     const newTotalCost = costPriceTotal;
-                    const costDifference = newTotalCost - oldTotalCost; // Difference in cost
+                    const costDifference = newTotalCost - oldTotalCost; 
 
-                    // Adjust capital based on the change in product cost
                     currentSystem.capital -= costDifference;
                     
                     product.name = name;
@@ -1486,7 +1399,7 @@ if (!currentBusinessId) {
                     product.costPriceRetail = costPriceRetail;
                     product.sellingPriceRetail = sellingPriceRetail;
                 }
-                await saveData(currentSystem); // Save changes to Supabase
+                await saveData(currentSystem); 
                 renderBusinessDetails();
                 closeModal('addProductModal');
             } else {
@@ -1511,15 +1424,11 @@ if (!currentBusinessId) {
         async function deleteProduct(index) {
             if (confirm('Una uhakika unataka kufuta bidhaa hii?')) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
-                const product = currentSystem.products[index];
-                
                 currentSystem.products.splice(index, 1);
-                
-                // Also remove any sales and stock counts related to this product
                 currentSystem.sales = currentSystem.sales.filter(sale => sale.productIndex !== index);
-                currentSystem.stockCounts = currentSystem.stockCounts.filter(count => count.productIndex !== index);
+                currentSystem.debts = (currentSystem.debts || []).filter(debt => debt.productIndex !== index);
 
-                await saveData(currentSystem); // Save changes to Supabase
+                await saveData(currentSystem); 
                 renderBusinessDetails();
             }
         }
@@ -1530,16 +1439,28 @@ if (!currentBusinessId) {
             document.getElementById('saleDate').value = new Date().toISOString().slice(0, 10);
             document.getElementById('saleQuantity').value = '';
             document.getElementById('actualSalePrice').value = '';
-            quantityAlert.style.display = 'none';
+            document.getElementById('quantityAlert').style.display = 'none';
+            
+            // Ficha mambo ya deni ukiwa unaweka mauzo mapya
+            document.getElementById('isDebtCheck').checked = false;
+            document.getElementById('debtCustomerNameDiv').style.display = 'none';
+            document.getElementById('debtCustomerName').value = '';
+            document.getElementById('debtToggleContainer').style.display = 'block';
 
             const currentSystem = capitalSystems[currentBusinessIndex];
             const select = saleProductNameSelect;
             select.innerHTML = '<option value="">-- Chagua Bidhaa --</option>';
+            
+            if (currentSystem.products.length === 0) {
+                 alert("Huna bidhaa stoo. Tafadhali ingiza mzigo kwanza.");
+                 return;
+            }
+
             currentSystem.products.forEach((product, index) => {
                 if (product.currentQuantity > 0) {
                     const option = document.createElement('option');
                     option.value = index;
-                    option.textContent = `${product.name} (Stoo: ${product.currentQuantity})`;
+                    option.textContent = `${product.name} (Stoo ziko: ${product.currentQuantity})`;
                     select.appendChild(option);
                 }
             });
@@ -1551,50 +1472,53 @@ if (!currentBusinessId) {
             const productIndex = parseInt(saleProductNameSelect.value);
             const quantity = parseInt(saleQuantityInput.value);
             const actualSalePrice = parseFloat(actualSalePriceInput.value) || 0;
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            
+            const isDebt = document.getElementById('isDebtCheck').checked;
+            const customerName = document.getElementById('debtCustomerName').value.trim();
+
+            if (isDebt && !customerName) {
+                alert("Tafadhali andika Jina la Mteja unayemkopesha.");
+                return;
+            }
 
             if (date && !isNaN(productIndex) && quantity > 0) {
-                const currentSystem = capitalSystems[currentBusinessIndex];
                 const product = currentSystem.products[productIndex];
                 const totalCalculatedPrice = product.sellingPriceRetail * quantity;
                 const finalSalePrice = actualSalePrice > 0 ? actualSalePrice : totalCalculatedPrice;
                 
-                const profitPerItem = product.sellingPriceRetail - product.costPriceRetail;
-                const totalProfit = profitPerItem * quantity;
-                
                 if (quantity > product.currentQuantity && saleBeingEdited === null) {
-                    quantityAlert.style.display = 'block';
+                    document.getElementById('quantityAlert').style.display = 'block';
                     return;
                 }
-                quantityAlert.style.display = 'none';
+                document.getElementById('quantityAlert').style.display = 'none';
+
+                const transactionData = {
+                    date,
+                    productIndex,
+                    quantity,
+                    totalPrice: finalSalePrice
+                };
 
                 if (saleBeingEdited) {
-                    // Edit existing sale
                     const oldSale = currentSystem.sales[saleBeingEdited.index];
                     const oldProduct = currentSystem.products[oldSale.productIndex];
-                    
-                    // Revert old changes
                     oldProduct.currentQuantity += oldSale.quantity;
-
-                    // Apply new changes
                     product.currentQuantity -= quantity;
 
-                    oldSale.date = date;
-                    oldSale.productIndex = productIndex;
-                    oldSale.quantity = quantity;
-                    oldSale.totalPrice = finalSalePrice;
+                    currentSystem.sales[saleBeingEdited.index] = transactionData;
                 } else {
-                    // Add new sale
-                    const newSale = {
-                        date,
-                        productIndex,
-                        quantity,
-                        totalPrice: finalSalePrice
-                    };
-                    currentSystem.sales.push(newSale);
+                    if (isDebt) {
+                        transactionData.customerName = customerName;
+                        currentSystem.debts = currentSystem.debts || [];
+                        currentSystem.debts.push(transactionData);
+                    } else {
+                        currentSystem.sales.push(transactionData);
+                    }
                     product.currentQuantity -= quantity;
                 }
                 
-                await saveData(currentSystem); // Save changes to Supabase
+                await saveData(currentSystem); 
                 renderBusinessDetails();
                 closeModals();
             } else {
@@ -1606,10 +1530,12 @@ if (!currentBusinessId) {
             const currentSystem = capitalSystems[currentBusinessIndex];
             saleBeingEdited = { index: index };
             const sale = currentSystem.sales[index];
-            const product = currentSystem.products[sale.productIndex];
 
             document.getElementById('saleIndex').value = index;
             document.getElementById('saleDate').value = sale.date;
+            
+            // Zuia kubadili sale kwenda kwenye deni wakati wa ku-edit kuzuia mambo kuchanganya
+            document.getElementById('debtToggleContainer').style.display = 'none';
 
             const select = saleProductNameSelect;
             select.innerHTML = '<option value="">-- Chagua Bidhaa --</option>';
@@ -1618,9 +1544,9 @@ if (!currentBusinessId) {
                 option.value = pIndex;
                 let displayQuantity = p.currentQuantity;
                 if (pIndex === sale.productIndex) {
-                    displayQuantity += sale.quantity; // Add back the quantity of the sale being edited
+                    displayQuantity += sale.quantity; 
                 }
-                option.textContent = `${p.name} (Stoo: ${displayQuantity})`;
+                option.textContent = `${p.name} (Stoo ziko: ${displayQuantity})`;
                 if (pIndex === sale.productIndex) {
                     option.selected = true;
                 }
@@ -1632,9 +1558,8 @@ if (!currentBusinessId) {
             openModal('addSaleModal');
         }
 
-        
         async function deleteSale(index) {
-            if (confirm('Una uhakika unataka kufuta mauzo haya?')) {
+            if (confirm('Una uhakika unataka kufuta mauzo haya? (Bidhaa zitarudi stoo)')) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
                 const sale = currentSystem.sales[index];
                 const product = currentSystem.products[sale.productIndex];
@@ -1642,7 +1567,7 @@ if (!currentBusinessId) {
                 product.currentQuantity += sale.quantity;
                 currentSystem.sales.splice(index, 1);
                 
-                await saveData(currentSystem); // Save changes to Supabase
+                await saveData(currentSystem); 
                 renderBusinessDetails();
                 if (dailySalesDetail.style.display === 'block') {
                     showDailySales(sale.date);
@@ -1656,7 +1581,7 @@ if (!currentBusinessId) {
             document.getElementById('dailyExpenseDate').value = new Date().toISOString().slice(0, 10);
             document.getElementById('dailyExpenseName').value = '';
             document.getElementById('dailyExpenseAmount').value = '';
-            dailyExpenseModalTitle.textContent = 'Ongeza Matumizi ya Kila Siku';
+            dailyExpenseModalTitle.textContent = 'Matumizi ya Kila Siku';
             openModal('addDailyExpenseModal');
         }
 
@@ -1669,17 +1594,15 @@ if (!currentBusinessId) {
             if (date && name && !isNaN(amount) && amount > 0) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
                 if (index === '') {
-                    // Add new expense
                     const newExpense = { date, name, amount };
                     currentSystem.dailyExpenses.push(newExpense);
                 } else {
-                    // Edit existing expense
                     const oldExpense = currentSystem.dailyExpenses[parseInt(index)];
                     oldExpense.date = date;
                     oldExpense.name = name;
                     oldExpense.amount = amount;
                 }
-                await saveData(currentSystem); // Save changes to Supabase
+                await saveData(currentSystem); 
                 renderBusinessDetails();
                 closeModals();
             } else {
@@ -1691,7 +1614,7 @@ if (!currentBusinessId) {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const expense = currentSystem.dailyExpenses[index];
             dailyExpenseBeingEdited = { index: index };
-            dailyExpenseModalTitle.textContent = 'Badilisha Matumizi ya Kila Siku';
+            dailyExpenseModalTitle.textContent = 'Badilisha Matumizi';
             document.getElementById('dailyExpenseIndex').value = index;
             document.getElementById('dailyExpenseDate').value = expense.date;
             document.getElementById('dailyExpenseName').value = expense.name;
@@ -1704,7 +1627,7 @@ if (!currentBusinessId) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
                 const expense = currentSystem.dailyExpenses[index];
                 currentSystem.dailyExpenses.splice(index, 1);
-                await saveData(currentSystem); // Save changes to Supabase
+                await saveData(currentSystem); 
                 renderBusinessDetails();
                 if (dailyExpensesDetail.style.display === 'block') {
                     showDailyExpenses(expense.date);
@@ -1719,7 +1642,7 @@ if (!currentBusinessId) {
             document.getElementById('capitalExpenseName').value = '';
             document.getElementById('capitalExpenseAmount').value = '';
             capitalExpenseAlert.style.display = 'none';
-            capitalExpenseModalTitle.textContent = 'Ongeza Matumizi ya Mtaji';
+            capitalExpenseModalTitle.textContent = 'Matumizi ya Mtaji';
             openModal('addCapitalExpenseModal');
         }
 
@@ -1738,24 +1661,22 @@ if (!currentBusinessId) {
                 capitalExpenseAlert.style.display = 'none';
 
                 if (capitalExpenseBeingEdited) {
-                    // Edit existing expense
                     const oldExpense = currentSystem.capitalExpenses[capitalExpenseBeingEdited.index];
                     const oldAmount = oldExpense.amount;
-                    currentSystem.capital += oldAmount; // Return old amount to capital
+                    currentSystem.capital += oldAmount; 
                     
                     oldExpense.date = date;
                     oldExpense.name = name;
                     oldExpense.amount = amount;
 
-                    currentSystem.capital -= amount; // Deduct new amount
+                    currentSystem.capital -= amount; 
                 } else {
-                    // Add new expense
                     const newExpense = { date, name, amount };
                     currentSystem.capitalExpenses.push(newExpense);
-                    currentSystem.capital -= amount; // Capital decreases when recording capital expenses
+                    currentSystem.capital -= amount; 
                 }
                 
-                await saveData(currentSystem); // Save changes to Supabase
+                await saveData(currentSystem); 
                 renderBusinessDetails();
                 closeModals();
             } else {
@@ -1767,7 +1688,7 @@ if (!currentBusinessId) {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const expense = currentSystem.capitalExpenses[index];
             capitalExpenseBeingEdited = { index: index };
-            capitalExpenseModalTitle.textContent = 'Badilisha Matumizi ya Mtaji';
+            capitalExpenseModalTitle.textContent = 'Badilisha Matumizi Mtaji';
             document.getElementById('capitalExpenseIndex').value = index;
             document.getElementById('capitalExpenseDate').value = expense.date;
             document.getElementById('capitalExpenseName').value = expense.name;
@@ -1779,89 +1700,26 @@ if (!currentBusinessId) {
             if (confirm('Una uhakika unataka kufuta matumizi haya?')) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
                 const expense = currentSystem.capitalExpenses[index];
-                currentSystem.capital += expense.amount; // Refund the capital
+                currentSystem.capital += expense.amount; 
                 currentSystem.capitalExpenses.splice(index, 1);
                 
-                await saveData(currentSystem); // Save changes to Supabase
+                await saveData(currentSystem); 
                 renderBusinessDetails();
                 if (dailyCapitalExpensesDetail.style.display === 'block') {
                     showDailyCapitalExpenses(expense.date);
                 }
             }
         }
-        
-        function addStockCount() {
-            stockCountBeingEdited = null;
-            document.getElementById('stockCountDate').value = new Date().toISOString().slice(0, 10);
-            document.getElementById('remainingQuantity').value = '';
-            remainingQuantityAlert.style.display = 'none';
-
-            const currentSystem = capitalSystems[currentBusinessIndex];
-            const select = stockProductNameSelect;
-            select.innerHTML = '<option value="">-- Chagua Bidhaa --</option>';
-            currentSystem.products.forEach((product, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${product.name} (Stoo: ${product.currentQuantity})`;
-                select.appendChild(option);
-            });
-            openModal('addStockCountModal');
-        }
-
-        async function saveStockCount() {
-            const date = stockCountDateInput.value;
-            const productIndex = parseInt(stockProductNameSelect.value);
-            const remainingQuantity = parseInt(remainingQuantityInput.value);
-
-            if (date && !isNaN(productIndex) && !isNaN(remainingQuantity)) {
-                const currentSystem = capitalSystems[currentBusinessIndex];
-                const product = currentSystem.products[productIndex];
-                
-                if (remainingQuantity > product.currentQuantity) {
-                    remainingQuantityAlert.style.display = 'block';
-                    return;
-                }
-                remainingQuantityAlert.style.display = 'none';
-
-                const soldQuantity = product.currentQuantity - remainingQuantity;
-                const totalSales = soldQuantity * product.sellingPriceRetail;
-                const totalProfit = soldQuantity * (product.sellingPriceRetail - product.costPriceRetail);
-
-                const newStockCount = {
-                    date,
-                    productIndex,
-                    remainingQuantity,
-                    soldQuantity,
-                    totalSales,
-                    totalProfit
-                };
-
-                capitalSystems[currentBusinessIndex].stockCounts.push(newStockCount);
-                await saveData(currentSystem); // Save changes to Supabase
-                renderBusinessDetails();
-                closeModal('addStockCountModal');
-            } else {
-                alert('Tafadhali jaza taarifa zote za hesabu ya stoo.');
-            }
-        }
-        
-        async function deleteStockCount(index) {
-            if (confirm('Una uhakika unataka kufuta rekodi hii ya hesabu ya stoo?')) {
-                const currentSystem = capitalSystems[currentBusinessIndex];
-                const stockCount = currentSystem.stockCounts[index];
-                
-                currentSystem.stockCounts.splice(index, 1);
-                
-                await saveData(currentSystem); // Save changes to Supabase
-                renderBusinessDetails();
-                if (dailyStockCountDetail.style.display === 'block') {
-                    showDailyStockCounts(stockCount.date);
-                }
-            }
-        }
 
         function renderPurchaseHistory() {
-            const purchases = capitalSystems[currentBusinessIndex].products;
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            
+            if(!currentSystem || currentSystem.products.length === 0) {
+                 alert("Hakuna kumbukumbu za ununuzi bado.");
+                 return;
+            }
+
+            const purchases = currentSystem.products;
             purchaseHistoryTableBody.innerHTML = '';
             purchases.forEach(product => {
                 const tr = document.createElement('tr');
@@ -1888,8 +1746,8 @@ if (!currentBusinessId) {
                 if (!isNaN(sellingPrice)) {
                     const profitTotal = (sellingPrice - costRetail) * quantity;
                     const profitRetail = sellingPrice - costRetail;
-                    projectedProfitTotalSpan.textContent = `TZS ${profitTotal.toFixed(2)}`;
-                    projectedProfitRetailSpan.textContent = `TZS ${profitRetail.toFixed(2)}`;
+                    projectedProfitTotalSpan.textContent = `TZS ${profitTotal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
+                    projectedProfitRetailSpan.textContent = `TZS ${profitRetail.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
                 }
             } else {
                 costPriceRetailInput.value = '';
@@ -1898,12 +1756,356 @@ if (!currentBusinessId) {
             }
         }
 
-        // Logout Function
+        // ==========================================
+        // MABADILIKO YA RIPOTI KWA MUUNDO MPYA 
+        // ==========================================
+
+        function toggleCustomDates() {
+            const val = document.getElementById('reportTimeframe').value;
+            if (val === 'custom') {
+                document.getElementById('customDateDiv').style.display = 'block';
+            } else {
+                document.getElementById('customDateDiv').style.display = 'none';
+            }
+        }
+
+        function openReportModal() {
+            document.getElementById('reportTimeframe').value = 'siku';
+            toggleCustomDates();
+            openModal('reportModal');
+        }
+
+        function getReportData() {
+            const timeframe = document.getElementById('reportTimeframe').value;
+            const sys = capitalSystems[currentBusinessIndex];
+            sys.debts = sys.debts || [];
+            
+            let startDate = new Date();
+            let endDate = new Date();
+            let timeframeLabel = "";
+
+            if (timeframe === 'siku') {
+                timeframeLabel = "Siku ya Leo";
+                startDate.setHours(0,0,0,0);
+                endDate.setHours(23,59,59,999);
+            } else if (timeframe === 'wiki') {
+                timeframeLabel = "Wiki Hii";
+                const day = startDate.getDay();
+                const diff = startDate.getDate() - day + (day === 0 ? -6 : 1);
+                startDate.setDate(diff);
+                startDate.setHours(0,0,0,0);
+                endDate.setHours(23,59,59,999);
+            } else if (timeframe === 'mwezi') {
+                timeframeLabel = "Mwezi Huu";
+                startDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+                endDate = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0, 23,59,59,999);
+            } else if (timeframe === 'mwaka') {
+                timeframeLabel = "Mwaka Huu";
+                startDate = new Date(startDate.getFullYear(), 0, 1);
+                endDate = new Date(endDate.getFullYear(), 11, 31, 23,59,59,999);
+            } else if (timeframe === 'custom') {
+                const sDate = document.getElementById('startDateFilter').value;
+                const eDate = document.getElementById('endDateFilter').value;
+                if (!sDate || !eDate) {
+                    alert("Tafadhali chagua tarehe zote mbili (Kuanzia na Mpaka).");
+                    return null;
+                }
+                startDate = new Date(sDate);
+                startDate.setHours(0,0,0,0);
+                endDate = new Date(eDate);
+                endDate.setHours(23,59,59,999);
+                timeframeLabel = `Kuanzia ${formatDate(sDate)} mpaka ${formatDate(eDate)}`;
+            }
+
+            const filterByDate = (item) => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            };
+
+            const fSales = sys.sales.filter(filterByDate);
+            const fExpenses = sys.dailyExpenses.filter(filterByDate);
+            const fDebts = sys.debts.filter(filterByDate);
+
+            // MUUNDO MPYA: MAPATO NA MATUMIZI PAMOJA (LEDGER)
+            let ledger = [];
+            let tSales = 0;
+            let gProfit = 0;
+            let tExpenses = 0;
+            let totalProfit = 0;
+
+            // Ingiza Mauzo kwenye Ledger
+            fSales.forEach(sale => {
+                const pName = sys.products[sale.productIndex] ? sys.products[sale.productIndex].name : "Bidhaa Imefutwa";
+                const profitKiasi = sys.products[sale.productIndex] ? (sys.products[sale.productIndex].sellingPriceRetail - sys.products[sale.productIndex].costPriceRetail) * sale.quantity : 0;
+                
+                ledger.push({
+                    date: sale.date,
+                    desc: `Mauzo: ${pName} (Idadi: ${sale.quantity})`,
+                    revenue: sale.totalPrice,
+                    expenditure: 0,
+                    profit: profitKiasi
+                });
+                tSales += sale.totalPrice;
+                gProfit += profitKiasi;
+                totalProfit += profitKiasi;
+            });
+
+            // Ingiza Matumizi kwenye Ledger
+            fExpenses.forEach(exp => {
+                ledger.push({
+                    date: exp.date,
+                    desc: `Matumizi: ${exp.name}`,
+                    revenue: 0,
+                    expenditure: exp.amount,
+                    profit: -exp.amount // Inapunguza faida
+                });
+                tExpenses += exp.amount;
+                totalProfit -= exp.amount; // Inapunguza faida kuu
+            });
+
+            // Panga Ledger kulingana na tarehe (Zinazofanana zifuatane)
+            ledger.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // Madeni (Hayaingii kwenye hesabu ya pesa mkononi, yanakaa pembeni)
+            let tDebts = 0;
+            fDebts.forEach(debt => tDebts += debt.totalPrice);
+
+            return { 
+                timeframeLabel, 
+                ledger, // Ripoti Kuu
+                tSales, 
+                gProfit, 
+                tExpenses, 
+                netProfit: totalProfit, // Faida Kamili
+                fDebts,
+                tDebts,
+                sysProducts: sys.products,
+                bName: sys.name
+            };
+        }
+
+        function generateReport(format) {
+            const reportData = getReportData();
+            if (!reportData) return; // Kama alisahau kuweka tarehe custom
+
+            if (reportData.ledger.length === 0 && reportData.fDebts.length === 0) {
+                alert(`Hakuna taarifa zozote kwa ${reportData.timeframeLabel}. Huwezi kutengeneza ripoti tupu.`);
+                return;
+            }
+
+            if (format === 'pdf') {
+                exportToPDF(reportData);
+            } else if (format === 'excel') {
+                exportToExcel(reportData);
+            } else if (format === 'doc') {
+                exportToWord(reportData);
+            }
+            closeModal('reportModal');
+        }
+
+        function exportToPDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(18);
+            doc.text(`RIPOTI YA MAPATO NA MATUMIZI - ${data.bName.toUpperCase()}`, 14, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`Muda wa Ripoti: ${data.timeframeLabel}`, 14, 30);
+            
+            let finalY = 35;
+
+            // 1. JEDWALI KUU (LEDGER) KAMA ULIVYOOMBA PICHANI
+            if(data.ledger.length > 0) {
+                const ledgerBody = data.ledger.map(row => {
+                    return [
+                        formatDate(row.date), 
+                        row.desc, 
+                        row.revenue > 0 ? formatNumber(row.revenue) : "-", 
+                        row.expenditure > 0 ? formatNumber(row.expenditure) : "-", 
+                        formatNumber(row.profit)
+                    ];
+                });
+
+                // Mstari wa Jumla
+                ledgerBody.push([
+                    "JUMLA / TOTAL", 
+                    "", 
+                    formatNumber(data.tSales), 
+                    formatNumber(data.tExpenses), 
+                    formatNumber(data.netProfit)
+                ]);
+
+                doc.autoTable({
+                    startY: finalY,
+                    head: [['Tarehe (Date)', 'Maelezo (Description)', 'Mapato (Revenue)', 'Matumizi (Expenditure)', 'Faida (Profit)']],
+                    body: ledgerBody,
+                    theme: 'grid',
+                    headStyles: { fillColor: [46, 204, 113] }, // Rangi ya Kijani
+                    didParseCell: function(data) {
+                        if (data.row.index === ledgerBody.length - 1) {
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fillColor = [236, 240, 241];
+                        }
+                    }
+                });
+                finalY = doc.lastAutoTable.finalY + 15;
+            }
+
+            // 2. MUHTASARI (SUMMARY)
+            if(finalY > 230) { doc.addPage(); finalY = 20; }
+            doc.setFontSize(14);
+            doc.text("MUHTASARI WA MAHESABU", 14, finalY);
+            
+            const tableData = [
+                ["Jumla ya Mauzo Taslimu", `TZS ${formatNumber(data.tSales)}`],
+                ["Faida Ghafi (Faida kwenye Bidhaa)", `TZS ${formatNumber(data.gProfit)}`],
+                ["Jumla ya Matumizi (Yaliyotolewa)", `TZS ${formatNumber(data.tExpenses)}`],
+                ["FAIDA KAMILI (Net Profit)", `TZS ${formatNumber(data.netProfit)}`]
+            ];
+
+            doc.autoTable({
+                startY: finalY + 5,
+                head: [['Kipengele', 'Kiasi']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [52, 73, 94] }
+            });
+            finalY = doc.lastAutoTable.finalY + 15;
+
+            // 3. MADENI YALIYONJE
+            if(data.fDebts.length > 0) {
+                if(finalY > 230) { doc.addPage(); finalY = 20; }
+                doc.setFontSize(14);
+                doc.text("ORODHA YA MADENI NAYOWADAI WATEJA", 14, finalY);
+                
+                const debtBody = data.fDebts.map(d => {
+                    const pName = data.sysProducts[d.productIndex] ? data.sysProducts[d.productIndex].name : "Bidhaa Imefutwa";
+                    return [formatDate(d.date), d.customerName, pName, d.quantity, `TZS ${formatNumber(d.totalPrice)}`];
+                });
+                
+                // Mstari wa jumla madeni
+                debtBody.push(["JUMLA KUU", "", "", "", `TZS ${formatNumber(data.tDebts)}`]);
+
+                doc.autoTable({
+                    startY: finalY + 5,
+                    head: [['Tarehe', 'Jina la Mteja', 'Bidhaa', 'Idadi', 'Deni']],
+                    body: debtBody,
+                    theme: 'grid',
+                    headStyles: { fillColor: [245, 158, 11] },
+                    didParseCell: function(info) {
+                        if (info.row.index === debtBody.length - 1) {
+                            info.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+            }
+
+            doc.save(`Ripoti_Kamili_${data.timeframeLabel.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        function exportToExcel(data) {
+            const wb = XLSX.utils.book_new();
+            
+            let wsData = [
+                ["RIPOTI YA MAPATO NA MATUMIZI - SMARTJANJA"],
+                ["Biashara:", data.bName],
+                ["Muda wa Ripoti:", data.timeframeLabel],
+                [],
+                ["TAREHE", "MAELEZO", "MAPATO (TZS)", "MATUMIZI (TZS)", "FAIDA (TZS)"]
+            ];
+            
+            data.ledger.forEach(row => {
+                wsData.push([
+                    formatDate(row.date), 
+                    row.desc, 
+                    row.revenue > 0 ? row.revenue : "-", 
+                    row.expenditure > 0 ? row.expenditure : "-", 
+                    row.profit
+                ]);
+            });
+            wsData.push(["JUMLA / TOTAL", "", data.tSales, data.tExpenses, data.netProfit]);
+            wsData.push([]);
+            
+            wsData.push(["MUHTASARI WA HESABU"]);
+            wsData.push(["Kipengele", "Kiasi (TZS)"]);
+            wsData.push(["Jumla ya Mauzo Taslimu", data.tSales]);
+            wsData.push(["Faida Ghafi (Faida kwenye Bidhaa)", data.gProfit]);
+            wsData.push(["Matumizi ya Kawaida", data.tExpenses]);
+            wsData.push(["FAIDA KAMILI (Net Profit)", data.netProfit]);
+            wsData.push([]);
+
+            if(data.fDebts.length > 0) {
+                wsData.push(["ORODHA YA MADENI NAYOWADAI"]);
+                wsData.push(["Tarehe", "Mteja", "Bidhaa", "Idadi", "Deni (TZS)"]);
+                data.fDebts.forEach(d => {
+                    const pName = data.sysProducts[d.productIndex] ? data.sysProducts[d.productIndex].name : "Imefutwa";
+                    wsData.push([formatDate(d.date), d.customerName, pName, d.quantity, d.totalPrice]);
+                });
+                wsData.push(["JUMLA YOTE YA MADENI", "", "", "", data.tDebts]);
+            }
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "Ripoti");
+            XLSX.writeFile(wb, `Ripoti_Kamili_${data.timeframeLabel.replace(/\s+/g, '_')}.xlsx`);
+        }
+
+        function exportToWord(data) {
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Ripoti</title><style>table{width:100%; border-collapse:collapse; margin-bottom:20px;} th,td{border:1px solid #ccc; padding:8px; text-align:left;} th{background:#2ecc71; color:white;}</style></head><body>";
+            const footer = "</body></html>";
+            
+            let content = `
+                <h2>RIPOTI YA MAPATO NA MATUMIZI - ${data.bName.toUpperCase()}</h2>
+                <p><strong>Muda wa Ripoti:</strong> ${data.timeframeLabel}</p>
+                <hr>
+                
+                <h3>Jedwali Kuu la Mapato na Matumizi</h3>
+                <table>
+                    <tr><th>Tarehe</th><th>Maelezo</th><th>Mapato (TZS)</th><th>Matumizi (TZS)</th><th>Faida (TZS)</th></tr>
+            `;
+
+            data.ledger.forEach(row => {
+                content += `<tr><td>${formatDate(row.date)}</td><td>${row.desc}</td><td>${row.revenue > 0 ? formatNumber(row.revenue) : "-"}</td><td>${row.expenditure > 0 ? formatNumber(row.expenditure) : "-"}</td><td>${formatNumber(row.profit)}</td></tr>`;
+            });
+            content += `<tr style="font-weight:bold; background:#eee;"><td>JUMLA</td><td></td><td>${formatNumber(data.tSales)}</td><td>${formatNumber(data.tExpenses)}</td><td>${formatNumber(data.netProfit)}</td></tr></table>`;
+
+            content += `
+                <h3>Muhtasari wa Hesabu</h3>
+                <table style="width:50%;">
+                    <tr><th style="background:#34495e;">Kipengele</th><th style="background:#34495e;">Kiasi</th></tr>
+                    <tr><td>Jumla ya Mauzo Taslimu</td><td>TZS ${formatNumber(data.tSales)}</td></tr>
+                    <tr><td>Faida Ghafi</td><td>TZS ${formatNumber(data.gProfit)}</td></tr>
+                    <tr><td>Matumizi yaliyotolewa</td><td>TZS ${formatNumber(data.tExpenses)}</td></tr>
+                    <tr><td><strong>FAIDA KAMILI (Net Profit)</strong></td><td><strong>TZS ${formatNumber(data.netProfit)}</strong></td></tr>
+                </table>
+            `;
+
+            if(data.fDebts.length > 0) {
+                content += `<h3>Orodha ya Madeni Nnayowadai</h3><table><tr><th style="background:#f39c12;">Tarehe</th><th style="background:#f39c12;">Mteja</th><th style="background:#f39c12;">Bidhaa</th><th style="background:#f39c12;">Deni (TZS)</th></tr>`;
+                data.fDebts.forEach(d => {
+                    const pName = data.sysProducts[d.productIndex] ? data.sysProducts[d.productIndex].name : "Imefutwa";
+                    content += `<tr><td>${formatDate(d.date)}</td><td>${d.customerName}</td><td>${pName} x${d.quantity}</td><td>${formatNumber(d.totalPrice)}</td></tr>`;
+                });
+                content += `<tr style="font-weight:bold; background:#eee;"><td>JUMLA KUU YOTE</td><td></td><td></td><td>${formatNumber(data.tDebts)}</td></tr></table>`;
+            }
+
+            const html = header + content + footer;
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Ripoti_Kamili_${data.timeframeLabel.replace(/\s+/g, '_')}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==========================================
+
+
         function logout() {
             if (confirm('Una uhakika unataka kutoka?')) {
-                // In a real application, you would handle Supabase authentication logout here
-                // For this example, we'll just redirect.
-                window.location.href = 'indexa.html'; // Redirect to login/registration page
+                window.location.href = 'indexa.html'; 
             }
         }
 
@@ -1913,50 +2115,27 @@ if (!currentBusinessId) {
         saveCapitalBtn.onclick = saveCapital;
         closeCapitalModal.onclick = closeModals;
         backToCapitalBtn.onclick = goBackToCapitalList;
-        salesBtn.onclick = () => {
-            salesSystemContent.classList.remove('hidden');
-            stockSystemContent.classList.add('hidden');
-            salesBtn.classList.add('active');
-            stockBtn.classList.remove('active');
-            renderBusinessDetails();
-        };
-        stockBtn.onclick = () => {
-            stockSystemContent.classList.remove('hidden');
-            salesSystemContent.classList.add('hidden');
-            stockBtn.classList.add('active');
-            salesBtn.classList.remove('active');
-            renderBusinessDetails();
-        };
-        addProductBtn.onclick = addProduct;
-        addSaleBtn.onclick = addSale;
-        addDailyExpenseBtn.onclick = addDailyExpense;
-        addCapitalExpenseBtn.onclick = addCapitalExpense;
-        addStockCountBtn.onclick = addStockCount;
-        showPurchaseHistoryBtn.onclick = renderPurchaseHistory;
         closeProductModal.onclick = closeModals;
         closeSaleModal.onclick = closeModals;
         closeDailyExpenseModal.onclick = closeModals;
         closeCapitalExpenseModal.onclick = closeModals;
-        closeStockCountModal.onclick = closeModals;
         closePurchaseHistoryModal.onclick = closeModals;
+        closeReportModal.onclick = closeModals; // Kufunga Modal ya Ripoti
         saveProductBtn.onclick = saveProduct;
         saveSaleBtn.onclick = saveSale;
         saveDailyExpenseBtn.onclick = saveDailyExpense;
         saveCapitalExpenseBtn.onclick = saveCapitalExpense;
-        saveStockCountBtn.onclick = saveStockCount;
         backToCapitalBtn.onclick = goBackToCapitalList;
         
         document.addEventListener('click', function(event) {
             const isDropdownBtn = event.target.matches('.dropdown-btn, .dropdown-btn *');
             
-            // Close all dropdowns
             document.querySelectorAll('.dropdown-content').forEach(dropdown => {
                 if (dropdown.style.display === 'block') {
                     dropdown.style.display = 'none';
                 }
             });
 
-            // Open the clicked dropdown if a button was clicked
             if (isDropdownBtn) {
                 const dropdownBtn = event.target.closest('.dropdown-btn');
                 const dropdownContent = dropdownBtn.nextElementSibling;
@@ -1978,7 +2157,7 @@ if (!currentBusinessId) {
                     splashScreen.style.display = 'none';
                     mainContent.classList.remove('hidden');
                     await loadData();
-                }, 500);
+                }, 600);
             }, 1000);
         });
     </script>
