@@ -12,168 +12,398 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
 
         :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --primary-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
-            --secondary-color: #10b981;
-            --secondary-hover: #059669;
-            --danger-color: #ef4444;
-            --danger-hover: #dc2626;
-            --warning-color: #f59e0b;
-            --background-light: #f8fafc;
-            --card-background: #ffffff;
-            --text-dark: #0f172a;
+            /* Rangi za Premium */
+            --primary: #1e3a8a; /* Dark Blue */
+            --primary-light: #3b82f6; /* Light Blue */
+            --primary-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            --accent: #f59e0b; /* Golden Amber */
+            --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            
+            --bg-body: #f8fafc; /* Lighter grayish blue for calm background */
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-light: #e2e8f0;
-            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-            --btn-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
+            --border-color: #e2e8f0;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+            
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--background-light);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
             margin: 0;
             padding: 0;
-            color: var(--text-dark);
+            color: var(--text-main);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            position: relative;
         }
 
-        /* Splash Screen */
+        /* Urembo wa Background (Soft Blurred Blobs) */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        body::before {
+            width: 300px; height: 300px;
+            background: var(--primary-light);
+            top: -100px; left: -100px;
+        }
+        body::after {
+            width: 250px; height: 250px;
+            background: var(--accent);
+            bottom: -50px; right: -50px;
+            opacity: 0.2;
+        }
+
+        .container {
+            padding: 24px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ---------------------------------------------------
+           SPLASH SCREEN
+        ----------------------------------------------------- */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--primary-gradient); color: white;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        #splash-screen h1 { font-size: 3em; margin-bottom: 5px; font-weight: 700; letter-spacing: -1px; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #splash-screen p { font-size: 1.2em; font-weight: 300; opacity: 0.9; }
+        #splash-screen h1 { font-family: 'Poppins', sans-serif; font-size: 3.5em; margin-bottom: 5px; font-weight: 700; letter-spacing: -1px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #splash-screen p { font-size: 1.2em; font-weight: 300; opacity: 0.9; letter-spacing: 2px;}
 
-        .container { padding: 24px; max-width: 800px; margin: 0 auto; }
-
-        .network-badge {
-            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
-            border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-bottom: 15px; width: fit-content;
+        /* ---------------------------------------------------
+           HEADER & NETWORK BADGE
+        ----------------------------------------------------- */
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 24px; flex-wrap: wrap; gap: 15px; position: relative;
         }
-        .network-online { background-color: #d1fae5; color: #059669; }
-        .network-offline { background-color: #fee2e2; color: #dc2626; }
-        .network-syncing { background-color: #fef3c7; color: #d97706; }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px; }
-        .header-actions { display: flex; gap: 12px; width: 100%; }
-        .header h1 { margin: 0; font-size: 1.6em; font-weight: 700; color: var(--text-dark); width: 100%; }
+        .header-actions { display: flex; gap: 10px; width: 100%; }
+        .header h1 { 
+            font-family: 'Poppins', sans-serif; margin: 0; font-size: 1.8em; 
+            font-weight: 700; color: var(--text-main); width: 100%; 
+            letter-spacing: -0.5px;
+        }
         
-        #capital-balance {
-            background: var(--primary-gradient); color: #fff; padding: 24px; border-radius: 20px;
-            font-weight: 600; font-size: 1.5em; width: 100%; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
-            position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 5px;
+        /* Network Badge sasa iko juu kulia kwenye kona */
+        .network-badge-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 5px;
         }
-        #capital-balance::before { content: "Jumla ya Mtaji"; font-size: 0.55em; font-weight: 400; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
-        #capital-balance::after { content: '\f51e'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 2.5em; opacity: 0.1; }
+        .network-badge {
+            display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
+            border-radius: 30px; font-size: 0.75em; font-weight: 600; 
+            transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: var(--shadow-sm);
+        }
+        .network-online { background-color: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;}
+        .network-offline { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca;}
+        .network-syncing { background-color: #fffbeb; color: #d97706; border: 1px solid #fde68a;}
 
-        .scroll-navigator-wrapper { margin: 20px -24px 20px -24px; padding: 10px 24px; overflow: hidden; }
-        .scroll-navigator { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none; }
+        /* ---------------------------------------------------
+           KADI YA MTAJI (PREMIUM WALLET CARD)
+        ----------------------------------------------------- */
+        #capital-balance {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 70%, #60a5fa 100%);
+            color: #fff; padding: 30px 25px; border-radius: var(--radius-lg);
+            font-weight: 700; font-size: 2em; width: 100%; box-sizing: border-box; 
+            box-shadow: 0 15px 30px -5px rgba(30, 58, 138, 0.4);
+            position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 8px;
+            font-family: 'Poppins', sans-serif;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Glass effect inside the card */
+        #capital-balance::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom right, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
+            pointer-events: none;
+        }
+
+        .capital-label { 
+            font-size: 0.35em; font-weight: 500; text-transform: uppercase; 
+            letter-spacing: 2px; opacity: 0.8; font-family: 'Inter', sans-serif;
+        }
+        
+        /* Mapambo kwenye kadi (Circles) */
+        .card-decoration-1 {
+            position: absolute; width: 150px; height: 150px; background: rgba(255,255,255,0.1);
+            border-radius: 50%; top: -50px; right: -20px;
+        }
+        .card-decoration-2 {
+            position: absolute; width: 100px; height: 100px; background: rgba(255,255,255,0.05);
+            border-radius: 50%; bottom: -20px; right: 80px;
+        }
+
+        /* ---------------------------------------------------
+           SCROLL NAVIGATOR (SOFT & INTUITIVE)
+        ----------------------------------------------------- */
+        .scroll-navigator-wrapper { 
+            margin: 25px -20px 10px -20px; padding: 10px 20px; overflow: hidden; 
+        }
+        .scroll-navigator { 
+            display: flex; overflow-x: auto; gap: 16px; padding-bottom: 15px; 
+            scrollbar-width: none; -ms-overflow-style: none; 
+        }
         .scroll-navigator::-webkit-scrollbar { display: none; }
 
         .nav-item {
             flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 100px; height: 100px; background-color: var(--card-background); border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border-light); cursor: pointer;
-            transition: all 0.2s ease; text-align: center; padding: 10px; box-sizing: border-box; color: var(--text-dark); text-decoration: none;
+            width: 105px; height: 105px; background-color: var(--bg-card); border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md); border: 1px solid var(--border-color); cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; padding: 12px; box-sizing: border-box; 
+            color: var(--text-muted); text-decoration: none; position: relative; overflow: hidden;
         }
-        .nav-item:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(37, 99, 235, 0.15); border-color: var(--primary-color); }
-        .nav-item:active { transform: scale(0.95); }
-        .nav-item i { font-size: 24px; margin-bottom: 8px; color: var(--primary-color); }
-        .nav-item.highlight { background: var(--primary-gradient); color: white; border: none; }
+        .nav-item:hover { 
+            transform: translateY(-5px); box-shadow: var(--shadow-lg); 
+            border-color: var(--primary-light); color: var(--primary);
+        }
+        .nav-item:active { transform: scale(0.96); }
+        .nav-item i { font-size: 26px; margin-bottom: 10px; color: var(--text-muted); transition: color 0.3s;}
+        .nav-item:hover i { color: var(--primary-light); }
+        .nav-item span { font-size: 0.75em; font-weight: 600; line-height: 1.3; font-family: 'Poppins', sans-serif;}
+
+        /* Highlight Button (Weka Mauzo) */
+        .nav-item.highlight { 
+            background: var(--primary-gradient); color: white; border: none; 
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5);
+        }
         .nav-item.highlight i { color: white; }
-        .nav-item span { font-size: 0.75em; font-weight: 600; line-height: 1.2; }
+        .nav-item.highlight:hover { box-shadow: 0 15px 25px -5px rgba(59, 130, 246, 0.6); color: white;}
+        .nav-item.highlight:hover i { color: white; }
 
-        .section { background-color: var(--card-background); padding: 24px; border-radius: 20px; box-shadow: var(--card-shadow); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.8); }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 15px; }
-        .section-header h2 { margin: 0; font-size: 1.2em; font-weight: 600; color: var(--text-dark); }
+        /* ---------------------------------------------------
+           SECTIONS (CARDS)
+        ----------------------------------------------------- */
+        .section { 
+            background-color: var(--bg-card); padding: 24px; border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-card); margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.8); 
+            transition: transform 0.3s ease;
+        }
+        .section:hover { transform: translateY(-2px); }
 
-        .accordion-btn { width: 100%; padding: 16px; background-color: #f1f5f9; color: var(--text-dark); border: 1px solid var(--border-light); border-radius: 12px; font-size: 1em; font-weight: 600; cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; margin-bottom: 15px; }
-        .accordion-btn:hover { background-color: #e2e8f0; }
+        .section-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; padding-bottom: 12px;
+        }
+        .section-header h2 { 
+            font-family: 'Poppins', sans-serif; margin: 0; font-size: 1.25em; 
+            font-weight: 700; color: var(--text-main); 
+        }
+
+        /* ---------------------------------------------------
+           BUTTONS ZA KAWAIDA
+        ----------------------------------------------------- */
+        .add-btn { 
+            background-color: var(--bg-body); color: var(--primary); border: 1px solid var(--border-color); 
+            border-radius: var(--radius-sm); padding: 10px 18px; font-size: 0.9em; font-weight: 600; 
+            cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; 
+            font-family: 'Inter', sans-serif; box-shadow: var(--shadow-sm);
+        }
+        .add-btn:hover { 
+            background-color: var(--primary-light); color: white; border-color: var(--primary-light); 
+            transform: translateY(-2px); box-shadow: var(--shadow-md);
+        }
+        .btn-danger { color: var(--danger); }
+        .btn-danger:hover { background-color: var(--danger); border-color: var(--danger); }
+        
+        .back-button { 
+            background-color: var(--bg-body); padding: 10px 18px; border-radius: var(--radius-sm); 
+            font-weight: 500; color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer; 
+            transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);
+        }
+        .back-button:hover { background-color: var(--border-color); }
+
+        /* ACCORDION (Orodha ya Bidhaa) */
+        .accordion-btn { 
+            width: 100%; padding: 16px 20px; background-color: var(--bg-body); color: var(--primary); 
+            border: 1px dashed var(--border-color); border-radius: var(--radius-md); font-size: 1em; font-weight: 600; 
+            cursor: pointer; text-align: left; display: flex; justify-content: space-between; align-items: center; 
+            transition: all 0.3s; margin-bottom: 15px; font-family: 'Poppins', sans-serif;
+        }
+        .accordion-btn:hover { background-color: #e0e7ff; border-color: var(--primary-light); }
         .accordion-btn.active i { transform: rotate(180deg); }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: #fafbfc; border-radius: 12px; }
-        .accordion-content.show { max-height: 2000px; border: 1px solid var(--border-light); padding: 10px; margin-bottom: 15px; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background-color: transparent; }
+        .accordion-content.show { max-height: 3000px; padding-top: 10px; margin-bottom: 15px; }
 
-        .add-btn { background-color: var(--card-background); color: var(--primary-color); border: 1px solid var(--border-light); border-radius: 12px; padding: 10px 16px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
-        .add-btn:hover { background-color: var(--primary-color); color: white; border-color: var(--primary-color); transform: translateY(-2px); box-shadow: var(--btn-shadow); }
-        .btn-danger { color: var(--danger-color); }
-        .btn-danger:hover { background-color: var(--danger-color); border-color: var(--danger-color); box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39); }
-        .back-button { background-color: #f1f5f9; padding: 10px 18px; border-radius: 12px; font-weight: 500; color: var(--text-dark); border: none; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
-        .back-button:hover { background-color: #e2e8f0; }
-        
+        /* ---------------------------------------------------
+           LIST ITEMS (MISTARI YA DATA)
+        ----------------------------------------------------- */
         ul.item-list, ul#capital-list { list-style: none; padding: 0; margin: 0; }
-        .list-item { background-color: #fff; padding: 16px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-light); transition: all 0.2s ease; }
-        .list-item:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .list-item.clickable-capital:active, .list-item.date-item:active { transform: scale(0.98); background-color: var(--background-light); }
+        .list-item { 
+            background-color: #fff; padding: 18px; border-radius: var(--radius-md); margin-bottom: 14px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border: 1px solid var(--border-color); transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        .list-item:hover { border-color: var(--primary-light); box-shadow: var(--shadow-md); transform: translateX(2px);}
+        .list-item.clickable-capital:active, .list-item.date-item:active { transform: scale(0.98); background-color: var(--bg-body); }
         .list-item.clickable-capital, .list-item.date-item { cursor: pointer; }
-        .item-info { font-size: 0.95em; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
-        .item-info strong { color: var(--text-dark); font-size: 1.1em; font-weight: 600; }
-        .item-profit { font-weight: 600; color: var(--secondary-color); background: #d1fae5; padding: 2px 8px; border-radius: 6px; font-size: 0.9em; }
-        .item-expense { font-weight: 600; color: var(--danger-color); background: #fee2e2; padding: 2px 8px; border-radius: 6px; font-size: 0.9em; }
-        .item-debt { font-weight: 600; color: var(--warning-color); background: #fef3c7; padding: 2px 8px; border-radius: 6px; font-size: 0.9em; }
         
-        .checkbox-container { background: #fffdf2; padding: 15px; border-radius: 12px; border: 1px solid #fde68a; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .checkbox-container input { width: 22px; height: 22px; margin: 0; accent-color: var(--warning-color); cursor: pointer; }
-        .checkbox-container span { font-weight: 600; color: #d97706; font-size: 1.05em; }
+        .item-info { font-size: 0.95em; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; }
+        .item-info strong { color: var(--text-main); font-size: 1.15em; font-weight: 700; font-family: 'Poppins', sans-serif;}
+        
+        /* Badges za Fedha ndani ya Lists */
+        .item-profit { font-weight: 700; color: var(--success); background: #ecfdf5; padding: 4px 10px; border-radius: 8px; font-size: 0.9em; display: inline-block; border: 1px solid #a7f3d0;}
+        .item-expense { font-weight: 700; color: var(--danger); background: #fef2f2; padding: 4px 10px; border-radius: 8px; font-size: 0.9em; display: inline-block; border: 1px solid #fecaca;}
+        .item-debt { font-weight: 700; color: var(--warning); background: #fffbeb; padding: 4px 10px; border-radius: 8px; font-size: 0.9em; display: inline-block; border: 1px solid #fde68a;}
+        
+        /* Custom Checkbox ya Madeni */
+        .checkbox-container { 
+            background: #fffbeb; padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--warning); 
+            margin-bottom: 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s;
+        }
+        .checkbox-container:hover { background: #fef3c7; }
+        .checkbox-container input { width: 22px; height: 22px; margin: 0; accent-color: var(--warning); cursor: pointer; }
+        .checkbox-container span { font-weight: 600; color: #d97706; font-size: 1.05em; font-family: 'Poppins', sans-serif;}
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: flex-end; }
-        .modal-content { background-color: var(--card-background); padding: 30px 24px 40px; border-top-left-radius: 24px; border-top-right-radius: 24px; width: 100%; max-width: 500px; box-sizing: border-box; text-align: left; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; max-height: 90vh; overflow-y: auto; }
-        .modal-content::before { content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; background-color: #cbd5e1; border-radius: 10px; }
+        /* ---------------------------------------------------
+           MODALS (MADIRISHA YA KUIBUKA) YALIYOBORESHWA
+        ----------------------------------------------------- */
+        .modal { 
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); 
+            justify-content: center; align-items: flex-end; 
+        }
+        .modal-content { 
+            background-color: var(--bg-card); padding: 35px 25px 45px; border-radius: 30px 30px 0 0; 
+            width: 100%; max-width: 500px; box-sizing: border-box; text-align: left; 
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.2); animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            position: relative; max-height: 92vh; overflow-y: auto; 
+        }
+        .modal-content::before { 
+            content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%); 
+            width: 50px; height: 6px; background-color: var(--border-color); border-radius: 10px; 
+        }
         @keyframes slideInUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-content h2, .modal-content h3 { margin-top: 10px; margin-bottom: 24px; color: var(--text-dark); font-weight: 700; text-align: center; }
-        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border-light); background-color: #f8fafc; border-radius: 12px; box-sizing: border-box; font-size: 1em; font-family: inherit; color: var(--text-dark); transition: all 0.2s ease; }
-        .modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus { outline: none; border-color: var(--primary-color); background-color: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
-        .modal-content input[readonly] { background-color: #e2e8f0; color: var(--text-muted); cursor: not-allowed; }
-        .modal-content label { display: block; margin-bottom: 8px; font-size: 0.9em; font-weight: 500; color: var(--text-dark); }
-        .modal-content .btn-modal { width: 100%; background: var(--primary-gradient); color: #fff; border: none; padding: 16px; border-radius: 14px; cursor: pointer; font-size: 1.1em; font-weight: 600; margin-top: 10px; box-shadow: var(--btn-shadow); transition: transform 0.2s ease; }
-        .modal-content .btn-modal:active { transform: scale(0.98); }
-        .modal-content .close-btn { position: absolute; top: 20px; right: 24px; font-size: 28px; font-weight: 400; cursor: pointer; color: var(--text-muted); line-height: 1; }
-        .modal-content .close-btn:hover { color: var(--danger-color); }
-        .alert-message { color: var(--danger-color); font-size: 0.85em; margin-top: -10px; margin-bottom: 15px; background: #fee2e2; padding: 8px 12px; border-radius: 8px; }
-        .profit-info { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.95em; color: #166534; }
-        .profit-info p { margin: 5px 0; display: flex; justify-content: space-between; }
-        .profit-info span { font-weight: 700; }
         
+        .modal-content h2, .modal-content h3 { 
+            margin-top: 15px; margin-bottom: 25px; color: var(--text-main); font-weight: 700; 
+            font-family: 'Poppins', sans-serif; font-size: 1.4em;
+        }
+        
+        .modal-content label { display: block; margin-bottom: 8px; font-size: 0.9em; font-weight: 600; color: var(--text-muted); }
+        .modal-content input, .modal-content select, .modal-content textarea { 
+            width: 100%; padding: 16px; margin-bottom: 20px; border: 2px solid var(--border-color); 
+            background-color: var(--bg-body); border-radius: var(--radius-sm); box-sizing: border-box; 
+            font-size: 1em; font-family: 'Inter', sans-serif; color: var(--text-main); transition: all 0.3s ease; 
+        }
+        .modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus { 
+            outline: none; border-color: var(--primary-light); background-color: #fff; box-shadow: var(--shadow-glow); 
+        }
+        .modal-content input[readonly] { background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; border-color: var(--border-color);}
+        
+        /* Modal Primary Button */
+        .modal-content .btn-modal { 
+            width: 100%; background: var(--primary-gradient); color: #fff; border: none; padding: 18px; 
+            border-radius: var(--radius-md); cursor: pointer; font-size: 1.1em; font-weight: 700; 
+            margin-top: 10px; box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4); 
+            transition: all 0.3s ease; font-family: 'Poppins', sans-serif; letter-spacing: 0.5px;
+        }
+        .modal-content .btn-modal:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(59, 130, 246, 0.5); }
+        .modal-content .btn-modal:active { transform: scale(0.98); }
+        
+        .modal-content .close-btn { 
+            position: absolute; top: 20px; right: 24px; font-size: 28px; font-weight: 400; 
+            cursor: pointer; color: var(--text-muted); line-height: 1; transition: color 0.2s;
+        }
+        .modal-content .close-btn:hover { color: var(--danger); }
+        
+        .alert-message { color: var(--danger); font-size: 0.85em; margin-top: -15px; margin-bottom: 20px; background: #fef2f2; padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid #fecaca;}
+        
+        .profit-info { background: #f0fdf4; border: 1px dashed #34d399; padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px; font-size: 0.95em; color: #047857; }
+        .profit-info p { margin: 6px 0; display: flex; justify-content: space-between; }
+        .profit-info span { font-weight: 700; font-family: 'Poppins', sans-serif;}
+        
+        /* ---------------------------------------------------
+           DROPDOWN (Vidoti Vitatu)
+        ----------------------------------------------------- */
         .dropdown { position: relative; display: inline-block; }
-        .dropdown-btn { background-color: #f1f5f9; border: none; font-size: 18px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; color: var(--text-muted); display: flex; justify-content: center; align-items: center; transition: background 0.2s; }
-        .dropdown-btn:hover { background-color: #e2e8f0; color: var(--text-dark); }
-        .dropdown-content { display: none; position: absolute; background-color: var(--card-background); min-width: 140px; box-shadow: 0px 10px 25px rgba(0,0,0,0.1); z-index: 10; right: 0; top: 40px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-light); animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .dropdown-content button { color: var(--text-dark); padding: 14px 16px; text-decoration: none; display: block; background-color: transparent; border: none; width: 100%; text-align: left; cursor: pointer; font-size: 0.95em; font-family: inherit; }
-        .dropdown-content button:hover { background-color: #f8fafc; color: var(--primary-color); }
-        .dropdown-content button:last-child:hover { color: var(--danger-color); }
+        .dropdown-btn { 
+            background-color: var(--bg-body); border: 1px solid transparent; font-size: 18px; 
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer; color: var(--text-muted); 
+            display: flex; justify-content: center; align-items: center; transition: all 0.2s; 
+        }
+        .dropdown-btn:hover { background-color: #e2e8f0; color: var(--text-main); }
+        .dropdown-content { 
+            display: none; position: absolute; background-color: var(--bg-card); min-width: 160px; 
+            box-shadow: 0px 15px 35px rgba(0,0,0,0.15); z-index: 10; right: 0; top: 45px; 
+            border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border-color); 
+            animation: fadeIn 0.2s ease-out; 
+        }
+        .dropdown-content button { 
+            color: var(--text-main); padding: 14px 18px; text-decoration: none; display: block; 
+            background-color: transparent; border: none; width: 100%; text-align: left; 
+            cursor: pointer; font-size: 0.95em; font-family: 'Inter', sans-serif; font-weight: 500;
+        }
+        .dropdown-content button:hover { background-color: var(--bg-body); color: var(--primary-light); padding-left: 22px; transition: padding 0.2s;}
+        .dropdown-content button:last-child:hover { color: var(--danger); }
         
         .hidden { display: none !important; }
         .capital-item-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .capital-clickable-area { flex-grow: 1; padding: 5px 0; }
         
-        .sales-table, .expenses-table, .purchase-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; background-color: var(--card-background); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-light); }
-        .sales-table th, .sales-table td, .expenses-table th, .expenses-table td, .purchase-table th, .purchase-table td { padding: 14px 16px; text-align: left; font-size: 0.9em; border-bottom: 1px solid var(--border-light); }
-        .sales-table th, .expenses-table th, .purchase-table th { background-color: #f8fafc; color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.8em; letter-spacing: 0.5px; }
+        /* ---------------------------------------------------
+           TABLES
+        ----------------------------------------------------- */
+        .sales-table, .expenses-table, .purchase-table { 
+            width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; 
+            background-color: var(--bg-card); border-radius: var(--radius-md); overflow: hidden; 
+            border: 1px solid var(--border-color); 
+        }
+        .sales-table th, .sales-table td, .expenses-table th, .expenses-table td, .purchase-table th, .purchase-table td { 
+            padding: 16px 16px; text-align: left; font-size: 0.9em; border-bottom: 1px solid var(--border-color); 
+        }
+        .sales-table th, .expenses-table th, .purchase-table th { 
+            background-color: var(--bg-body); color: var(--text-muted); font-weight: 600; 
+            text-transform: uppercase; font-size: 0.75em; letter-spacing: 0.5px; 
+        }
         .sales-table tr:last-child td, .expenses-table tr:last-child td, .purchase-table tr:last-child td { border-bottom: none; }
-        .sales-table tr:hover, .expenses-table tr:hover, .purchase-table tr:hover { background-color: #f8fafc; }
+        .sales-table tr:hover, .expenses-table tr:hover, .purchase-table tr:hover { background-color: #f1f5f9; }
         .total-row { font-weight: 700; background-color: #eff6ff !important; }
-        .total-amount { color: var(--primary-color); font-size: 1.1em; }
-        h4 { color: var(--text-dark); margin-top: 0; font-size: 1.1em; }
+        .total-amount { color: var(--primary); font-size: 1.1em; font-family: 'Poppins', sans-serif;}
+        h4 { color: var(--text-main); margin-top: 0; font-size: 1.1em; font-family: 'Poppins', sans-serif;}
 
-        .format-btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .format-btn { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border-light); background: #f1f5f9; cursor: pointer; font-weight: 600; color: var(--text-dark); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .format-btn i { font-size: 20px; }
-        .format-btn:hover { background: #e2e8f0; border-color: var(--primary-color); }
+        /* Format Buttons kwa PDF/Excel */
+        .format-btn-group { display: flex; gap: 12px; margin-top: 15px; }
+        .format-btn { 
+            flex: 1; padding: 14px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); 
+            background: var(--bg-body); cursor: pointer; font-weight: 600; color: var(--text-main); 
+            transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: 'Inter', sans-serif;
+        }
+        .format-btn i { font-size: 22px; }
+        .format-btn:hover { background: #fff; border-color: var(--primary-light); box-shadow: var(--shadow-sm); transform: translateY(-2px);}
         .format-btn.pdf-btn { color: #dc2626; }
-        .format-btn.excel-btn { color: #16a34a; }
+        .format-btn.excel-btn { color: #10b981; }
         .format-btn.doc-btn { color: #2563eb; }
 
-        .custom-date-fields { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--primary-color); display: none; }
-        .custom-date-fields label { font-size: 0.85em; color: var(--text-muted); margin-bottom: 5px;}
-        .custom-date-fields input { padding: 10px; font-size: 0.9em; margin-bottom: 10px;}
+        .custom-date-fields { background: var(--bg-body); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; border-left: 4px solid var(--primary-light); display: none; }
+        .custom-date-fields label { font-size: 0.85em; color: var(--text-muted); margin-bottom: 8px;}
+        .custom-date-fields input { padding: 14px; font-size: 0.95em; margin-bottom: 12px;}
     </style>
 </head>
 <body>
@@ -184,11 +414,17 @@
     </div>
 
     <div id="main-content" class="hidden">
-        <div id="capital-page" class="container">
-            <div id="networkStatus" class="network-badge network-online">
-                <i class="fa-solid fa-wifi"></i> Mtandaoni
+        
+        <!-- NETWORK BADGE YAKO IKO HAPA JUU -->
+        <div class="container" style="padding-bottom: 0;">
+            <div class="network-badge-container">
+                <div id="networkStatus" class="network-badge network-online">
+                    <i class="fa-solid fa-wifi"></i> Mtandaoni
+                </div>
             </div>
+        </div>
 
+        <div id="capital-page" class="container">
             <div class="header">
                 <h1>Karibu, Msimamizi 👋</h1>
                 <div class="header-actions">
@@ -210,18 +446,20 @@
         </div>
 
         <div id="business-page" class="hidden container">
-            <div id="networkStatusBiz" class="network-badge network-online">
-                <i class="fa-solid fa-wifi"></i> Mtandaoni
-            </div>
-
             <div class="header">
                 <button id="backToCapitalBtn" class="back-button"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
                 <h1 id="business-title"></h1>
+                
+                <!-- KADI YA MTAJI ILIYOBORESHWA -->
                 <div id="capital-balance">
-                    Mtaji: TZS 0
+                    <div class="card-decoration-1"></div>
+                    <div class="card-decoration-2"></div>
+                    <span class="capital-label">Jumla ya Mtaji</span>
+                    <span id="capital-amount-text">TZS 0</span>
                 </div>
             </div>
 
+            <!-- SCROLL NAVIGATOR ILIYOBORESHWA -->
             <div class="scroll-navigator-wrapper">
                 <div class="scroll-navigator">
                     <div class="nav-item highlight" onclick="addSale()">
@@ -248,7 +486,7 @@
                         <i class="fa-solid fa-clipboard-list"></i>
                         <span>Kumbukumbu</span>
                     </div>
-                    <div class="nav-item" onclick="openReportModal()" style="border-color: #3b82f6; background: #eff6ff;">
+                    <div class="nav-item" onclick="openReportModal()" style="border-color: #bfdbfe; background: #eff6ff;">
                         <i class="fa-solid fa-file-invoice" style="color: #2563eb;"></i>
                         <span style="color: #2563eb;">Toa Ripoti</span>
                     </div>
@@ -258,19 +496,19 @@
             <div id="sales-system-content">
                 
                 <div class="section">
-                    <div class="section-header" style="margin-bottom: 5px; border-bottom: none; padding-bottom: 0;">
+                    <div class="section-header" style="margin-bottom: 10px; border-bottom: none; padding-bottom: 0;">
                         <h2>Usimamizi wa Stoo</h2>
                     </div>
                     
                     <button class="accordion-btn" id="toggleProductsBtn">
-                        <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-color);"></i> Tazama Orodha ya Bidhaa</span>
+                        <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-light);"></i> Tazama Orodha ya Bidhaa</span>
                         <i class="fa-solid fa-chevron-down"></i>
                     </button>
                     
                     <div class="accordion-content" id="productsAccordion">
                         <ul id="product-list" class="item-list"></ul>
-                        <button onclick="addProduct()" class="add-btn" style="width: 100%; justify-content: center; margin-top: 10px; background-color: #eff6ff; border-color: #bfdbfe;">
-                            <i class="fa-solid fa-plus"></i> Ingiza Bidhaa Mpya
+                        <button onclick="addProduct()" class="add-btn" style="width: 100%; justify-content: center; margin-top: 15px; background-color: #eff6ff; border: 1px dashed #93c5fd; color: #2563eb;">
+                            <i class="fa-solid fa-plus"></i> Ingiza Bidhaa Mpya Stoo
                         </button>
                     </div>
                 </div>
@@ -305,17 +543,17 @@
                                 </tfoot>
                             </table>
                         </div>
-                        <button onclick="goBackToDateList()" class="back-button" style="margin-top: 20px;">Rudi Kwenye Tarehe</button>
+                        <button onclick="goBackToDateList()" class="back-button" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Rudi Kwenye Tarehe</button>
                     </div>
                 </div>
 
-                <div class="section" id="debt-section" style="border: 2px solid #fde68a; background: #fffdf2;">
-                    <div class="section-header" style="border-bottom: 1px solid #fcd34d;">
-                        <h2 style="color: #d97706;"><i class="fa-solid fa-book-open"></i> Madeni ya Wateja</h2>
+                <div class="section" id="debt-section" style="border: 1px solid #fde68a; background: #fffdf2;">
+                    <div class="section-header" style="border-bottom: 1px dashed #fcd34d;">
+                        <h2 style="color: #d97706;"><i class="fa-solid fa-book-open" style="margin-right:8px;"></i> Madeni ya Wateja</h2>
                     </div>
-                    <div style="background: #fee2e2; color: #dc2626; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; font-size: 1.1em; display: flex; justify-content: space-between; border: 1px solid #fca5a5;">
+                    <div style="background: #fef2f2; color: #b91c1c; padding: 18px; border-radius: var(--radius-sm); margin-bottom: 20px; font-weight: 700; font-size: 1.1em; display: flex; justify-content: space-between; border: 1px dashed #fca5a5;">
                         <span>Jumla Unayodaiwa:</span>
-                        <span id="total-debts-amount">TZS 0</span>
+                        <span id="total-debts-amount" style="font-family: 'Poppins', sans-serif;">TZS 0</span>
                     </div>
                     <ul id="debts-list" class="item-list"></ul>
                 </div>
@@ -346,7 +584,7 @@
                                 </tfoot>
                             </table>
                         </div>
-                        <button onclick="goBackToDailyExpenseDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
+                        <button onclick="goBackToDailyExpenseDateList()" class="back-button" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Rudi Nyuma</button>
                     </div>
                 </div>
 
@@ -376,7 +614,7 @@
                                 </tfoot>
                             </table>
                         </div>
-                        <button onclick="goBackToCapitalExpenseDateList()" class="back-button" style="margin-top: 20px;">Rudi Nyuma</button>
+                        <button onclick="goBackToCapitalExpenseDateList()" class="back-button" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Rudi Nyuma</button>
                     </div>
                 </div>
 
@@ -384,15 +622,19 @@
         </div>
     </div>
     
+    <!-- MODALS ZOTE (Zilivyoachwa na Logic lakini muonekano safi) -->
     <div id="addCapitalModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeCapitalModal">&times;</span>
             <h2 id="capitalModalTitle">Weka Mtaji Mpya</h2>
             <div id="addCapitalForm">
                 <input type="hidden" id="capitalIndex">
-                <input type="text" id="capitalName" placeholder="Jina la Biashara (Mfano: Duka la Nguo)" required>
-                <input type="number" id="capitalAmount" placeholder="Kiasi cha Mtaji (TZS)" required>
-                <textarea id="capitalDescription" placeholder="Maelezo mafupi (hiari)" rows="3"></textarea>
+                <label>Jina la Biashara / Mtaji</label>
+                <input type="text" id="capitalName" placeholder="Mfano: Duka la Nguo" required>
+                <label>Kiasi cha Mtaji</label>
+                <input type="number" id="capitalAmount" placeholder="TZS" required>
+                <label>Maelezo mafupi (Hiari)</label>
+                <textarea id="capitalDescription" placeholder="Andika maelezo hapa..." rows="3"></textarea>
                 <button id="saveCapitalBtn" class="btn-modal">Hifadhi Mtaji</button>
             </div>
         </div>
@@ -443,18 +685,18 @@
                 </label>
             </div>
             
-            <div id="debtCustomerNameDiv" style="display: none; background: #fffdf2; padding: 15px; border-radius: 12px; border-left: 4px solid #f59e0b; margin-bottom: 15px;">
-                <label style="color: #d97706; font-weight: bold; margin-bottom: 5px;">Andika Jina la Mteja / Namba yake</label>
-                <input type="text" id="debtCustomerName" placeholder="Mfano: Juma - 07123..." style="margin-bottom: 0; background: white;">
+            <div id="debtCustomerNameDiv" style="display: none; background: #fffdf2; padding: 15px; border-radius: var(--radius-sm); border-left: 4px solid #f59e0b; margin-bottom: 20px;">
+                <label style="color: #d97706; margin-bottom: 8px;">Andika Jina la Mteja / Namba yake</label>
+                <input type="text" id="debtCustomerName" placeholder="Mfano: Juma - 07123..." style="margin-bottom: 0; background: white; border-color:#fde68a;">
             </div>
 
-            <div style="background: #f1f5f9; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid var(--primary-color);">
+            <div style="background: #f8fafc; padding: 15px; border-radius: var(--radius-sm); margin-bottom: 20px; border: 1px dashed #cbd5e1;">
                 <label style="margin-bottom: 5px;">Bei Halisi Uliyouza (Hiari)</label>
                 <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">Jaza hapa tu kama umemuuzia mteja kwa bei ya punguzo au tofauti na bei uliyopanga.</p>
                 <input type="number" id="actualSalePrice" placeholder="TZS" style="margin-bottom: 0;">
             </div>
             
-            <button id="saveSaleBtn" class="btn-modal">Hifadhi</button>
+            <button id="saveSaleBtn" class="btn-modal">Hifadhi Taarifa</button>
         </div>
     </div>
 
@@ -513,8 +755,8 @@
     <div id="reportModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeReportModal">&times;</span>
-            <h3 style="color: var(--primary-color);"><i class="fa-solid fa-file-invoice"></i> Tengeneza Ripoti</h3>
-            <p style="text-align:center; font-size:0.9em; color:var(--text-muted); margin-bottom: 20px;">Ripoti itaonyesha mchanganuo wa kila bidhaa, madeni, na faida kamili (Faida - Matumizi).</p>
+            <h3 style="color: var(--primary-light);"><i class="fa-solid fa-file-invoice"></i> Tengeneza Ripoti</h3>
+            <p style="text-align:center; font-size:0.9em; color:var(--text-muted); margin-bottom: 25px;">Ripoti itaonyesha mchanganuo wa kila bidhaa, madeni, na faida kamili (Faida - Matumizi).</p>
             
             <label>Chagua Muda wa Ripoti</label>
             <select id="reportTimeframe" onchange="toggleCustomDates()">
@@ -522,17 +764,17 @@
                 <option value="wiki">Wiki Hii</option>
                 <option value="mwezi">Mwezi Huu</option>
                 <option value="mwaka">Mwaka Huu</option>
-                <option value="custom">Chagua Tarehe (Custom)</option>
+                <option value="custom">Chagua Tarehe Maalum (Custom)</option>
             </select>
             
             <div id="customDateDiv" class="custom-date-fields">
                 <label>Kuanzia Tarehe:</label>
                 <input type="date" id="startDateFilter">
                 <label>Mpaka Tarehe:</label>
-                <input type="date" id="endDateFilter">
+                <input type="date" id="endDateFilter" style="margin-bottom:0;">
             </div>
             
-            <label style="margin-top: 15px;">Chagua Aina ya Faili (Format) Kisha Pakua:</label>
+            <label style="margin-top: 20px;">Chagua Aina ya Faili Kisha Pakua:</label>
             <div class="format-btn-group">
                 <button class="format-btn pdf-btn" onclick="generateReport('pdf')">
                     <i class="fa-solid fa-file-pdf"></i> PDF
@@ -547,6 +789,7 @@
         </div>
     </div>
     
+    <!-- KODI ZAKO ZA JAVASCRIPT ZINABAKI KAMA ZILIVYO -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; 
@@ -559,32 +802,28 @@
             return urlParams.get('businessId');
         }
 
-        // Helper kwa kusogeza screen
         function scrollToElement(id) {
             document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Kuficha/Kuonyesha fomu ya jina la mkopaji
         document.getElementById('isDebtCheck').addEventListener('change', function() {
             document.getElementById('debtCustomerNameDiv').style.display = this.checked ? 'block' : 'none';
         });
 
-        // Network Status
+        // Kwenye Network status nimebadilisha kidogo document.getElementById kupata target ya pili niliyohamisha
         function updateNetworkStatusUI() {
-            const badges = [document.getElementById('networkStatus'), document.getElementById('networkStatusBiz')];
+            const badge = document.getElementById('networkStatus');
             const isOnline = navigator.onLine;
             
-            badges.forEach(badge => {
-                if(badge){
-                    if (isOnline) {
-                        badge.className = 'network-badge network-online';
-                        badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Mtandaoni';
-                    } else {
-                        badge.className = 'network-badge network-offline';
-                        badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Nje ya Mtandao (Offline)';
-                    }
+            if(badge){
+                if (isOnline) {
+                    badge.className = 'network-badge network-online';
+                    badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Mtandaoni';
+                } else {
+                    badge.className = 'network-badge network-offline';
+                    badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Nje ya Mtandao (Offline)';
                 }
-            });
+            }
             
             if (isOnline && localStorage.getItem('sj_pending_sync') === 'true') {
                 syncDataToSupabase();
@@ -595,7 +834,6 @@
         window.addEventListener('offline', updateNetworkStatusUI);
 
         let currentBusinessId = getBusinessIdFromUrl();
-
         let capitalSystems = [];
         let currentBusinessIndex = null;
         let saleBeingEdited = null;
@@ -619,9 +857,7 @@
         const capitalIndexInput = document.getElementById('capitalIndex');
         const backToCapitalBtn = document.getElementById('backToCapitalBtn');
         const businessTitle = document.getElementById('business-title');
-        const capitalBalanceSpan = document.getElementById('capital-balance');
         
-        // Accordion Element
         const toggleProductsBtn = document.getElementById('toggleProductsBtn');
         const productsAccordion = document.getElementById('productsAccordion');
 
@@ -685,20 +921,17 @@
         const dailyCapitalExpensesTotalSpan = document.getElementById('daily-capital-expenses-total');
         const purchaseHistoryTableBody = document.getElementById('purchaseHistoryTableBody');
 
-        // Accordion Logic
         toggleProductsBtn.addEventListener('click', function() {
             this.classList.toggle('active');
             productsAccordion.classList.toggle('show');
-            
             const textSpan = this.querySelector('span');
             if(productsAccordion.classList.contains('show')) {
-                textSpan.innerHTML = '<i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-color);"></i> Ficha Orodha ya Bidhaa';
+                textSpan.innerHTML = '<i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-light);"></i> Ficha Orodha ya Bidhaa';
             } else {
-                textSpan.innerHTML = '<i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-color);"></i> Tazama Orodha ya Bidhaa';
+                textSpan.innerHTML = '<i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-light);"></i> Tazama Orodha ya Bidhaa';
             }
         });
 
-        // Load Data
         async function loadData() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session && navigator.onLine) {
@@ -750,14 +983,12 @@
                 loadLocalData();
             }
             
-            // Hakikisha muundo wa madeni upo kwa kila mtaji
             capitalSystems.forEach(sys => { sys.debts = sys.debts || []; });
 
             renderCapitalList();
             updateNetworkStatusUI();
         }
 
-        // Local Data
         function loadLocalData() {
             const localData = localStorage.getItem(`sj_systems_${currentBusinessId}`);
             if (localData) {
@@ -767,7 +998,6 @@
             }
         }
         
-        // Save Data
         async function saveData(systemData) {
             if (!systemData || !systemData.id) return;
             systemData.debts = systemData.debts || [];
@@ -790,7 +1020,7 @@
                 sales: systemData.sales,
                 dailyExpenses: systemData.dailyExpenses,
                 capitalExpenses: systemData.capitalExpenses,
-                debts: systemData.debts, // Okoa madeni
+                debts: systemData.debts, 
                 business_id: currentBusinessId
             };
         
@@ -806,15 +1036,12 @@
             }
         }
 
-        // Sync Data
         async function syncDataToSupabase() {
-            const badges = [document.getElementById('networkStatus'), document.getElementById('networkStatusBiz')];
-            badges.forEach(b => { 
-                if(b) {
-                    b.className = 'network-badge network-syncing'; 
-                    b.innerHTML = '<i class="fa-solid fa-rotate"></i> Inasawazisha...'; 
-                }
-            });
+            const badge = document.getElementById('networkStatus');
+            if(badge) {
+                badge.className = 'network-badge network-syncing'; 
+                badge.innerHTML = '<i class="fa-solid fa-rotate"></i> Inasawazisha...'; 
+            }
 
             let deletedItems = JSON.parse(localStorage.getItem('sj_deleted_items') || '[]');
             for (let id of deletedItems) {
@@ -873,14 +1100,14 @@
                     <div class="capital-clickable-area">
                         <div class="item-info">
                             <strong>${system.name}</strong>
-                            <span style="color: var(--primary-color); font-weight: 600;">TZS ${formatNumber(system.capital)}</span>
+                            <span style="color: var(--primary); font-weight: 700; font-family: 'Poppins', sans-serif;">TZS ${formatNumber(system.capital)}</span>
                         </div>
                     </div>
                     <div class="dropdown">
                         <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                         <div class="dropdown-content">
-                            <button onclick="editCapital(${index})"><i class="fa-solid fa-pen-to-square" style="width:20px;"></i> Badilisha</button>
-                            <button onclick="deleteCapital(${index})"><i class="fa-solid fa-trash-can" style="width:20px;"></i> Futa</button>
+                            <button onclick="editCapital(${index})"><i class="fa-solid fa-pen-to-square" style="width:20px; color:var(--text-muted);"></i> Badilisha</button>
+                            <button onclick="deleteCapital(${index})"><i class="fa-solid fa-trash-can" style="width:20px; color:var(--danger);"></i> Futa</button>
                         </div>
                     </div>
                 `;
@@ -908,12 +1135,12 @@
         function renderBusinessDetails() {
             if (currentBusinessIndex === null) return;
             const currentSystem = capitalSystems[currentBusinessIndex];
-            capitalBalanceSpan.textContent = `TZS ${formatNumber(currentSystem.capital)}`;
+            document.getElementById('capital-amount-text').textContent = `TZS ${formatNumber(currentSystem.capital)}`;
             renderProductList();
             renderSalesDates();
             renderDailyExpenseDates();
             renderCapitalExpenseDates();
-            renderDebts(); // Weka wateja wanaodaiwa
+            renderDebts();
         }
 
         function renderProductList() {
@@ -921,7 +1148,7 @@
             const currentSystem = capitalSystems[currentBusinessIndex];
             
             if (currentSystem.products.length === 0) {
-                productList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted);">Hakuna bidhaa zilizosajiliwa bado.</li>';
+                productList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border: none; box-shadow: none;">Hakuna bidhaa zilizosajiliwa bado.</li>';
                 return;
             }
 
@@ -931,14 +1158,14 @@
                 li.innerHTML = `
                     <div class="item-info">
                         <strong>${product.name}</strong>
-                        <span>Stoo ipo: <b style="color:var(--text-dark);">${product.currentQuantity}</b> pcs</span>
-                        <span>Bei: TZS ${formatNumber(product.sellingPriceRetail)}</span>
+                        <span>Stoo ipo: <b style="color:var(--text-main);">${product.currentQuantity}</b> pcs</span>
+                        <span>Bei: <span style="color:var(--primary); font-weight:600;">TZS ${formatNumber(product.sellingPriceRetail)}</span></span>
                     </div>
                     <div class="dropdown">
                         <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                         <div class="dropdown-content">
-                            <button onclick="editProduct(${index})"><i class="fa-solid fa-pen-to-square" style="width:20px;"></i> Badilisha</button>
-                            <button onclick="deleteProduct(${index})"><i class="fa-solid fa-trash-can" style="width:20px;"></i> Futa</button>
+                            <button onclick="editProduct(${index})"><i class="fa-solid fa-pen-to-square" style="width:20px; color:var(--text-muted);"></i> Badilisha</button>
+                            <button onclick="deleteProduct(${index})"><i class="fa-solid fa-trash-can" style="width:20px; color:var(--danger);"></i> Futa</button>
                         </div>
                     </div>
                 `;
@@ -946,9 +1173,6 @@
             });
         }
 
-        // ==========================================
-        // KURENDER NA KULIPA MADENI
-        // ==========================================
         function renderDebts() {
             const sys = capitalSystems[currentBusinessIndex];
             sys.debts = sys.debts || [];
@@ -956,7 +1180,7 @@
             let totalDeni = 0;
 
             if(sys.debts.length === 0){
-                list.innerHTML = '<li style="text-align:center; padding: 15px; border:none; color: var(--text-muted);">Hakuna mteja anayedaiwa kwa sasa.</li>';
+                list.innerHTML = '<li style="text-align:center; padding: 15px; border:none; box-shadow:none; color: var(--text-muted); background: transparent;">Hakuna mteja anayedaiwa kwa sasa.</li>';
             } else {
                 sys.debts.forEach((debt, index) => {
                     totalDeni += debt.totalPrice;
@@ -964,16 +1188,16 @@
                     list.innerHTML += `
                         <li class="list-item">
                             <div class="item-info">
-                                <strong><i class="fa-solid fa-user" style="color:#d97706; margin-right:5px;"></i> ${debt.customerName}</strong>
+                                <strong><i class="fa-solid fa-user" style="color:var(--warning); margin-right:5px;"></i> ${debt.customerName}</strong>
                                 <span>${productName} (Idadi: ${debt.quantity})</span>
                                 <span class="item-debt">Kopeshwa: TZS ${formatNumber(debt.totalPrice)}</span>
-                                <span style="font-size:0.8em; color:#94a3b8;">Tarehe: ${formatDate(debt.date)}</span>
+                                <span style="font-size:0.85em; color:var(--text-muted);">Tarehe: ${formatDate(debt.date)}</span>
                             </div>
                             <div class="dropdown">
                                 <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                                 <div class="dropdown-content" style="min-width: 150px; right:0;">
-                                    <button onclick="payDebt(${index})" style="color: #059669; font-weight:bold;"><i class="fa-solid fa-check" style="width:20px;"></i> Amelipa Deni</button>
-                                    <button onclick="deleteDebt(${index})"><i class="fa-solid fa-trash" style="width:20px;"></i> Futa (Rudisha Stoo)</button>
+                                    <button onclick="payDebt(${index})" style="color: var(--success); font-weight:600;"><i class="fa-solid fa-check" style="width:20px;"></i> Amelipa Deni</button>
+                                    <button onclick="deleteDebt(${index})"><i class="fa-solid fa-trash" style="width:20px; color:var(--danger);"></i> Futa (Rudisha Stoo)</button>
                                 </div>
                             </div>
                         </li>
@@ -987,19 +1211,14 @@
             const sys = capitalSystems[currentBusinessIndex];
             const debt = sys.debts[index];
             if(confirm(`Je, unathibitisha kuwa mteja "${debt.customerName}" AMELIPA deni la TZS ${formatNumber(debt.totalPrice)}? \n\nHela hii itaingizwa kwenye mauzo ya leo.`)) {
-                
-                // Ingiza kwenye mauzo ya leo
                 sys.sales.push({
                     date: new Date().toISOString().slice(0, 10), 
                     productIndex: debt.productIndex,
                     quantity: debt.quantity,
                     totalPrice: debt.totalPrice,
-                    wasDebt: true // Kitambulisho kuwa hii ilikuwa deni
+                    wasDebt: true 
                 });
-                
-                // Futa kwenye orodha ya madeni
                 sys.debts.splice(index, 1);
-                
                 await saveData(sys);
                 renderBusinessDetails();
                 alert("Deni limelipwa na hela imeingia kwenye Mauzo ya Leo kikamilifu!");
@@ -1019,7 +1238,6 @@
             }
         }
 
-
         function renderSalesDates() {
             const currentSystem = capitalSystems[currentBusinessIndex];
             const salesByDate = currentSystem.sales.reduce((acc, sale) => {
@@ -1032,7 +1250,7 @@
             const sortedDates = Object.keys(salesByDate).sort().reverse();
             
             if(sortedDates.length === 0) {
-                 salesDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent;">Hakuna mauzo yaliyofanyika bado.</li>';
+                 salesDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent; box-shadow:none;">Hakuna mauzo yaliyofanyika bado.</li>';
             }
 
             sortedDates.forEach(date => {
@@ -1049,11 +1267,11 @@
                 li.onclick = () => showDailySales(date);
                 li.innerHTML = `
                     <div class="item-info">
-                        <strong><i class="fa-regular fa-calendar" style="margin-right: 5px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
-                        <span style="margin-top:5px;">Mauzo Taslimu: <b>TZS ${formatNumber(totalDailySales)}</b></span>
+                        <strong><i class="fa-regular fa-calendar" style="margin-right: 8px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
+                        <span style="margin-top:5px;">Mauzo Taslimu: <b style="color:var(--primary);">TZS ${formatNumber(totalDailySales)}</b></span>
                         <span>Faida ya Bidhaa: <span class="item-profit" style="margin-left: 5px;">TZS ${formatNumber(totalDailyProfit)}</span></span>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
+                    <i class="fa-solid fa-chevron-right" style="color: var(--border-color);"></i>
                 `;
                 salesDateList.appendChild(li);
             });
@@ -1079,18 +1297,18 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
-                        ${product.name}
-                        ${sale.wasDebt ? '<br><small style="color:#d97706;">(Lipo Deni)</small>' : ''}
+                        <span style="font-weight:600;">${product.name}</span>
+                        ${sale.wasDebt ? '<br><small style="color:var(--warning);">(Deni Lililolipwa)</small>' : ''}
                     </td>
                     <td>${sale.quantity}</td>
-                    <td>TZS ${formatNumber(sale.totalPrice)}</td>
+                    <td style="font-weight:600;">TZS ${formatNumber(sale.totalPrice)}</td>
                     <td><span class="item-profit">TZS ${formatNumber(profit)}</span></td>
                     <td>
                         <div class="dropdown">
                             <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                            <div class="dropdown-content" style="right: 0; min-width: 100px;">
-                                <button onclick="editSale(${currentSystem.sales.indexOf(sale)})">Badilisha</button>
-                                <button onclick="deleteSale(${currentSystem.sales.indexOf(sale)})">Futa</button>
+                            <div class="dropdown-content" style="right: 0; min-width: 120px;">
+                                <button onclick="editSale(${currentSystem.sales.indexOf(sale)})"><i class="fa-solid fa-pen-to-square" style="width:20px; color:var(--text-muted);"></i> Badilisha</button>
+                                <button onclick="deleteSale(${currentSystem.sales.indexOf(sale)})"><i class="fa-solid fa-trash-can" style="width:20px; color:var(--danger);"></i> Futa</button>
                             </div>
                         </div>
                     </td>
@@ -1124,7 +1342,7 @@
             const sortedDates = Object.keys(expensesByDate).sort().reverse();
             
             if(sortedDates.length === 0) {
-                 dailyExpenseDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent;">Hakuna matumizi yaliyowekwa.</li>';
+                 dailyExpenseDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent; box-shadow:none;">Hakuna matumizi yaliyowekwa.</li>';
             }
 
             sortedDates.forEach(date => {
@@ -1134,10 +1352,10 @@
                 li.onclick = () => showDailyExpenses(date);
                 li.innerHTML = `
                     <div class="item-info">
-                        <strong><i class="fa-regular fa-calendar" style="margin-right: 5px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
+                        <strong><i class="fa-regular fa-calendar" style="margin-right: 8px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
                         <span style="margin-top:5px;">Jumla Imetumika: <span class="item-expense" style="margin-left: 5px;">TZS ${formatNumber(totalDailyExpense)}</span></span>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
+                    <i class="fa-solid fa-chevron-right" style="color: var(--border-color);"></i>
                 `;
                 dailyExpenseDateList.appendChild(li);
             });
@@ -1156,14 +1374,14 @@
             expensesForDate.forEach((exp, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${exp.name}</td>
+                    <td style="font-weight:500;">${exp.name}</td>
                     <td><span class="item-expense">TZS ${formatNumber(exp.amount)}</span></td>
                     <td>
                         <div class="dropdown">
                             <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                             <div class="dropdown-content">
-                                <button onclick="editDailyExpense(${currentSystem.dailyExpenses.indexOf(exp)})">Badilisha</button>
-                                <button onclick="deleteDailyExpense(${currentSystem.dailyExpenses.indexOf(exp)})">Futa</button>
+                                <button onclick="editDailyExpense(${currentSystem.dailyExpenses.indexOf(exp)})"><i class="fa-solid fa-pen-to-square" style="width:20px; color:var(--text-muted);"></i> Badilisha</button>
+                                <button onclick="deleteDailyExpense(${currentSystem.dailyExpenses.indexOf(exp)})"><i class="fa-solid fa-trash-can" style="width:20px; color:var(--danger);"></i> Futa</button>
                             </div>
                         </div>
                     </td>
@@ -1194,7 +1412,7 @@
             const sortedDates = Object.keys(expensesByDate).sort().reverse();
             
             if(sortedDates.length === 0) {
-                 capitalExpenseDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent;">Hakuna matumizi ya mtaji yaliyowekwa.</li>';
+                 capitalExpenseDateList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-muted); border:none; background:transparent; box-shadow:none;">Hakuna matumizi ya mtaji yaliyowekwa.</li>';
             }
 
             sortedDates.forEach(date => {
@@ -1204,10 +1422,10 @@
                 li.onclick = () => showDailyCapitalExpenses(date);
                 li.innerHTML = `
                     <div class="item-info">
-                        <strong><i class="fa-regular fa-calendar" style="margin-right: 5px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
+                        <strong><i class="fa-regular fa-calendar" style="margin-right: 8px; color: var(--text-muted);"></i> ${formatDate(date)}</strong>
                         <span style="margin-top:5px;">Jumla Imetumika: <span class="item-expense" style="margin-left: 5px;">TZS ${formatNumber(totalDailyExpense)}</span></span>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="color: #cbd5e1;"></i>
+                    <i class="fa-solid fa-chevron-right" style="color: var(--border-color);"></i>
                 `;
                 capitalExpenseDateList.appendChild(li);
             });
@@ -1226,14 +1444,14 @@
             expensesForDate.forEach((exp, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${exp.name}</td>
+                    <td style="font-weight:500;">${exp.name}</td>
                     <td><span class="item-expense">TZS ${formatNumber(exp.amount)}</span></td>
                     <td>
                         <div class="dropdown">
                             <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                             <div class="dropdown-content">
-                                <button onclick="editCapitalExpense(${currentSystem.capitalExpenses.indexOf(exp)})">Badilisha</button>
-                                <button onclick="deleteCapitalExpense(${currentSystem.capitalExpenses.indexOf(exp)})">Futa</button>
+                                <button onclick="editCapitalExpense(${currentSystem.capitalExpenses.indexOf(exp)})"><i class="fa-solid fa-pen-to-square" style="width:20px; color:var(--text-muted);"></i> Badilisha</button>
+                                <button onclick="deleteCapitalExpense(${currentSystem.capitalExpenses.indexOf(exp)})"><i class="fa-solid fa-trash-can" style="width:20px; color:var(--danger);"></i> Futa</button>
                             </div>
                         </div>
                     </td>
@@ -1289,7 +1507,7 @@
                         sales: [],
                         dailyExpenses: [],
                         capitalExpenses: [],
-                        debts: [] // Hakikisha deni array ipo
+                        debts: [] 
                     };
                     capitalSystems.push(newSystem);
                     await saveData(newSystem);
@@ -1441,7 +1659,6 @@
             document.getElementById('actualSalePrice').value = '';
             document.getElementById('quantityAlert').style.display = 'none';
             
-            // Ficha mambo ya deni ukiwa unaweka mauzo mapya
             document.getElementById('isDebtCheck').checked = false;
             document.getElementById('debtCustomerNameDiv').style.display = 'none';
             document.getElementById('debtCustomerName').value = '';
@@ -1534,7 +1751,6 @@
             document.getElementById('saleIndex').value = index;
             document.getElementById('saleDate').value = sale.date;
             
-            // Zuia kubadili sale kwenda kwenye deni wakati wa ku-edit kuzuia mambo kuchanganya
             document.getElementById('debtToggleContainer').style.display = 'none';
 
             const select = saleProductNameSelect;
@@ -1725,9 +1941,9 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${formatDate(product.dateAdded)}</td>
-                    <td>${product.name}</td>
+                    <td style="font-weight:500;">${product.name}</td>
                     <td>${product.initialQuantity}</td>
-                    <td>TZS ${formatNumber(product.costPriceTotal)}</td>
+                    <td style="font-weight:600;">TZS ${formatNumber(product.costPriceTotal)}</td>
                 `;
                 purchaseHistoryTableBody.appendChild(tr);
             });
@@ -1757,7 +1973,7 @@
         }
 
         // ==========================================
-        // MABADILIKO YA RIPOTI KWA MUUNDO MPYA 
+        // LOGIC YA RIPOTI KUU INABAKI KAMA ILIVYO
         // ==========================================
 
         function toggleCustomDates() {
@@ -1826,21 +2042,19 @@
             const fExpenses = sys.dailyExpenses.filter(filterByDate);
             const fDebts = sys.debts.filter(filterByDate);
 
-            // MUUNDO MPYA: MAPATO NA MATUMIZI PAMOJA (LEDGER)
             let ledger = [];
             let tSales = 0;
             let gProfit = 0;
             let tExpenses = 0;
             let totalProfit = 0;
 
-            // Ingiza Mauzo kwenye Ledger
             fSales.forEach(sale => {
                 const pName = sys.products[sale.productIndex] ? sys.products[sale.productIndex].name : "Bidhaa Imefutwa";
                 const profitKiasi = sys.products[sale.productIndex] ? (sys.products[sale.productIndex].sellingPriceRetail - sys.products[sale.productIndex].costPriceRetail) * sale.quantity : 0;
                 
                 ledger.push({
                     date: sale.date,
-                    desc: `Mauzo: ${pName} (Idadi: ${sale.quantity})`,
+                    desc: `Mauzo: ${pName} (x${sale.quantity})`,
                     revenue: sale.totalPrice,
                     expenditure: 0,
                     profit: profitKiasi
@@ -1850,33 +2064,30 @@
                 totalProfit += profitKiasi;
             });
 
-            // Ingiza Matumizi kwenye Ledger
             fExpenses.forEach(exp => {
                 ledger.push({
                     date: exp.date,
                     desc: `Matumizi: ${exp.name}`,
                     revenue: 0,
                     expenditure: exp.amount,
-                    profit: -exp.amount // Inapunguza faida
+                    profit: -exp.amount 
                 });
                 tExpenses += exp.amount;
-                totalProfit -= exp.amount; // Inapunguza faida kuu
+                totalProfit -= exp.amount; 
             });
 
-            // Panga Ledger kulingana na tarehe (Zinazofanana zifuatane)
             ledger.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            // Madeni (Hayaingii kwenye hesabu ya pesa mkononi, yanakaa pembeni)
             let tDebts = 0;
             fDebts.forEach(debt => tDebts += debt.totalPrice);
 
             return { 
                 timeframeLabel, 
-                ledger, // Ripoti Kuu
+                ledger, 
                 tSales, 
                 gProfit, 
                 tExpenses, 
-                netProfit: totalProfit, // Faida Kamili
+                netProfit: totalProfit, 
                 fDebts,
                 tDebts,
                 sysProducts: sys.products,
@@ -1886,7 +2097,7 @@
 
         function generateReport(format) {
             const reportData = getReportData();
-            if (!reportData) return; // Kama alisahau kuweka tarehe custom
+            if (!reportData) return; 
 
             if (reportData.ledger.length === 0 && reportData.fDebts.length === 0) {
                 alert(`Hakuna taarifa zozote kwa ${reportData.timeframeLabel}. Huwezi kutengeneza ripoti tupu.`);
@@ -1915,7 +2126,6 @@
             
             let finalY = 35;
 
-            // 1. JEDWALI KUU (LEDGER) KAMA ULIVYOOMBA PICHANI
             if(data.ledger.length > 0) {
                 const ledgerBody = data.ledger.map(row => {
                     return [
@@ -1927,7 +2137,6 @@
                     ];
                 });
 
-                // Mstari wa Jumla
                 ledgerBody.push([
                     "JUMLA / TOTAL", 
                     "", 
@@ -1941,7 +2150,7 @@
                     head: [['Tarehe (Date)', 'Maelezo (Description)', 'Mapato (Revenue)', 'Matumizi (Expenditure)', 'Faida (Profit)']],
                     body: ledgerBody,
                     theme: 'grid',
-                    headStyles: { fillColor: [46, 204, 113] }, // Rangi ya Kijani
+                    headStyles: { fillColor: [46, 204, 113] }, 
                     didParseCell: function(data) {
                         if (data.row.index === ledgerBody.length - 1) {
                             data.cell.styles.fontStyle = 'bold';
@@ -1952,7 +2161,6 @@
                 finalY = doc.lastAutoTable.finalY + 15;
             }
 
-            // 2. MUHTASARI (SUMMARY)
             if(finalY > 230) { doc.addPage(); finalY = 20; }
             doc.setFontSize(14);
             doc.text("MUHTASARI WA MAHESABU", 14, finalY);
@@ -1973,7 +2181,6 @@
             });
             finalY = doc.lastAutoTable.finalY + 15;
 
-            // 3. MADENI YALIYONJE
             if(data.fDebts.length > 0) {
                 if(finalY > 230) { doc.addPage(); finalY = 20; }
                 doc.setFontSize(14);
@@ -1984,7 +2191,6 @@
                     return [formatDate(d.date), d.customerName, pName, d.quantity, `TZS ${formatNumber(d.totalPrice)}`];
                 });
                 
-                // Mstari wa jumla madeni
                 debtBody.push(["JUMLA KUU", "", "", "", `TZS ${formatNumber(data.tDebts)}`]);
 
                 doc.autoTable({
@@ -2110,22 +2316,15 @@
         }
 
         // EVENT LISTENERS
-        addCapitalBtn.onclick = addCapital;
-        logoutBtn.onclick = logout;
-        saveCapitalBtn.onclick = saveCapital;
-        closeCapitalModal.onclick = closeModals;
-        backToCapitalBtn.onclick = goBackToCapitalList;
-        closeProductModal.onclick = closeModals;
-        closeSaleModal.onclick = closeModals;
-        closeDailyExpenseModal.onclick = closeModals;
-        closeCapitalExpenseModal.onclick = closeModals;
-        closePurchaseHistoryModal.onclick = closeModals;
-        closeReportModal.onclick = closeModals; // Kufunga Modal ya Ripoti
-        saveProductBtn.onclick = saveProduct;
-        saveSaleBtn.onclick = saveSale;
-        saveDailyExpenseBtn.onclick = saveDailyExpense;
-        saveCapitalExpenseBtn.onclick = saveCapitalExpense;
-        backToCapitalBtn.onclick = goBackToCapitalList;
+        document.getElementById('addCapitalBtn').onclick = addCapital;
+        document.getElementById('logoutBtn').onclick = logout;
+        document.getElementById('saveCapitalBtn').onclick = saveCapital;
+        document.getElementById('backToCapitalBtn').onclick = goBackToCapitalList;
+        document.querySelectorAll('.close-btn').forEach(btn => btn.onclick = closeModals);
+        document.getElementById('saveProductBtn').onclick = saveProduct;
+        document.getElementById('saveSaleBtn').onclick = saveSale;
+        document.getElementById('saveDailyExpenseBtn').onclick = saveDailyExpense;
+        document.getElementById('saveCapitalExpenseBtn').onclick = saveCapitalExpense;
         
         document.addEventListener('click', function(event) {
             const isDropdownBtn = event.target.matches('.dropdown-btn, .dropdown-btn *');
@@ -2145,17 +2344,17 @@
             }
         });
 
-        costPriceTotalInput.addEventListener('input', calculatePricesAndProfit);
-        productQuantityInput.addEventListener('input', calculatePricesAndProfit);
-        sellingPriceRetailInput.addEventListener('input', calculatePricesAndProfit);
+        document.getElementById('costPriceTotal').addEventListener('input', calculatePricesAndProfit);
+        document.getElementById('productQuantity').addEventListener('input', calculatePricesAndProfit);
+        document.getElementById('sellingPriceRetail').addEventListener('input', calculatePricesAndProfit);
 
         // Initial loading of data
         window.addEventListener('load', async () => {
             setTimeout(async () => {
-                splashScreen.style.opacity = '0';
+                document.getElementById('splash-screen').style.opacity = '0';
                 setTimeout(async () => {
-                    splashScreen.style.display = 'none';
-                    mainContent.classList.remove('hidden');
+                    document.getElementById('splash-screen').style.display = 'none';
+                    document.getElementById('main-content').classList.remove('hidden');
                     await loadData();
                 }, 600);
             }, 1000);
