@@ -3,202 +3,334 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SmartJanja</title>
+    <title>SmartJanja - Kuingia</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link rel="icon" type="image/jpg" href="smart.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-        :root {
-            --primary-color: #007BFF;
-            --secondary-color: #28a745;
-            --background-light: #f4f7f9;
-            --card-background: #ffffff;
-            --text-dark: #333;
-            --text-muted: #6c757d;
-        }
-
+        /* =========================================================
+           1. BACKGROUND YA PREMIUM KAMA YA INTRO (LOW-POLY MESH)
+        ========================================================== */
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--background-light);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            background-color: #8bbce1;
+            background-image: 
+                linear-gradient(135deg, rgba(8, 56, 102, 0.8) 0%, rgba(92, 172, 238, 0.4) 100%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon fill='%23fff' fill-opacity='0.05' points='0,0 40,20 0,40'/%3E%3Cpolygon fill='%23000' fill-opacity='0.1' points='0,0 60,0 40,20'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.08' points='60,0 100,0 100,30'/%3E%3Cpolygon fill='%23000' fill-opacity='0.12' points='60,0 100,30 40,20'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.15' points='40,20 100,30 70,60'/%3E%3Cpolygon fill='%23000' fill-opacity='0.08' points='40,20 70,60 20,70'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.05' points='0,40 40,20 20,70'/%3E%3Cpolygon fill='%23000' fill-opacity='0.15' points='0,40 20,70 0,100'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.08' points='0,100 20,70 50,100'/%3E%3Cpolygon fill='%23000' fill-opacity='0.12' points='20,70 70,60 50,100'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.15' points='70,60 100,30 100,80'/%3E%3Cpolygon fill='%23000' fill-opacity='0.05' points='70,60 100,80 80,100'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.1' points='70,60 80,100 50,100'/%3E%3Cpolygon fill='%23000' fill-opacity='0.15' points='100,80 100,100 80,100'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon fill='%23fff' fill-opacity='0.04' points='0,0 40,20 0,40'/%3E%3Cpolygon fill='%23000' fill-opacity='0.08' points='0,0 60,0 40,20'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.06' points='60,0 100,0 100,30'/%3E%3Cpolygon fill='%23000' fill-opacity='0.1' points='60,0 100,30 40,20'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.12' points='40,20 100,30 70,60'/%3E%3Cpolygon fill='%23000' fill-opacity='0.06' points='40,20 70,60 20,70'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.04' points='0,40 40,20 20,70'/%3E%3Cpolygon fill='%23000' fill-opacity='0.12' points='0,40 20,70 0,100'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.06' points='0,100 20,70 50,100'/%3E%3Cpolygon fill='%23000' fill-opacity='0.1' points='20,70 70,60 50,100'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.12' points='70,60 100,30 100,80'/%3E%3Cpolygon fill='%23000' fill-opacity='0.04' points='70,60 100,80 80,100'/%3E%3Cpolygon fill='%23fff' fill-opacity='0.08' points='70,60 80,100 50,100'/%3E%3Cpolygon fill='%23000' fill-opacity='0.12' points='100,80 100,100 80,100'/%3E%3C/svg%3E");
+            background-size: cover, 180px 180px, 350px 350px;
+            background-position: center, 0 0, 50px 50px;
+            background-attachment: fixed;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* =========================================================
+           2. KADI YA KIOO (GLASSMORPHISM EFFECT)
+        ========================================================== */
         .auth-container {
-            background-color: var(--card-background);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background: rgba(25, 33, 60, 0.45);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 45px 35px;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 500px;
+            max-width: 420px;
             text-align: center;
+            color: #ffffff;
+            animation: slideUp 0.6s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .logo-img {
-            margin-bottom: 40px;
-            animation: bounce 2s infinite ease-in-out;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+            max-width: 85px;
+            margin-bottom: 10px;
+            animation: float 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
         }
-          
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-30px); }
-            60% { transform: translateY(-15px); }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
         }
 
         .auth-container h1 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
+        /* =========================================================
+           3. TABS ZA KUCHAGUA (PREMIUM PILLS)
+        ========================================================== */
         .auth-tabs {
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            padding: 5px;
+            margin-bottom: 35px;
+            position: relative;
         }
 
         .auth-tab {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
             font-weight: 600;
-            color: var(--text-muted);
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 10px;
             transition: all 0.3s ease;
+            letter-spacing: 0.5px;
         }
 
         .auth-tab.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .auth-form {
             display: none;
             text-align: left;
+            animation: fadeIn 0.5s ease-in-out;
         }
 
         .auth-form.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* =========================================================
+           4. UREMBO WA VIWANJA VYA KUJAZA (INPUT FIELDS)
+        ========================================================== */
         .form-group {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 0.85em;
             font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i.icon-left {
+            position: absolute;
+            left: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1em;
+            transition: color 0.3s;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            padding: 15px 15px 15px 45px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: #ffffff;
+            font-size: 0.95em;
+            font-family: inherit;
             box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #f59e0b; /* Dhahabu ya kuvutia inapobofya */
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .form-group input:focus + i.icon-left,
+        .input-wrapper:focus-within i.icon-left {
+            color: #f59e0b; /* Icon inakuwa dhahabu */
         }
 
         .password-toggle {
             position: absolute;
             right: 15px;
-            top: 38px;
             cursor: pointer;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.3s;
         }
+        .password-toggle:hover { color: #ffffff; }
 
+        /* =========================================================
+           5. KITUFE CHA KUSUBMIT (PREMIUM GRADIENT)
+        ========================================================== */
         .btn-submit {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             border: none;
-            border-radius: 8px;
-            background-color: var(--primary-color);
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #fff;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 1.05em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -5px rgba(217, 119, 6, 0.5);
+            margin-top: 10px;
         }
 
         .btn-submit:hover {
-            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -5px rgba(217, 119, 6, 0.6);
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 10px -5px rgba(217, 119, 6, 0.5);
         }
 
         .para {
-            font-weight: bold;
-            color: #474545;
-            font-size: 14px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85em;
+            margin-top: 25px;
+            letter-spacing: 0.5px;
+        }
+        .para i {
+            color: #f59e0b;
+            margin-right: 5px;
+        }
+        
+        /* Custom Alert ndani ya Glass */
+        .custom-alert {
+            display: none;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85em;
+            text-align: center;
+            animation: fadeIn 0.3s;
         }
     </style>
 </head>
 <body>
     <div id="splash" class="auth-container">
-         <h1 class="logo-img">Smart Janja</h1>
+         <img src="smart.png" alt="SmartJanja Logo" class="logo-img">
+         <h1>SmartJanja</h1>
    
         <div class="auth-tabs">
             <span class="auth-tab active" id="signup-tab">Jisajili</span>
-            <span class="auth-tab" id="login-tab">Ingia</span>
+            <span class="auth-tab" id="login-tab">Ingia Ndani</span>
         </div>
 
+        <div id="alertBox" class="custom-alert"></div>
+
+        <!-- FOMU YA KUJISAJILI -->
         <div id="signup-form" class="auth-form active">
-            <h2>Usajili wa Msimamizi</h2>
             <form id="admin-signup-form">
                 <div class="form-group">
                     <label for="owner-fullname">Jina Kamili</label>
-                    <input type="text" id="owner-fullname" required />
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user icon-left"></i>
+                        <input type="text" id="owner-fullname" placeholder="Mfano: Juma Omary" required />
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="phone-number">Namba ya Simu</label>
-                    <input type="tel" id="phone-number" placeholder="Mfano: 0712345678" required>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-phone icon-left"></i>
+                        <input type="tel" id="phone-number" placeholder="Mfano: 0712345678" required>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="admin-password">Neno la Siri</label>
-                    <input type="password" id="admin-password" required />
-                    <span class="password-toggle" onclick="togglePasswordVisibility('admin-password')"><i class="fa-solid fa-eye"></i></span>
+                    <label for="admin-password">Neno la Siri (Password)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock icon-left"></i>
+                        <input type="password" id="admin-password" placeholder="Tengeneza neno la siri" required />
+                        <span class="password-toggle" onclick="togglePasswordVisibility('admin-password')"><i class="fa-solid fa-eye"></i></span>
+                    </div>
                 </div>
-                <p class="para">Kwa msaada tupigie au tuma ujumbe mfupi kupitia namba: 0786701705</p>
-                <button type="submit" class="btn-submit">Jisajili</button>
+                <button type="submit" class="btn-submit">Jisajili Sasa</button>
             </form>
         </div>
 
+        <!-- FOMU YA KUINGIA (LOGIN) -->
         <div id="login-form" class="auth-form">
-            <h2>Ingia kama Msimamizi</h2>
             <form id="login-admin-form">
                 <div class="form-group">
                     <label for="admin-login-phone">Namba ya Simu</label>
-                    <input type="tel" id="admin-login-phone" placeholder="Mfano: 0712345678" required />
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-phone icon-left"></i>
+                        <input type="tel" id="admin-login-phone" placeholder="Ingiza namba yako" required />
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="admin-login-password">Neno la Siri</label>
-                    <input type="password" id="admin-login-password" required />
-                    <span class="password-toggle" onclick="togglePasswordVisibility('admin-login-password')"><i class="fa-solid fa-eye"></i></span>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock icon-left"></i>
+                        <input type="password" id="admin-login-password" placeholder="Ingiza neno la siri" required />
+                        <span class="password-toggle" onclick="togglePasswordVisibility('admin-login-password')"><i class="fa-solid fa-eye"></i></span>
+                    </div>
                 </div>
-                <p class="para">Kwa msaada tupigie au tuma ujumbe mfupi kupitia namba: 0786701705</p>
-                <button type="submit" class="btn-submit">Ingia</button>
+                <button type="submit" class="btn-submit">Ingia Ndani</button>
             </form>
         </div>
+        
+        <p class="para"><i class="fa-solid fa-headset"></i> Kwa msaada tupigie/SMS: 0786701705</p>
     </div>
 
+    <!-- MISTARI YAKO ASILI YA JS INABAKI HAPA BILA KUPUNGUZWA -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M';
        
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Helper ya kuonyesha Alert kwa urembo
+        function showPremiumAlert(msg) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${msg}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => { alertBox.style.display = 'none'; }, 5000);
+        }
 
         // --- Mfumo wa Auto-Login ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -213,6 +345,8 @@
                     .single();
 
                 if (businessProfile) {
+                    // Hifadhi kwenye local storage kwa ajili ya offline feature iliyopo kwenye msimamizi.html
+                    localStorage.setItem('sj_current_biz_id', businessProfile.id);
                     window.location.href = `msimamizi.html?businessId=${businessProfile.id}`;
                 }
             }
@@ -229,6 +363,7 @@
             loginTab.classList.remove('active');
             signupForm.classList.add('active');
             loginForm.classList.remove('active');
+            document.getElementById('alertBox').style.display = 'none';
         });
     
         loginTab.addEventListener('click', () => {
@@ -236,6 +371,7 @@
             signupTab.classList.remove('active');
             loginForm.classList.add('active');
             signupForm.classList.remove('active');
+            document.getElementById('alertBox').style.display = 'none';
         });
     
         function togglePasswordVisibility(inputId) {
@@ -260,7 +396,7 @@
             const adminPassword = document.getElementById('admin-password').value;
 
             if (adminPassword.length < 6) {
-                alert('Neno la siri lazima liwe na angalau herufi 6.');
+                showPremiumAlert('Neno la siri lazima liwe na angalau herufi 6.');
                 return;
             }
     
@@ -276,9 +412,9 @@
                 if (error) {
                     // Check if it's a duplicate email error to give a friendly message
                     if(error.message.includes("already registered")) {
-                        alert("Namba hii ya simu imeshasajiliwa tayari. Tafadhali ingia (login).");
+                        showPremiumAlert("Namba hii ya simu imeshasajiliwa tayari. Tafadhali bofya 'Ingia Ndani'.");
                     } else {
-                        alert(`Hitilafu wakati wa usajili: ${error.message}`);
+                        showPremiumAlert(`Hitilafu: ${error.message}`);
                     }
                     return;
                 }
@@ -292,7 +428,7 @@
                     });
     
                 if (insertError) {
-                    alert(`Hitilafu kuhifadhi taarifa: ${insertError.message}`);
+                    showPremiumAlert(`Hitilafu kuhifadhi taarifa: ${insertError.message}`);
                     return;
                 }
     
@@ -303,14 +439,16 @@
                     .single();
     
                 if (fetchError || !businessProfile) {
-                    alert(`Hitilafu kupakua data: ${fetchError ? fetchError.message : ''}`);
+                    showPremiumAlert(`Hitilafu kupakua data: ${fetchError ? fetchError.message : ''}`);
                     return;
                 }
     
+                // Mstari huu nimeuongeza hapa pia ili ukisajili akupitishe moja kwa moja akiwa na Offline ID
+                localStorage.setItem('sj_current_biz_id', businessProfile.id);
                 window.location.href = `msimamizi.html?businessId=${businessProfile.id}`;
     
             } catch (err) {
-                alert(`Hitilafu isiyojulikana: ${err.message}`);
+                showPremiumAlert(`Hitilafu isiyojulikana: ${err.message}`);
             }
         });
     
@@ -331,7 +469,7 @@
                 });
 
                 if (error) {
-                    alert(`Namba ya simu au Neno la siri si sahihi.`);
+                    showPremiumAlert(`Namba ya simu au Neno la siri si sahihi.`);
                     return;
                 }
 
@@ -342,15 +480,18 @@
                     .single();
 
                 if (fetchError || !businessProfile) {
-                    alert('Kuna tatizo na akaunti hii. Tafadhali wasiliana na msaada.');
+                    showPremiumAlert('Kuna tatizo na akaunti hii. Tafadhali wasiliana na msaada.');
                     await supabaseClient.auth.signOut(); 
                     return;
                 }
                 
+                // Mstari huu ni kwa ajili ya kufanya offline mode ifanye kazi unapo-login
+                localStorage.setItem('sj_current_biz_id', businessProfile.id);
+                
                 window.location.href = `msimamizi.html?businessId=${businessProfile.id}`;
 
             } catch (err) {
-                alert(`Kuna tatizo limetokea: ${err.message}`);
+                showPremiumAlert(`Kuna tatizo limetokea: ${err.message}`);
             }
         });
     </script>
