@@ -11,7 +11,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <!-- MAKTABA YA DEXIE.JS KWA AJILI YA DATABASE YA OFFLINE -->
     <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
 
     <style>
@@ -447,7 +446,7 @@
                 <div id="capital-balance">
                     <div class="card-decoration-1"></div>
                     <div class="card-decoration-2"></div>
-                    <span class="capital-label">Jumla ya Mtaji</span>
+                    <span class="capital-label">Jumla ya Mtaji (Unaobaki)</span>
                     <span id="capital-amount-text">TZS 0</span>
                 </div>
             </div>
@@ -682,11 +681,11 @@
             </div>
 
             <div style="background: #f8fafc; padding: 15px; border-radius: var(--radius-sm); margin-bottom: 20px; border: 1px dashed #cbd5e1;">
-                <label style="margin-bottom: 5px;">Bei Halisi Uliyouza (Hiari)</label>
-                <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">Jaza hapa tu kama umemuuzia mteja kwa bei ya punguzo au tofauti na bei uliyopanga.</p>
+                <label style="margin-bottom: 5px;">Bei Uliyouza Kimoja (Kama umepunguza bei)</label>
+                <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">Jaza hapa bei ya bidhaa MOJA tu kama umemuuzia mteja tofauti na bei ya kawaida. Mfumo utazidisha na idadi kiotomatiki.</p>
                 <input type="number" id="actualSalePrice" placeholder="TZS" style="margin-bottom: 0;">
+                <div id="liveSaleTotal" style="margin-top: 10px; font-weight: 700; color: var(--primary); display: none;">Jumla Itakayoingia: TZS 0</div>
             </div>
-            
             <button id="saveSaleBtn" class="btn-modal">Hifadhi Taarifa</button>
         </div>
     </div>
@@ -787,27 +786,14 @@
        
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Njia salama ya kusoma localStorage kuzuia error browser ikizuia storage
         function getSafeLocalStorage(key) {
-            try {
-                return localStorage.getItem(key);
-            } catch(e) {
-                console.warn("Storage access blocked by browser settings.", e);
-                return null;
-            }
+            try { return localStorage.getItem(key); } catch(e) { return null; }
         }
         
         function setSafeLocalStorage(key, value) {
-            try {
-                localStorage.setItem(key, value);
-            } catch(e) {
-                console.warn("Storage access blocked by browser settings.", e);
-            }
+            try { localStorage.setItem(key, value); } catch(e) {}
         }
 
-        // ==========================================
-        // 1. KUFUNGUA DATABASE YA OFFLINE (DEXIE)
-        // ==========================================
         const db = new Dexie('SmartJanjaDB');
         db.version(1).stores({
             capital_systems: 'id, business_id, name, capital, description, products, sales, dailyExpenses, capitalExpenses, debts'
@@ -826,9 +812,6 @@
             document.getElementById('debtCustomerNameDiv').style.display = this.checked ? 'block' : 'none';
         });
 
-        // ==========================================
-        // 2. NETWORK LISTENER NA AUTO-SYNC
-        // ==========================================
         function updateNetworkStatusUI() {
             const badge = document.getElementById('networkStatus');
             const isOnline = navigator.onLine;
@@ -837,8 +820,6 @@
                 if (isOnline) {
                     badge.className = 'network-badge network-online';
                     badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Mtandaoni';
-                    
-                    // Kama yupo online na kuna data za offline, TUMA (Sync)
                     if (getSafeLocalStorage('sj_pending_sync') === 'true') {
                         syncDataToSupabase();
                     }
@@ -951,22 +932,15 @@
             }
         });
 
-        // ==========================================
-        // 3. KU-LOAD DATA KUTOKA KWENYE OFFLINE DB KWANZA
-        // ==========================================
         async function loadData() {
             if (!currentBusinessId) {
                 window.location.href = 'indexa.html'; 
                 return;
             }
-
             try {
-                // Vuta data kutoka kwenye Dexie (Simu) kwanza kabisa (Kasi kubwa)
                 const offlineData = await db.capital_systems.where('business_id').equals(currentBusinessId).toArray();
-                
                 if (offlineData && offlineData.length > 0) {
                     capitalSystems = offlineData;
-                    // Hakikisha array zote zipo kuepuka errors
                     capitalSystems.forEach(sys => { 
                         sys.debts = sys.debts || []; 
                         sys.products = sys.products || [];
@@ -976,26 +950,19 @@
                     });
                     renderCapitalList();
                 }
-
-                // Kama ipo online, jaribu kusawazisha kimya kimya
                 if (navigator.onLine) {
                     syncDataToSupabase();
                 }
             } catch (err) {
                 console.error("Error loading from local DB:", err);
             }
-            
             updateNetworkStatusUI();
         }
         
-        // ==========================================
-        // 4. KU-SAVE DATA OFFLINE PAPO HAPO
-        // ==========================================
         async function saveData(systemData) {
             if (!systemData || !systemData.id) return;
             systemData.debts = systemData.debts || [];
 
-            // Update array yetu ya kwenye screen
             const index = capitalSystems.findIndex(s => s.id === systemData.id);
             if(index !== -1) {
                 capitalSystems[index] = systemData;
@@ -1007,6 +974,7 @@
                 id: systemData.id,
                 name: systemData.name,
                 capital: systemData.capital,
+                original_capital: systemData.original_capital, // MABADILIKO YA KUTUNZA MTAJI WA ASILI
                 description: systemData.description,
                 products: systemData.products,
                 sales: systemData.sales,
@@ -1017,17 +985,12 @@
             };
             
             try {
-                // Save kwenye Dexie (Offline DB) kwa kasi ya radi
                 await db.capital_systems.put(dataToSave);
-                
-                // Weka alama kuwa kuna kazi inasubiri kutumwa
                 setSafeLocalStorage('sj_pending_sync', 'true');
-                
-                // Kama intaneti ipo, tuma mtandaoni sasa hivi
                 if (navigator.onLine) {
                     syncDataToSupabase();
                 } else {
-                    updateNetworkStatusUI(); // Onyesha kuwa ipo offline na imehifadhiwa
+                    updateNetworkStatusUI(); 
                 }
             } catch (err) {
                 console.error("Error saving to local DB:", err);
@@ -1035,9 +998,6 @@
             }
         }
 
-        // ==========================================
-        // 5. KUSAWAZISHA DATA NA MTANDAO (AUTO-SYNC)
-        // ==========================================
         async function syncDataToSupabase() {
             if (getSafeLocalStorage('sj_pending_sync') !== 'true') return;
 
@@ -1048,22 +1008,18 @@
             }
 
             try {
-                // Futa yaliyofutwa
                 let deletedItems = JSON.parse(getSafeLocalStorage('sj_deleted_items') || '[]');
                 for (let id of deletedItems) {
                      await supabaseClient.from('capital_systems').delete().eq('id', id);
                 }
                 setSafeLocalStorage('sj_deleted_items', '[]');
 
-                // Vuta data zote mpya toka Dexie na zitume Supabase
                 const localData = await db.capital_systems.toArray();
                 if (localData && localData.length > 0) {
                     const { error } = await supabaseClient.from('capital_systems').upsert(localData, { onConflict: 'id' });
                     
                     if (!error) {
                         setSafeLocalStorage('sj_pending_sync', 'false');
-                    } else {
-                        console.error("Supabase sync error:", error);
                     }
                 } else {
                      setSafeLocalStorage('sj_pending_sync', 'false');
@@ -1071,7 +1027,6 @@
             } catch (err) {
                 console.error("Sync failed, will try later:", err);
             }
-            
             setTimeout(updateNetworkStatusUI, 1000);
         }
 
@@ -1087,11 +1042,15 @@
                 const li = document.createElement('li');
                 li.className = 'list-item clickable-capital';
                 li.dataset.index = index;
+                
+                // MABADILIKO: Inaonyesha mtaji wa asili kama upo, kama haupo inatumia mtaji wa sasa
+                const displayCapital = system.original_capital !== undefined ? system.original_capital : system.capital;
+                
                 li.innerHTML = `
                     <div class="capital-clickable-area">
                         <div class="item-info">
                             <strong>${system.name}</strong>
-                            <span style="color: var(--primary); font-weight: 700; font-family: 'Poppins', sans-serif;">TZS ${formatNumber(system.capital)}</span>
+                            <span style="color: var(--primary); font-weight: 700; font-family: 'Poppins', sans-serif;">TZS ${formatNumber(displayCapital)}</span>
                         </div>
                     </div>
                     <div class="dropdown">
@@ -1121,6 +1080,7 @@
         function renderBusinessDetails() {
             if (currentBusinessIndex === null) return;
             const currentSystem = capitalSystems[currentBusinessIndex];
+            // Ndani inaonyesha mtaji unaopungua (Current Capital)
             document.getElementById('capital-amount-text').textContent = `TZS ${formatNumber(currentSystem.capital)}`;
             renderProductList(); renderSalesDates(); renderDailyExpenseDates(); renderCapitalExpenseDates(); renderDebts(); 
         }
@@ -1219,7 +1179,6 @@
                 renderBusinessDetails();
             }
         }
-
 
         function renderSalesDates() {
             const currentSystem = capitalSystems[currentBusinessIndex];
@@ -1485,6 +1444,7 @@
                         id: generateUUID(), 
                         name: name,
                         capital: amount,
+                        original_capital: amount, // MABADILIKO YAMEONGEZWA HAPA
                         description: description,
                         products: [],
                         sales: [],
@@ -1495,7 +1455,13 @@
                     await saveData(newSystem);
                 } else {
                     const system = capitalSystems[parseInt(index)];
-                    system.capital = amount;
+                    
+                    // MABADILIKO YA KUSAKINISHA MTAJI UKIBADILISHWA:
+                    const oldOriginal = system.original_capital !== undefined ? system.original_capital : system.capital;
+                    const diff = amount - oldOriginal;
+                    system.capital = system.capital + diff;
+                    system.original_capital = amount; // Hifadhi mtaji mpya wa asili
+                    
                     system.name = name;
                     system.description = description;
                     await saveData(system);
@@ -1512,7 +1478,8 @@
             capitalModalTitle.textContent = 'Badilisha Mtaji';
             capitalIndexInput.value = index;
             capitalNameInput.value = system.name;
-            capitalAmountInput.value = system.capital;
+            // Onyesha mtaji wa asili kama upo badala ya salio
+            capitalAmountInput.value = system.original_capital !== undefined ? system.original_capital : system.capital;
             capitalDescriptionInput.value = system.description || '';
             openModal('addCapitalModal');
         }
@@ -1522,7 +1489,7 @@
                 const systemToDelete = capitalSystems[index];
                 capitalSystems.splice(index, 1);
                 
-                await db.capital_systems.delete(systemToDelete.id); // Delete from offline DB
+                await db.capital_systems.delete(systemToDelete.id); 
                 setSafeLocalStorage(`sj_systems_${currentBusinessId}`, JSON.stringify(capitalSystems));
                 
                 if (navigator.onLine) {
@@ -1639,7 +1606,8 @@
             document.getElementById('saleIndex').value = '';
             document.getElementById('saleDate').value = new Date().toISOString().slice(0, 10);
             document.getElementById('saleQuantity').value = '';
-            document.getElementById('actualSalePrice').value = '';
+            document.getElementById('actualSalePrice').value = ''; // Safisha input
+            document.getElementById('liveSaleTotal').style.display = 'none'; // Ficha jumla ya kuanzia
             document.getElementById('quantityAlert').style.display = 'none';
             
             document.getElementById('isDebtCheck').checked = false;
@@ -1671,7 +1639,10 @@
             const date = saleDateInput.value;
             const productIndex = parseInt(saleProductNameSelect.value);
             const quantity = parseInt(saleQuantityInput.value);
-            const actualSalePrice = parseFloat(actualSalePriceInput.value) || 0;
+            
+            // MABADILIKO YA KUZIDISHA: Tunachukua bei ya kimoja anayoweka (kama ipo)
+            const actualSaleUnitPrice = parseFloat(actualSalePriceInput.value) || 0;
+            
             const currentSystem = capitalSystems[currentBusinessIndex];
             
             const isDebt = document.getElementById('isDebtCheck').checked;
@@ -1685,7 +1656,9 @@
             if (date && !isNaN(productIndex) && quantity > 0) {
                 const product = currentSystem.products[productIndex];
                 const totalCalculatedPrice = product.sellingPriceRetail * quantity;
-                const finalSalePrice = actualSalePrice > 0 ? actualSalePrice : totalCalculatedPrice;
+                
+                // MABADILIKO: Kama aliweka bei punguzo kwa bidhaa moja, tunazidisha na idadi kiotomatiki
+                const finalSalePrice = actualSaleUnitPrice > 0 ? (actualSaleUnitPrice * quantity) : totalCalculatedPrice;
                 
                 if (quantity > product.currentQuantity && saleBeingEdited === null) {
                     document.getElementById('quantityAlert').style.display = 'block';
@@ -1697,7 +1670,8 @@
                     date,
                     productIndex,
                     quantity,
-                    totalPrice: finalSalePrice
+                    totalPrice: finalSalePrice, // Hii ndio hela inayokwenda kwenye mauzo
+                    unitPrice: actualSaleUnitPrice > 0 ? actualSaleUnitPrice : product.sellingPriceRetail
                 };
 
                 if (saleBeingEdited) {
@@ -1752,7 +1726,9 @@
                 select.appendChild(option);
             });
             document.getElementById('saleQuantity').value = sale.quantity;
-            document.getElementById('actualSalePrice').value = sale.totalPrice;
+            // MABADILIKO: Tunamrudishia bei ya kimoja
+            document.getElementById('actualSalePrice').value = sale.unitPrice || (sale.totalPrice / sale.quantity);
+            calculateLiveSaleTotal(); // Call ili ionyeshe jumla
             
             openModal('addSaleModal');
         }
@@ -2296,8 +2272,21 @@
             document.body.removeChild(link);
         }
 
-        // ==========================================
-
+        // MABADILIKO YA LIVE CALCULATION
+        function calculateLiveSaleTotal() {
+            const q = parseInt(document.getElementById('saleQuantity').value) || 0;
+            const unitPrice = parseFloat(document.getElementById('actualSalePrice').value) || 0;
+            const displayDiv = document.getElementById('liveSaleTotal');
+            
+            if (q > 0 && unitPrice > 0) {
+                displayDiv.style.display = 'block';
+                displayDiv.textContent = `Jumla Itakayoingia: TZS ${formatNumber(q * unitPrice)}`;
+            } else {
+                displayDiv.style.display = 'none';
+            }
+        }
+        document.getElementById('saleQuantity').addEventListener('input', calculateLiveSaleTotal);
+        document.getElementById('actualSalePrice').addEventListener('input', calculateLiveSaleTotal);
 
         function logout() {
             if (confirm('Una uhakika unataka kutoka?')) {
