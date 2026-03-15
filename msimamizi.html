@@ -10,6 +10,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- MAKTABA YA DEXIE.JS KWA AJILI YA DATABASE YA OFFLINE -->
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
@@ -108,7 +111,6 @@
             letter-spacing: -0.5px;
         }
         
-        /* Network Badge sasa iko juu kulia kwenye kona */
         .network-badge-container {
             display: flex;
             justify-content: flex-end;
@@ -137,7 +139,6 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         
-        /* Glass effect inside the card */
         #capital-balance::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(to bottom right, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
@@ -149,7 +150,6 @@
             letter-spacing: 2px; opacity: 0.8; font-family: 'Inter', sans-serif;
         }
         
-        /* Mapambo kwenye kadi (Circles) */
         .card-decoration-1 {
             position: absolute; width: 150px; height: 150px; background: rgba(255,255,255,0.1);
             border-radius: 50%; top: -50px; right: -20px;
@@ -187,7 +187,6 @@
         .nav-item:hover i { color: var(--primary-light); }
         .nav-item span { font-size: 0.75em; font-weight: 600; line-height: 1.3; font-family: 'Poppins', sans-serif;}
 
-        /* Highlight Button (Weka Mauzo) */
         .nav-item.highlight { 
             background: var(--primary-gradient); color: white; border: none; 
             box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5);
@@ -238,7 +237,6 @@
         }
         .back-button:hover { background-color: var(--border-color); }
 
-        /* ACCORDION (Orodha ya Bidhaa) */
         .accordion-btn { 
             width: 100%; padding: 16px 20px; background-color: var(--bg-body); color: var(--primary); 
             border: 1px dashed var(--border-color); border-radius: var(--radius-md); font-size: 1em; font-weight: 600; 
@@ -267,12 +265,10 @@
         .item-info { font-size: 0.95em; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; }
         .item-info strong { color: var(--text-main); font-size: 1.15em; font-weight: 700; font-family: 'Poppins', sans-serif;}
         
-        /* Badges za Fedha ndani ya Lists */
         .item-profit { font-weight: 700; color: var(--success); background: #ecfdf5; padding: 4px 10px; border-radius: 8px; font-size: 0.9em; display: inline-block; border: 1px solid #a7f3d0;}
         .item-expense { font-weight: 700; color: var(--danger); background: #fef2f2; padding: 4px 10px; border-radius: 8px; font-size: 0.9em; display: inline-block; border: 1px solid #fecaca;}
         .item-debt { font-weight: 700; color: var(--warning); background: #fffbeb; padding: 4px 10px; border-radius: 8px; font-size: 0.9em; display: inline-block; border: 1px solid #fde68a;}
         
-        /* Custom Checkbox ya Madeni */
         .checkbox-container { 
             background: #fffbeb; padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--warning); 
             margin-bottom: 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s;
@@ -317,7 +313,6 @@
         }
         .modal-content input[readonly] { background-color: #f1f5f9; color: var(--text-muted); cursor: not-allowed; border-color: var(--border-color);}
         
-        /* Modal Primary Button */
         .modal-content .btn-modal { 
             width: 100%; background: var(--primary-gradient); color: #fff; border: none; padding: 18px; 
             border-radius: var(--radius-md); cursor: pointer; font-size: 1.1em; font-weight: 700; 
@@ -415,7 +410,6 @@
 
     <div id="main-content" class="hidden">
         
-        <!-- NETWORK BADGE YAKO IKO HAPA JUU -->
         <div class="container" style="padding-bottom: 0;">
             <div class="network-badge-container">
                 <div id="networkStatus" class="network-badge network-online">
@@ -450,7 +444,6 @@
                 <button id="backToCapitalBtn" class="back-button"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
                 <h1 id="business-title"></h1>
                 
-                <!-- KADI YA MTAJI ILIYOBORESHWA -->
                 <div id="capital-balance">
                     <div class="card-decoration-1"></div>
                     <div class="card-decoration-2"></div>
@@ -459,7 +452,6 @@
                 </div>
             </div>
 
-            <!-- SCROLL NAVIGATOR ILIYOBORESHWA -->
             <div class="scroll-navigator-wrapper">
                 <div class="scroll-navigator">
                     <div class="nav-item highlight" onclick="addSale()">
@@ -622,7 +614,6 @@
         </div>
     </div>
     
-    <!-- MODALS ZOTE (Zilivyoachwa na Logic lakini muonekano safi) -->
     <div id="addCapitalModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" id="closeCapitalModal">&times;</span>
@@ -789,13 +780,38 @@
         </div>
     </div>
     
-    <!-- KODI ZAKO ZA JAVASCRIPT ZINABAKI KAMA ZILIVYO -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M';
        
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Njia salama ya kusoma localStorage kuzuia error browser ikizuia storage
+        function getSafeLocalStorage(key) {
+            try {
+                return localStorage.getItem(key);
+            } catch(e) {
+                console.warn("Storage access blocked by browser settings.", e);
+                return null;
+            }
+        }
+        
+        function setSafeLocalStorage(key, value) {
+            try {
+                localStorage.setItem(key, value);
+            } catch(e) {
+                console.warn("Storage access blocked by browser settings.", e);
+            }
+        }
+
+        // ==========================================
+        // 1. KUFUNGUA DATABASE YA OFFLINE (DEXIE)
+        // ==========================================
+        const db = new Dexie('SmartJanjaDB');
+        db.version(1).stores({
+            capital_systems: 'id, business_id, name, capital, description, products, sales, dailyExpenses, capitalExpenses, debts'
+        });
 
         function getBusinessIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -810,7 +826,9 @@
             document.getElementById('debtCustomerNameDiv').style.display = this.checked ? 'block' : 'none';
         });
 
-        // Kwenye Network status nimebadilisha kidogo document.getElementById kupata target ya pili niliyohamisha
+        // ==========================================
+        // 2. NETWORK LISTENER NA AUTO-SYNC
+        // ==========================================
         function updateNetworkStatusUI() {
             const badge = document.getElementById('networkStatus');
             const isOnline = navigator.onLine;
@@ -819,21 +837,22 @@
                 if (isOnline) {
                     badge.className = 'network-badge network-online';
                     badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Mtandaoni';
+                    
+                    // Kama yupo online na kuna data za offline, TUMA (Sync)
+                    if (getSafeLocalStorage('sj_pending_sync') === 'true') {
+                        syncDataToSupabase();
+                    }
                 } else {
                     badge.className = 'network-badge network-offline';
                     badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Nje ya Mtandao (Offline)';
                 }
-            }
-            
-            if (isOnline && localStorage.getItem('sj_pending_sync') === 'true') {
-                syncDataToSupabase();
             }
         }
 
         window.addEventListener('online', updateNetworkStatusUI);
         window.addEventListener('offline', updateNetworkStatusUI);
 
-        let currentBusinessId = getBusinessIdFromUrl();
+        let currentBusinessId = getBusinessIdFromUrl() || getSafeLocalStorage('sj_current_biz_id');
         let capitalSystems = [];
         let currentBusinessIndex = null;
         let saleBeingEdited = null;
@@ -932,85 +951,58 @@
             }
         });
 
+        // ==========================================
+        // 3. KU-LOAD DATA KUTOKA KWENYE OFFLINE DB KWANZA
+        // ==========================================
         async function loadData() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session && navigator.onLine) {
-                window.location.href = 'indexa.html'; 
-                return;
-            }
-            
-            let bId = getBusinessIdFromUrl() || localStorage.getItem('sj_current_biz_id');
-
-            if (!bId && navigator.onLine && session) {
-                try {
-                    const { data: businessProfile } = await supabaseClient
-                        .from('business_profiles')
-                        .select('*')
-                        .eq('admin_id', session.user.id)
-                        .single();
-                    if(businessProfile) {
-                        bId = businessProfile.id;
-                        localStorage.setItem('sj_current_biz_id', bId);
-                    }
-                } catch(e) { console.error(e); }
-            }
-
-            if (!bId) {
+            if (!currentBusinessId) {
                 window.location.href = 'indexa.html'; 
                 return;
             }
 
-            currentBusinessId = bId;
-            localStorage.setItem('sj_current_biz_id', currentBusinessId);
-            
-            if (navigator.onLine) {
-                try {
-                    const { data: capitalData, error: capitalError } = await supabaseClient
-                        .from('capital_systems')
-                        .select('*')
-                        .eq('business_id', currentBusinessId);
-            
-                    if (!capitalError) {
-                        capitalSystems = capitalData || [];
-                        localStorage.setItem(`sj_systems_${currentBusinessId}`, JSON.stringify(capitalSystems));
-                    } else {
-                        loadLocalData();
-                    }
-                } catch (e) {
-                    loadLocalData();
+            try {
+                // Vuta data kutoka kwenye Dexie (Simu) kwanza kabisa (Kasi kubwa)
+                const offlineData = await db.capital_systems.where('business_id').equals(currentBusinessId).toArray();
+                
+                if (offlineData && offlineData.length > 0) {
+                    capitalSystems = offlineData;
+                    // Hakikisha array zote zipo kuepuka errors
+                    capitalSystems.forEach(sys => { 
+                        sys.debts = sys.debts || []; 
+                        sys.products = sys.products || [];
+                        sys.sales = sys.sales || [];
+                        sys.dailyExpenses = sys.dailyExpenses || [];
+                        sys.capitalExpenses = sys.capitalExpenses || [];
+                    });
+                    renderCapitalList();
                 }
-            } else {
-                loadLocalData();
+
+                // Kama ipo online, jaribu kusawazisha kimya kimya
+                if (navigator.onLine) {
+                    syncDataToSupabase();
+                }
+            } catch (err) {
+                console.error("Error loading from local DB:", err);
             }
             
-            capitalSystems.forEach(sys => { sys.debts = sys.debts || []; });
-
-            renderCapitalList();
             updateNetworkStatusUI();
         }
-
-        function loadLocalData() {
-            const localData = localStorage.getItem(`sj_systems_${currentBusinessId}`);
-            if (localData) {
-                capitalSystems = JSON.parse(localData);
-            } else {
-                capitalSystems = [];
-            }
-        }
         
+        // ==========================================
+        // 4. KU-SAVE DATA OFFLINE PAPO HAPO
+        // ==========================================
         async function saveData(systemData) {
             if (!systemData || !systemData.id) return;
             systemData.debts = systemData.debts || [];
 
+            // Update array yetu ya kwenye screen
             const index = capitalSystems.findIndex(s => s.id === systemData.id);
             if(index !== -1) {
                 capitalSystems[index] = systemData;
-            } else if(!capitalSystems.some(s => s.id === systemData.id)) {
+            } else {
                 capitalSystems.push(systemData);
             }
             
-            localStorage.setItem(`sj_systems_${currentBusinessId}`, JSON.stringify(capitalSystems));
-        
             const dataToSave = {
                 id: systemData.id,
                 name: systemData.name,
@@ -1023,72 +1015,71 @@
                 debts: systemData.debts, 
                 business_id: currentBusinessId
             };
-        
-            if (navigator.onLine) {
-                try {
-                    await supabaseClient.from('capital_systems').upsert(dataToSave, { onConflict: 'id' });
-                    localStorage.setItem('sj_pending_sync', 'false');
-                } catch (e) {
-                    localStorage.setItem('sj_pending_sync', 'true');
+            
+            try {
+                // Save kwenye Dexie (Offline DB) kwa kasi ya radi
+                await db.capital_systems.put(dataToSave);
+                
+                // Weka alama kuwa kuna kazi inasubiri kutumwa
+                setSafeLocalStorage('sj_pending_sync', 'true');
+                
+                // Kama intaneti ipo, tuma mtandaoni sasa hivi
+                if (navigator.onLine) {
+                    syncDataToSupabase();
+                } else {
+                    updateNetworkStatusUI(); // Onyesha kuwa ipo offline na imehifadhiwa
                 }
-            } else {
-                localStorage.setItem('sj_pending_sync', 'true');
+            } catch (err) {
+                console.error("Error saving to local DB:", err);
+                alert("Kumbukumbu ya simu imejaa au imezuiwa na browser.");
             }
         }
 
+        // ==========================================
+        // 5. KUSAWAZISHA DATA NA MTANDAO (AUTO-SYNC)
+        // ==========================================
         async function syncDataToSupabase() {
+            if (getSafeLocalStorage('sj_pending_sync') !== 'true') return;
+
             const badge = document.getElementById('networkStatus');
             if(badge) {
                 badge.className = 'network-badge network-syncing'; 
-                badge.innerHTML = '<i class="fa-solid fa-rotate"></i> Inasawazisha...'; 
+                badge.innerHTML = '<i class="fa-solid fa-rotate fa-spin"></i> Inasawazisha...'; 
             }
 
-            let deletedItems = JSON.parse(localStorage.getItem('sj_deleted_items') || '[]');
-            for (let id of deletedItems) {
-                 await supabaseClient.from('capital_systems').delete().eq('id', id);
-            }
-            localStorage.setItem('sj_deleted_items', '[]');
-
-            const localData = localStorage.getItem(`sj_systems_${currentBusinessId}`);
-            if (localData) {
-                const systems = JSON.parse(localData);
-                for (let sys of systems) {
-                    const dataToSave = {
-                        id: sys.id, name: sys.name, capital: sys.capital, description: sys.description,
-                        products: sys.products, sales: sys.sales, dailyExpenses: sys.dailyExpenses,
-                        capitalExpenses: sys.capitalExpenses, debts: sys.debts, business_id: currentBusinessId
-                    };
-                    await supabaseClient.from('capital_systems').upsert(dataToSave, { onConflict: 'id' });
+            try {
+                // Futa yaliyofutwa
+                let deletedItems = JSON.parse(getSafeLocalStorage('sj_deleted_items') || '[]');
+                for (let id of deletedItems) {
+                     await supabaseClient.from('capital_systems').delete().eq('id', id);
                 }
+                setSafeLocalStorage('sj_deleted_items', '[]');
+
+                // Vuta data zote mpya toka Dexie na zitume Supabase
+                const localData = await db.capital_systems.toArray();
+                if (localData && localData.length > 0) {
+                    const { error } = await supabaseClient.from('capital_systems').upsert(localData, { onConflict: 'id' });
+                    
+                    if (!error) {
+                        setSafeLocalStorage('sj_pending_sync', 'false');
+                    } else {
+                        console.error("Supabase sync error:", error);
+                    }
+                } else {
+                     setSafeLocalStorage('sj_pending_sync', 'false');
+                }
+            } catch (err) {
+                console.error("Sync failed, will try later:", err);
             }
             
-            localStorage.setItem('sj_pending_sync', 'false');
             setTimeout(updateNetworkStatusUI, 1000);
         }
 
-        function formatNumber(number) {
-            return Number(number).toLocaleString('en-US');
-        }
-
-        function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            const date = new Date(dateString + 'T00:00:00');
-            return date.toLocaleDateString('sw-TZ', options);
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function closeModals() {
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.style.display = 'none';
-            });
-        }
+        function formatNumber(number) { return Number(number).toLocaleString('en-US'); }
+        function formatDate(dateString) { const options = { year: 'numeric', month: 'short', day: 'numeric' }; const date = new Date(dateString + 'T00:00:00'); return date.toLocaleDateString('sw-TZ', options); }
+        function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+        function closeModals() { document.querySelectorAll('.modal').forEach(modal => { modal.style.display = 'none'; }); }
 
         function renderCapitalList() {
             capitalList.innerHTML = '';
@@ -1125,22 +1116,13 @@
             renderBusinessDetails();
         }
 
-        function goBackToCapitalList() {
-            currentBusinessIndex = null;
-            businessPage.classList.add('hidden');
-            capitalPage.classList.remove('hidden');
-            renderCapitalList();
-        }
+        function goBackToCapitalList() { currentBusinessIndex = null; businessPage.classList.add('hidden'); capitalPage.classList.remove('hidden'); renderCapitalList(); }
         
         function renderBusinessDetails() {
             if (currentBusinessIndex === null) return;
             const currentSystem = capitalSystems[currentBusinessIndex];
             document.getElementById('capital-amount-text').textContent = `TZS ${formatNumber(currentSystem.capital)}`;
-            renderProductList();
-            renderSalesDates();
-            renderDailyExpenseDates();
-            renderCapitalExpenseDates();
-            renderDebts();
+            renderProductList(); renderSalesDates(); renderDailyExpenseDates(); renderCapitalExpenseDates(); renderDebts(); 
         }
 
         function renderProductList() {
@@ -1237,6 +1219,7 @@
                 renderBusinessDetails();
             }
         }
+
 
         function renderSalesDates() {
             const currentSystem = capitalSystems[currentBusinessIndex];
@@ -1509,7 +1492,6 @@
                         capitalExpenses: [],
                         debts: [] 
                     };
-                    capitalSystems.push(newSystem);
                     await saveData(newSystem);
                 } else {
                     const system = capitalSystems[parseInt(index)];
@@ -1540,7 +1522,8 @@
                 const systemToDelete = capitalSystems[index];
                 capitalSystems.splice(index, 1);
                 
-                localStorage.setItem(`sj_systems_${currentBusinessId}`, JSON.stringify(capitalSystems));
+                await db.capital_systems.delete(systemToDelete.id); // Delete from offline DB
+                setSafeLocalStorage(`sj_systems_${currentBusinessId}`, JSON.stringify(capitalSystems));
                 
                 if (navigator.onLine) {
                     try {
@@ -1556,10 +1539,10 @@
         }
         
         function markAsDeleted(id) {
-            let deleted = JSON.parse(localStorage.getItem('sj_deleted_items') || '[]'); 
+            let deleted = JSON.parse(getSafeLocalStorage('sj_deleted_items') || '[]'); 
             deleted.push(id); 
-            localStorage.setItem('sj_deleted_items', JSON.stringify(deleted));
-            localStorage.setItem('sj_pending_sync', 'true');
+            setSafeLocalStorage('sj_deleted_items', JSON.stringify(deleted));
+            setSafeLocalStorage('sj_pending_sync', 'true');
         }
 
         function addProduct() {
@@ -1972,10 +1955,6 @@
             }
         }
 
-        // ==========================================
-        // LOGIC YA RIPOTI KUU INABAKI KAMA ILIVYO
-        // ==========================================
-
         function toggleCustomDates() {
             const val = document.getElementById('reportTimeframe').value;
             if (val === 'custom') {
@@ -2041,12 +2020,14 @@
             const fSales = sys.sales.filter(filterByDate);
             const fExpenses = sys.dailyExpenses.filter(filterByDate);
             const fDebts = sys.debts.filter(filterByDate);
+            const fCapExp = sys.capitalExpenses.filter(filterByDate);
 
             let ledger = [];
             let tSales = 0;
             let gProfit = 0;
             let tExpenses = 0;
             let totalProfit = 0;
+            let tCapExpAmount = 0;
 
             fSales.forEach(sale => {
                 const pName = sys.products[sale.productIndex] ? sys.products[sale.productIndex].name : "Bidhaa Imefutwa";
@@ -2054,7 +2035,7 @@
                 
                 ledger.push({
                     date: sale.date,
-                    desc: `Mauzo: ${pName} (x${sale.quantity})`,
+                    desc: `Mauzo: ${pName} (Idadi: ${sale.quantity})`,
                     revenue: sale.totalPrice,
                     expenditure: 0,
                     profit: profitKiasi
@@ -2076,6 +2057,8 @@
                 totalProfit -= exp.amount; 
             });
 
+            fCapExp.forEach(e => { tCapExpAmount += e.amount; });
+
             ledger.sort((a, b) => new Date(a.date) - new Date(b.date));
 
             let tDebts = 0;
@@ -2090,6 +2073,7 @@
                 netProfit: totalProfit, 
                 fDebts,
                 tDebts,
+                tCapExpAmount,
                 sysProducts: sys.products,
                 bName: sys.name
             };
@@ -2100,7 +2084,7 @@
             if (!reportData) return; 
 
             if (reportData.ledger.length === 0 && reportData.fDebts.length === 0) {
-                alert(`Hakuna taarifa zozote kwa ${reportData.timeframeLabel}. Huwezi kutengeneza ripoti tupu.`);
+                alert(`Hakuna taarifa zozote (Mauzo, Matumizi, au Madeni) kwa ${reportData.timeframeLabel}. Huwezi kutengeneza ripoti tupu.`);
                 return;
             }
 
@@ -2127,6 +2111,8 @@
             let finalY = 35;
 
             if(data.ledger.length > 0) {
+                doc.setFontSize(14);
+                doc.text("1. Mchanganuo Kamili wa Mauzo na Matumizi", 14, finalY);
                 const ledgerBody = data.ledger.map(row => {
                     return [
                         formatDate(row.date), 
@@ -2138,7 +2124,7 @@
                 });
 
                 ledgerBody.push([
-                    "JUMLA / TOTAL", 
+                    "JUMLA (TOTAL)", 
                     "", 
                     formatNumber(data.tSales), 
                     formatNumber(data.tExpenses), 
@@ -2146,11 +2132,11 @@
                 ]);
 
                 doc.autoTable({
-                    startY: finalY,
-                    head: [['Tarehe (Date)', 'Maelezo (Description)', 'Mapato (Revenue)', 'Matumizi (Expenditure)', 'Faida (Profit)']],
+                    startY: finalY + 5,
+                    head: [['Tarehe', 'Maelezo', 'Mapato (TZS)', 'Matumizi (TZS)', 'Faida (TZS)']],
                     body: ledgerBody,
                     theme: 'grid',
-                    headStyles: { fillColor: [46, 204, 113] }, 
+                    headStyles: { fillColor: [46, 204, 113] },
                     didParseCell: function(data) {
                         if (data.row.index === ledgerBody.length - 1) {
                             data.cell.styles.fontStyle = 'bold';
@@ -2163,13 +2149,14 @@
 
             if(finalY > 230) { doc.addPage(); finalY = 20; }
             doc.setFontSize(14);
-            doc.text("MUHTASARI WA MAHESABU", 14, finalY);
+            doc.text("2. MUHTASARI WA HESABU KAMILI", 14, finalY);
             
             const tableData = [
                 ["Jumla ya Mauzo Taslimu", `TZS ${formatNumber(data.tSales)}`],
-                ["Faida Ghafi (Faida kwenye Bidhaa)", `TZS ${formatNumber(data.gProfit)}`],
-                ["Jumla ya Matumizi (Yaliyotolewa)", `TZS ${formatNumber(data.tExpenses)}`],
-                ["FAIDA KAMILI (Net Profit)", `TZS ${formatNumber(data.netProfit)}`]
+                ["Faida Ghafi (Faida iliyopo kwenye Bidhaa)", `TZS ${formatNumber(data.gProfit)}`],
+                ["Jumla ya Matumizi ya Kawaida", `TZS ${formatNumber(data.tExpenses)}`],
+                ["FAIDA KAMILI (Net Profit)", `TZS ${formatNumber(data.netProfit)}`],
+                ["Matumizi Kwenye Mtaji Halisi", `TZS ${formatNumber(data.tCapExpAmount)}`]
             ];
 
             doc.autoTable({
@@ -2184,30 +2171,31 @@
             if(data.fDebts.length > 0) {
                 if(finalY > 230) { doc.addPage(); finalY = 20; }
                 doc.setFontSize(14);
-                doc.text("ORODHA YA MADENI NAYOWADAI WATEJA", 14, finalY);
+                doc.text("3. ORODHA YA MADENI NAYOWADAI WATEJA", 14, finalY);
                 
                 const debtBody = data.fDebts.map(d => {
                     const pName = data.sysProducts[d.productIndex] ? data.sysProducts[d.productIndex].name : "Bidhaa Imefutwa";
                     return [formatDate(d.date), d.customerName, pName, d.quantity, `TZS ${formatNumber(d.totalPrice)}`];
                 });
                 
-                debtBody.push(["JUMLA KUU", "", "", "", `TZS ${formatNumber(data.tDebts)}`]);
+                debtBody.push(["JUMLA KUU YOTE", "", "", "", `TZS ${formatNumber(data.tDebts)}`]);
 
                 doc.autoTable({
                     startY: finalY + 5,
-                    head: [['Tarehe', 'Jina la Mteja', 'Bidhaa', 'Idadi', 'Deni']],
+                    head: [['Tarehe', 'Jina la Mteja', 'Bidhaa', 'Idadi', 'Deni (TZS)']],
                     body: debtBody,
                     theme: 'grid',
                     headStyles: { fillColor: [245, 158, 11] },
                     didParseCell: function(info) {
                         if (info.row.index === debtBody.length - 1) {
                             info.cell.styles.fontStyle = 'bold';
+                            info.cell.styles.fillColor = [254, 243, 199];
                         }
                     }
                 });
             }
 
-            doc.save(`Ripoti_Kamili_${data.timeframeLabel.replace(/\s+/g, '_')}.pdf`);
+            doc.save(`Ripoti_Kamili_SmartJanja_${data.timeframeLabel.replace(/\s+/g, '_')}.pdf`);
         }
 
         function exportToExcel(data) {
@@ -2239,6 +2227,7 @@
             wsData.push(["Faida Ghafi (Faida kwenye Bidhaa)", data.gProfit]);
             wsData.push(["Matumizi ya Kawaida", data.tExpenses]);
             wsData.push(["FAIDA KAMILI (Net Profit)", data.netProfit]);
+            wsData.push(["Matumizi Kwenye Mtaji", data.tCapExpAmount]);
             wsData.push([]);
 
             if(data.fDebts.length > 0) {
@@ -2265,7 +2254,7 @@
                 <p><strong>Muda wa Ripoti:</strong> ${data.timeframeLabel}</p>
                 <hr>
                 
-                <h3>Jedwali Kuu la Mapato na Matumizi</h3>
+                <h3>1. Jedwali Kamili la Mapato na Matumizi</h3>
                 <table>
                     <tr><th>Tarehe</th><th>Maelezo</th><th>Mapato (TZS)</th><th>Matumizi (TZS)</th><th>Faida (TZS)</th></tr>
             `;
@@ -2276,23 +2265,24 @@
             content += `<tr style="font-weight:bold; background:#eee;"><td>JUMLA</td><td></td><td>${formatNumber(data.tSales)}</td><td>${formatNumber(data.tExpenses)}</td><td>${formatNumber(data.netProfit)}</td></tr></table>`;
 
             content += `
-                <h3>Muhtasari wa Hesabu</h3>
-                <table style="width:50%;">
+                <h3>2. Muhtasari wa Hesabu</h3>
+                <table style="width:60%;">
                     <tr><th style="background:#34495e;">Kipengele</th><th style="background:#34495e;">Kiasi</th></tr>
                     <tr><td>Jumla ya Mauzo Taslimu</td><td>TZS ${formatNumber(data.tSales)}</td></tr>
                     <tr><td>Faida Ghafi</td><td>TZS ${formatNumber(data.gProfit)}</td></tr>
                     <tr><td>Matumizi yaliyotolewa</td><td>TZS ${formatNumber(data.tExpenses)}</td></tr>
                     <tr><td><strong>FAIDA KAMILI (Net Profit)</strong></td><td><strong>TZS ${formatNumber(data.netProfit)}</strong></td></tr>
+                    <tr><td>Matumizi Kwenye Mtaji</td><td>TZS ${formatNumber(data.tCapExpAmount)}</td></tr>
                 </table>
             `;
 
             if(data.fDebts.length > 0) {
-                content += `<h3>Orodha ya Madeni Nnayowadai</h3><table><tr><th style="background:#f39c12;">Tarehe</th><th style="background:#f39c12;">Mteja</th><th style="background:#f39c12;">Bidhaa</th><th style="background:#f39c12;">Deni (TZS)</th></tr>`;
+                content += `<h3>3. Orodha ya Madeni Nayowadai</h3><table><tr><th style="background:#f39c12;">Tarehe</th><th style="background:#f39c12;">Mteja</th><th style="background:#f39c12;">Bidhaa</th><th style="background:#f39c12;">Deni (TZS)</th></tr>`;
                 data.fDebts.forEach(d => {
                     const pName = data.sysProducts[d.productIndex] ? data.sysProducts[d.productIndex].name : "Imefutwa";
                     content += `<tr><td>${formatDate(d.date)}</td><td>${d.customerName}</td><td>${pName} x${d.quantity}</td><td>${formatNumber(d.totalPrice)}</td></tr>`;
                 });
-                content += `<tr style="font-weight:bold; background:#eee;"><td>JUMLA KUU YOTE</td><td></td><td></td><td>${formatNumber(data.tDebts)}</td></tr></table>`;
+                content += `<tr style="font-weight:bold; background:#fef3c7;"><td>JUMLA KUU YOTE</td><td></td><td></td><td>${formatNumber(data.tDebts)}</td></tr></table>`;
             }
 
             const html = header + content + footer;
