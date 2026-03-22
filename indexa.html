@@ -4,6 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SmartJanja - Kuingia</title>
+    
+    <script>
+        (function() {
+            try {
+                // Inaangalia kwa haraka sana kabla page haijachorwa
+                var bizId = localStorage.getItem('sj_current_biz_id');
+                if (bizId) {
+                    // Inakurusha bila kubakiza history (Huwezi kurudi nyuma kwenye login)
+                    window.location.replace('msimamizi.html?businessId=' + encodeURIComponent(bizId));
+                }
+            } catch(e) {}
+        })();
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link rel="icon" type="image/jpg" href="smart.png">
     <style>
@@ -262,7 +275,6 @@
 
         <div id="alertBox" class="custom-alert"></div>
 
-        <!-- FOMU YA KUJISAJILI -->
         <div id="signup-form" class="auth-form active">
             <form id="admin-signup-form">
                 <div class="form-group">
@@ -291,7 +303,6 @@
             </form>
         </div>
 
-        <!-- FOMU YA KUINGIA (LOGIN) -->
         <div id="login-form" class="auth-form">
             <form id="login-admin-form">
                 <div class="form-group">
@@ -316,7 +327,6 @@
         <p class="para"><i class="fa-solid fa-headset"></i> Kwa msaada tupigie/SMS: 0786701705</p>
     </div>
 
-    <!-- MISTARI YAKO ASILI YA JS INABAKI HAPA BILA KUPUNGUZWA -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; 
@@ -332,7 +342,7 @@
             setTimeout(() => { alertBox.style.display = 'none'; }, 5000);
         }
 
-        // --- Mfumo wa Auto-Login ---
+        // --- Mfumo wa Auto-Login (Uliokuwepo unaendelea pia kama backup ya mtandao) ---
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabaseClient.auth.getSession();
             
@@ -347,7 +357,7 @@
                 if (businessProfile) {
                     // Hifadhi kwenye local storage kwa ajili ya offline feature iliyopo kwenye msimamizi.html
                     localStorage.setItem('sj_current_biz_id', businessProfile.id);
-                    window.location.href = `msimamizi.html?businessId=${businessProfile.id}`;
+                    window.location.replace(`msimamizi.html?businessId=${businessProfile.id}`);
                 }
             }
         });
@@ -445,7 +455,7 @@
     
                 // Mstari huu nimeuongeza hapa pia ili ukisajili akupitishe moja kwa moja akiwa na Offline ID
                 localStorage.setItem('sj_current_biz_id', businessProfile.id);
-                window.location.href = `msimamizi.html?businessId=${businessProfile.id}`;
+                window.location.replace(`msimamizi.html?businessId=${businessProfile.id}`);
     
             } catch (err) {
                 showPremiumAlert(`Hitilafu isiyojulikana: ${err.message}`);
@@ -488,7 +498,7 @@
                 // Mstari huu ni kwa ajili ya kufanya offline mode ifanye kazi unapo-login
                 localStorage.setItem('sj_current_biz_id', businessProfile.id);
                 
-                window.location.href = `msimamizi.html?businessId=${businessProfile.id}`;
+                window.location.replace(`msimamizi.html?businessId=${businessProfile.id}`);
 
             } catch (err) {
                 showPremiumAlert(`Kuna tatizo limetokea: ${err.message}`);
