@@ -3153,122 +3153,465 @@
         // ==========================================
         // MFUMO WA RIPOTI
         // ==========================================
-        // ==========================================
-// MFUMO WA RIPOTI ULIOBORESHWA (BLOB DOWNLOAD)
-// ==========================================
-  // 1. FUNCTION KUU INAYOITWA NA KITUFE (ONCLICK)
-function generateReport(format) {
-    const reportData = getReportData(); // Hakikisha function hii ipo kwenye kodi zako
-    if (!reportData) return; 
+        function generateReport(format) {
+            const reportData = getReportData();
+            if (!reportData) return; 
 
-    if (reportData.ledger.length === 0 && reportData.fDebts.length === 0) {
-        showToast(`Hakuna taarifa za kupakua.`, "warning");
-        return;
-    }
-
-    closeModal('reportModal');
-    showToast("Inaandaa faili lako...", "info");
-
-    setTimeout(() => {
-        try {
-            if (format === 'pdf') {
-                exportToPDF(reportData);
-            } else if (format === 'excel') {
-                exportToExcel(reportData);
-            } else if (format === 'doc') {
-                exportToWord(reportData);
+            if (reportData.ledger.length === 0 && reportData.fDebts.length === 0) {
+                showToast(`Hakuna taarifa zozote kwa ${reportData.timeframeLabel}.`, "warning");
+                return;
             }
-        } catch (error) {
-            console.error("Kosa:", error);
-            showToast("Tatizo limetokea wakati wa kuandaa faili.", "error");
+
+            closeModal('reportModal');
+            showToast("Inaandaa faili lako, tafadhali subiri...", "info");
+
+            setTimeout(() => {
+                try {
+                    if (format === 'pdf') {
+                        exportToPDF(reportData);
+                    } else if (format === 'excel') {
+                        exportToExcel(reportData);
+                    } else if (format === 'doc') {
+                        exportToWord(reportData);
+                    }
+                } catch (error) {
+                    console.error("Kosa kwenye kupakua ripoti:", error);
+                    showToast("Kuna tatizo limetokea wakati wa kuandaa faili.", "error");
+                }
+            }, 50); 
         }
-    }, 100); 
-}
 
-// 2. MFUMO WA KUDOWNLOAD (UNATAMBUA APP VS WEBSITE)
-async function forceDownloadBlob(blob, fileName) {
-    // Tambua kama mtumiaji yupo kwenye App (WebView) au Browser ya kawaida
-    const isWebView = navigator.userAgent.includes('wv') || 
-                      (navigator.userAgent.includes('iPhone') && !navigator.userAgent.includes('Safari')) ||
-                      window.location.protocol === 'file:';
+        async function downloadBase64File(base64DataUri, fileName, mimeType) {
+            try {
+                // Step 1: Convert data URI to Blob
+                let blob;
+                if (base64DataUri.startsWith('data:')) {
+                    const parts = base64DataUri.split(',');
+                    const byteString = atob(parts[1]);
+                    const ab = new ArrayBuffer(byteString.length);
+                    const ia = new Uint8Array(ab);
+                    for (let i = 0; i < byteString.length; i++) {
+                        ia[i] = byteString.charCodeAt(i);
+                    }
+                    blob = new Blob([ab], { type: mimeType });
+                } else {
+                    const response = await fetch(base64DataUri);
+                    blob = await response.blob();
+                }
 
-    if (isWebView) {
-        // --- MFUMO WA APP (WEB-TO-APP) ---
-        try {
-            const file = new File([blob], fileName, { type: blob.type });
-            // Jaribu Web Share API (Inakubalika zaidi kwenye Apps)
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    title: fileName,
-                    files: [file]
+                // Step 2: If running inside Capacitor (mobile app), use Filesystem API
+                if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+                    try {
+                        const reader = new FileReader();
+                        const base64Promise = new Promise((resolve, reject) => {
+                            reader.onloadend = () => {
+                                const base64 = reader.result.split(',')[1];
+                                resolve(base64);
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        });
+                        const base64Data = await base64Promise;
+                        const { Filesystem, Directory } = window.Capacitor.Plugins;
+
+                        // Write file to Documents directory
+                        const result = await Filesystem.writeFile({
+                            path: fileName,
+                            data: base64Data,
+                            directory: Directory.DOCUMENTS || 'DOCUMENTS',
+                            recursive: true
+                        });
+
+                        // Try to open/share using Capacitor Share plugin
+                        if (window.Capacitor.Plugins.Share) {
+                            try {
+                                await window.Capacitor.Plugins.Share.share({
+                                    title: fileName,
+                                    text: 'Ripoti Yako ya SmartJanja',
+                                    url: result.uri,
+                                    dialogTitle: 'Fungua au Tuma Ripoti'
+                                });
+                            } catch (shareErr) {
+                                console.log("Capacitor Share skipped:", shareErr);
+                            }
+                        }
+                        showToast("Faili limehifadhiwa kwenye simu yako!", "success");
+                        return;
+                    } catch (capErr) {
+                        console.warn("Capacitor Filesystem failed, falling back:", capErr);
+                    }
+                }
+
+                // Step 3: Try Web Share API with File (works on most mobile browsers)
+                const file = new File([blob], fileName, { type: mimeType });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            title: fileName,
+                            text: 'Ripoti Yako ya SmartJanja hii hapa',
+                            files: [file]
+                        });
+                        showToast("Faili lako limetumwa kikamilifu!", "success");
+                        return;
+                    } catch (shareErr) {
+                        if (shareErr.name === 'AbortError') {
+                            // User cancelled - still consider success since file was prepared
+                            console.log("Share cancelled by user");
+                        } else {
+                            console.log("Share failed, falling back to download:", shareErr);
+                        }
+                    }
+                }
+
+                // Step 4: Blob URL + anchor download (desktop & most browsers)
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = fileName;
+                link.style.cssText = 'position:fixed;left:-9999px;opacity:0';
+                document.body.appendChild(link);
+
+                // Detect iOS Safari which needs special handling
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+                if (isIOS && isSafari) {
+                    // iOS Safari: open blob in new tab so user can save manually
+                    const newWindow = window.open(blobUrl, '_blank');
+                    if (newWindow) {
+                        showToast("Faili limefunguka! Bonyeza 'Share' kisha 'Save to Files' kuhifadhi.", "info");
+                    } else {
+                        // If popup blocked, try the link click anyway
+                        link.click();
+                        showToast("Faili linapakuliwa...", "info");
+                    }
+                } else {
+                    link.click();
+                    showToast("Faili limepakuliwa! Angalia kwenye 'Downloads'.", "success");
+                }
+
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(blobUrl);
+                }, 5000);
+
+            } catch (error) {
+                console.error("Download Error:", error);
+                // Step 5: Ultimate fallback - open data URI directly
+                try {
+                    const fallbackBlob = new Blob(
+                        [Uint8Array.from(atob(base64DataUri.split(',')[1] || ''), c => c.charCodeAt(0))],
+                        { type: mimeType }
+                    );
+                    const fallbackUrl = URL.createObjectURL(fallbackBlob);
+                    window.open(fallbackUrl, '_blank');
+                    showToast("Faili linafunguka kwenye tab mpya.", "info");
+                    setTimeout(() => URL.revokeObjectURL(fallbackUrl), 10000);
+                } catch (e2) {
+                    showToast("Kuna tatizo la kupakua. Tafadhali jaribu tena.", "error");
+                    console.error("All download methods failed:", e2);
+                }
+            }
+        }
+
+        function exportToPDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(18);
+            doc.text(`RIPOTI YA MAPATO NA MATUMIZI - ${data.bName.toUpperCase()}`, 14, 20);
+            
+            doc.setFontSize(12);
+            doc.text(`Muda wa Ripoti: ${data.timeframeLabel}`, 14, 30);
+            
+            let finalY = 35;
+
+            if(data.ledger.length > 0) {
+                doc.setFontSize(14);
+                doc.text("1. Mchanganuo Kamili wa Mauzo na Matumizi", 14, finalY);
+                const ledgerBody = data.ledger.map(row => {
+                    return [
+                        formatDate(row.date), 
+                        row.desc, 
+                        row.revenue > 0 ? formatNumber(row.revenue) : "-", 
+                        row.expenditure > 0 ? formatNumber(row.expenditure) : "-", 
+                        formatNumber(row.profit)
+                    ];
                 });
-            } else {
-                // Njia mbadala kama Share API haipo kwenye App hiyo
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = function() {
-                    window.location.href = reader.result; 
-                };
+
+                ledgerBody.push([
+                    "JUMLA (TOTAL)", 
+                    "", 
+                    formatNumber(data.tSales), 
+                    formatNumber(data.tExpenses), 
+                    formatNumber(data.netProfit)
+                ]);
+
+                doc.autoTable({
+                    startY: finalY + 5,
+                    head: [['Tarehe', 'Maelezo', 'Mapato (TZS)', 'Matumizi (TZS)', 'Faida (TZS)']],
+                    body: ledgerBody,
+                    theme: 'grid',
+                    headStyles: { fillColor: [46, 204, 113] },
+                    didParseCell: function(data) {
+                        if (data.row.index === ledgerBody.length - 1) {
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fillColor = [236, 240, 241];
+                        }
+                    }
+                });
+                finalY = doc.lastAutoTable.finalY + 15;
             }
-        } catch (e) {
-            showToast("Tumia kivinjari cha kawaida kupakua.", "error");
+
+            if(finalY > 230) { doc.addPage(); finalY = 20; }
+            doc.setFontSize(14);
+            doc.text("2. MUHTASARI WA HESABU KAMILI", 14, finalY);
+            
+            const tableData = [
+                ["Jumla ya Mauzo Taslimu", `TZS ${formatNumber(data.tSales)}`],
+                ["Faida Ghafi (Faida iliyopo kwenye Bidhaa)", `TZS ${formatNumber(data.gProfit)}`],
+                ["Jumla ya Matumizi ya Kawaida", `TZS ${formatNumber(data.tExpenses)}`],
+                ["FAIDA KAMILI (Net Profit)", `TZS ${formatNumber(data.netProfit)}`]
+            ];
+
+            doc.autoTable({
+                startY: finalY + 5,
+                head: [['Kipengele', 'Kiasi']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [52, 73, 94] }
+            });
+            finalY = doc.lastAutoTable.finalY + 15;
+
+            // RIPOTI YA MATUMIZI YA MTAJI
+            if(data.fCapExp && data.fCapExp.length > 0) {
+                if(finalY > 230) { doc.addPage(); finalY = 20; }
+                doc.setFontSize(14);
+                doc.text("3. MATUMIZI YA MTAJI HALISI KWA KINA", 14, finalY);
+                
+                const capExpBody = data.fCapExp.map(e => {
+                    return [formatDate(e.date), e.name, `TZS ${formatNumber(e.amount)}`];
+                });
+                capExpBody.push(["JUMLA YOTE", "", `TZS ${formatNumber(data.tCapExpAmount)}`]);
+
+                doc.autoTable({
+                    startY: finalY + 5,
+                    head: [['Tarehe', 'Maelezo', 'Kiasi (TZS)']],
+                    body: capExpBody,
+                    theme: 'grid',
+                    headStyles: { fillColor: [220, 38, 38] },
+                    didParseCell: function(info) {
+                        if (info.row.index === capExpBody.length - 1) {
+                            info.cell.styles.fontStyle = 'bold';
+                            info.cell.styles.fillColor = [254, 226, 226];
+                        }
+                    }
+                });
+                finalY = doc.lastAutoTable.finalY + 15;
+            }
+
+            // RIPOTI YA MAKATO KUKUZA MTAJI
+            if(data.fReinvest && data.fReinvest.length > 0) {
+                if(finalY > 230) { doc.addPage(); finalY = 20; }
+                doc.setFontSize(14);
+                doc.text("4. MAKATO YA FAIDA YALIYOONGEZWA KWENYE MTAJI", 14, finalY);
+                
+                const reinvBody = data.fReinvest.map(r => {
+                    return [formatDate(r.date), `TZS ${formatNumber(r.profitBefore)}`, `TZS ${formatNumber(r.amount)}`];
+                });
+                reinvBody.push(["JUMLA ILIYOONGEZWA", "", `TZS ${formatNumber(data.tReinvest)}`]);
+
+                doc.autoTable({
+                    startY: finalY + 5,
+                    head: [['Tarehe', 'Faida Iliyopatikana', 'Kiasi Kilichokatwa (TZS)']],
+                    body: reinvBody,
+                    theme: 'grid',
+                    headStyles: { fillColor: [13, 148, 136] },
+                    didParseCell: function(info) {
+                        if (info.row.index === reinvBody.length - 1) {
+                            info.cell.styles.fontStyle = 'bold';
+                            info.cell.styles.fillColor = [204, 251, 241];
+                        }
+                    }
+                });
+                finalY = doc.lastAutoTable.finalY + 15;
+            }
+
+            if(data.fDebts.length > 0) {
+                if(finalY > 230) { doc.addPage(); finalY = 20; }
+                doc.setFontSize(14);
+                doc.text("5. ORODHA YA MADENI NAYOWADAI WATEJA", 14, finalY);
+                
+                const debtBody = data.fDebts.map(d => {
+                    const pName = data.sysProducts[d.productIndex] ? data.sysProducts[d.productIndex].name : "Bidhaa Imefutwa";
+                    return [formatDate(d.date), d.customerName, pName, d.quantity, `TZS ${formatNumber(d.totalPrice)}`];
+                });
+                
+                debtBody.push(["JUMLA KUU YOTE", "", "", "", `TZS ${formatNumber(data.tDebts)}`]);
+
+                doc.autoTable({
+                    startY: finalY + 5,
+                    head: [['Tarehe', 'Jina la Mteja', 'Bidhaa', 'Idadi', 'Deni (TZS)']],
+                    body: debtBody,
+                    theme: 'grid',
+                    headStyles: { fillColor: [245, 158, 11] },
+                    didParseCell: function(info) {
+                        if (info.row.index === debtBody.length - 1) {
+                            info.cell.styles.fontStyle = 'bold';
+                            info.cell.styles.fillColor = [254, 243, 199];
+                        }
+                    }
+                });
+            }
+
+            const pdfBase64 = doc.output('datauristring');
+            downloadBase64File(pdfBase64, `Ripoti_SmartJanja_${data.timeframeLabel.replace(/\s+/g, '_')}.pdf`, 'application/pdf');
         }
-    } else {
-        // --- MFUMO WA WEBSITE (BROWSER ZA KAWAIDA) ---
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+
+        function exportToExcel(data) {
+            const wb = XLSX.utils.book_new();
+            
+            let wsData = [
+                ["RIPOTI YA MAPATO NA MATUMIZI - SMARTJANJA"],
+                ["Biashara:", data.bName],
+                ["Muda wa Ripoti:", data.timeframeLabel],
+                [],
+                ["TAREHE", "MAELEZO", "MAPATO (TZS)", "MATUMIZI (TZS)", "FAIDA (TZS)"]
+            ];
+            
+            data.ledger.forEach(row => {
+                wsData.push([
+                    formatDate(row.date), 
+                    row.desc, 
+                    row.revenue > 0 ? row.revenue : "-", 
+                    row.expenditure > 0 ? row.expenditure : "-", 
+                    row.profit
+                ]);
+            });
+            wsData.push(["JUMLA / TOTAL", "", data.tSales, data.tExpenses, data.netProfit]);
+            wsData.push([]);
+            
+            wsData.push(["MUHTASARI WA HESABU"]);
+            wsData.push(["Kipengele", "Kiasi (TZS)"]);
+            wsData.push(["Jumla ya Mauzo Taslimu", data.tSales]);
+            wsData.push(["Faida Ghafi (Faida kwenye Bidhaa)", data.gProfit]);
+            wsData.push(["Matumizi ya Kawaida", data.tExpenses]);
+            wsData.push(["FAIDA KAMILI (Net Profit)", data.netProfit]);
+            wsData.push([]);
+            
+            if(data.fCapExp && data.fCapExp.length > 0) {
+                wsData.push(["MATUMIZI YA MTAJI HALISI"]);
+                wsData.push(["Tarehe", "Maelezo", "Kiasi (TZS)"]);
+                data.fCapExp.forEach(e => {
+                    wsData.push([formatDate(e.date), e.name, e.amount]);
+                });
+                wsData.push(["JUMLA YOTE", "", data.tCapExpAmount]);
+                wsData.push([]);
+            }
+
+            if(data.fReinvest && data.fReinvest.length > 0) {
+                wsData.push(["MAKATO YA FAIDA YALIYOONGEZWA MTAJI"]);
+                wsData.push(["Tarehe", "Faida Ilipatikana", "Kiasi Kilichokatwa (TZS)"]);
+                data.fReinvest.forEach(r => {
+                    wsData.push([formatDate(r.date), r.profitBefore, r.amount]);
+                });
+                wsData.push(["JUMLA ILIYOONGEZWA", "", data.tReinvest]);
+                wsData.push([]);
+            }
+
+            if(data.fDebts.length > 0) {
+                wsData.push(["ORODHA YA MADENI NAYOWADAI"]);
+                wsData.push(["Tarehe", "Mteja", "Bidhaa", "Idadi", "Deni (TZS)"]);
+                data.fDebts.forEach(d => {
+                    const pName = data.sysProducts[d.productIndex] ? data.sysProducts[d.productIndex].name : "Imefutwa";
+                    wsData.push([formatDate(d.date), d.customerName, pName, d.quantity, d.totalPrice]);
+                });
+                wsData.push(["JUMLA YOTE YA MADENI", "", "", "", data.tDebts]);
+            }
+
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "Ripoti");
+            
+            const excelBase64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+            const excelDataUri = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + excelBase64;
+            downloadBase64File(excelDataUri, `Ripoti_SmartJanja_${data.timeframeLabel.replace(/\s+/g, '_')}.xlsx`, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        }
+
+        function exportToWord(data) {
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Ripoti</title><style>table{width:100%; border-collapse:collapse; margin-bottom:20px;} th,td{border:1px solid #ccc; padding:8px; text-align:left;} th{background:#2ecc71; color:white;}</style></head><body>";
+            const footer = "</body></html>";
+            
+            let content = `
+                <h2>RIPOTI YA MAPATO NA MATUMIZI - ${data.bName.toUpperCase()}</h2>
+                <p><strong>Muda wa Ripoti:</strong> ${data.timeframeLabel}</p>
+                <hr>
+                
+                <h3>1. Jedwali Kamili la Mapato na Matumizi</h3>
+                <table>
+                    <tr><th>Tarehe</th><th>Maelezo</th><th>Mapato (TZS)</th><th>Matumizi (TZS)</th><th>Faida (TZS)</th></tr>
+            `;
+
+            data.ledger.forEach(row => {
+                content += `<tr><td>${formatDate(row.date)}</td><td>${row.desc}</td><td>${row.revenue > 0 ? formatNumber(row.revenue) : "-"}</td><td>${row.expenditure > 0 ? formatNumber(row.expenditure) : "-"}</td><td>${formatNumber(row.profit)}</td></tr>`;
+            });
+            content += `<tr style="font-weight:bold; background:#eee;"><td>JUMLA</td><td></td><td>${formatNumber(data.tSales)}</td><td>${formatNumber(data.tExpenses)}</td><td>${formatNumber(data.netProfit)}</td></tr></table>`;
+
+            content += `
+                <h3>2. Muhtasari wa Hesabu</h3>
+                <table style="width:60%;">
+                    <tr><th style="background:#34495e; color:white;">Kipengele</th><th style="background:#34495e; color:white;">Kiasi</th></tr>
+                    <tr><td>Jumla ya Mauzo Taslimu</td><td>TZS ${formatNumber(data.tSales)}</td></tr>
+                    <tr><td>Faida Ghafi</td><td>TZS ${formatNumber(data.gProfit)}</td></tr>
+                    <tr><td>Matumizi yaliyotolewa</td><td>TZS ${formatNumber(data.tExpenses)}</td></tr>
+                    <tr><td><strong>FAIDA KAMILI (Net Profit)</strong></td><td><strong>TZS ${formatNumber(data.netProfit)}</strong></td></tr>
+                </table>
+            `;
+            
+            if(data.fCapExp && data.fCapExp.length > 0) {
+                content += `<h3>3. Matumizi ya Mtaji kwa Kina</h3><table><tr><th style="background:#e74c3c; color:white;">Tarehe</th><th style="background:#e74c3c; color:white;">Maelezo</th><th style="background:#e74c3c; color:white;">Kiasi (TZS)</th></tr>`;
+                data.fCapExp.forEach(e => {
+                    content += `<tr><td>${formatDate(e.date)}</td><td>${e.name}</td><td>${formatNumber(e.amount)}</td></tr>`;
+                });
+                content += `<tr style="font-weight:bold; background:#fadbd8;"><td>JUMLA YOTE</td><td></td><td>${formatNumber(data.tCapExpAmount)}</td></tr></table>`;
+            }
+
+            if(data.fReinvest && data.fReinvest.length > 0) {
+                content += `<h3>4. Makato ya Faida Kukuza Mtaji</h3><table><tr><th style="background:#1abc9c; color:white;">Tarehe</th><th style="background:#1abc9c; color:white;">Faida Iliyopatikana</th><th style="background:#1abc9c; color:white;">Kiasi Kilichokatwa (TZS)</th></tr>`;
+                data.fReinvest.forEach(r => {
+                    content += `<tr><td>${formatDate(r.date)}</td><td>${formatNumber(r.profitBefore)}</td><td>${formatNumber(r.amount)}</td></tr>`;
+                });
+                content += `<tr style="font-weight:bold; background:#d1f2eb;"><td>JUMLA ILIYOONGEZWA</td><td></td><td>${formatNumber(data.tReinvest)}</td></tr></table>`;
+            }
+
+            if(data.fDebts.length > 0) {
+                content += `<h3>5. Orodha ya Madeni Nayowadai</h3><table><tr><th style="background:#f39c12; color:white;">Tarehe</th><th style="background:#f39c12; color:white;">Mteja</th><th style="background:#f39c12; color:white;">Bidhaa</th><th style="background:#f39c12; color:white;">Deni (TZS)</th></tr>`;
+                data.fDebts.forEach(d => {
+                    const pName = data.sysProducts[d.productIndex] ? data.sysProducts[d.productIndex].name : "Imefutwa";
+                    content += `<tr><td>${formatDate(d.date)}</td><td>${d.customerName}</td><td>${pName} x${d.quantity}</td><td>${formatNumber(d.totalPrice)}</td></tr>`;
+                });
+                content += `<tr style="font-weight:bold; background:#fef3c7;"><td>JUMLA KUU YOTE</td><td></td><td></td><td>${formatNumber(data.tDebts)}</td></tr></table>`;
+            }
+
+            const html = header + content + footer;
+            
+            const wordBase64 = btoa(unescape(encodeURIComponent(html)));
+            const wordDataUri = 'data:application/msword;base64,' + wordBase64;
+            downloadBase64File(wordDataUri, `Ripoti_SmartJanja_${data.timeframeLabel.replace(/\s+/g, '_')}.doc`, 'application/msword');
+        }
+
+        function calculateLiveSaleTotal() {
+            const q = parseInt(document.getElementById('saleQuantity').value) || 0;
+            const unitPrice = parseFloat(document.getElementById('actualSalePrice').value) || 0;
+            const displayDiv = document.getElementById('liveSaleTotal');
+            
+            if (q > 0 && unitPrice > 0) {
+                displayDiv.style.display = 'block';
+                displayDiv.textContent = `Jumla Itakayoingia: TZS ${formatNumber(q * unitPrice)}`;
+            } else {
+                displayDiv.style.display = 'none';
+            }
+        }
         
-        // Safisha memory baada ya download
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-        showToast("Ripoti imepakuliwa!", "success");
-    }
-}
-
-// 3. EXPORT FUNCTIONS (ZINAZOITWA NA GENERATEREPORT)
-function exportToPDF(data) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    doc.setFontSize(16);
-    doc.text(`RIPOTI - ${data.bName.toUpperCase()}`, 14, 20);
-    
-    // Hapa unaweka logic ya table yako kama ulivyokuwa nayo mwanzo
-    // ... (Kodi zako za jspdf hapa)
-
-    const pdfBlob = doc.output('blob');
-    forceDownloadBlob(pdfBlob, `Ripoti_${data.timeframeLabel}.pdf`);
-}
-
-function exportToExcel(data) {
-    const wb = XLSX.utils.book_new();
-    let wsData = [["TAREHE", "MAELEZO", "KIASI"]]; // Mfano wa data
-    
-    data.ledger.forEach(row => {
-        wsData.push([formatDate(row.date), row.desc, row.profit]);
-    });
-    
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    XLSX.utils.book_append_sheet(wb, ws, "Ripoti");
-    
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-    forceDownloadBlob(blob, `Ripoti_${data.timeframeLabel}.xlsx`);
-}
-
-function exportToWord(data) {
-    const html = `<html><body><h2>Ripoti ya ${data.bName}</h2></body></html>`;
-    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-    forceDownloadBlob(blob, `Ripoti_${data.timeframeLabel}.doc`);
-}
-
-
-
-    
         document.getElementById('saleQuantity').addEventListener('input', calculateLiveSaleTotal);
         document.getElementById('actualSalePrice').addEventListener('input', calculateLiveSaleTotal);
 
@@ -3329,26 +3672,6 @@ function exportToWord(data) {
                 .then(reg => console.log('SmartJanja ipo tayari kufanya kazi offline!'))
                 .catch(err => console.log('Kuna shida kidogo kusajili SW:', err));
             });
-        }
-        function calculateLiveSaleTotal() {
-            // Tunachukua idadi ya bidhaa
-            const q = parseInt(document.getElementById('saleQuantity').value) || 0;
-            // Tunachukua bei ya kuuzia uliyoweka
-            const unitPrice = parseFloat(document.getElementById('actualSalePrice').value) || 0;
-            // Tunatafuta sehemu ya kuonyesha jumla (div ya kuonyesha live total)
-            const displayDiv = document.getElementById('liveSaleTotal');
-            
-            if (displayDiv) {
-                if (q > 0 && unitPrice > 0) {
-                    displayDiv.style.display = 'block';
-                    // Tunapiga hesabu na kuifomati vizuri
-                    const total = q * unitPrice;
-                    displayDiv.innerHTML = `<i class="fas fa-calculator"></i> Jumla Itakayoingia: <strong>TZS ${formatNumber(total)}</strong>`;
-                    displayDiv.style.color = "#1e3a8a"; // Rangi ya bluu ya giza au kijani
-                } else {
-                    displayDiv.style.display = 'none';
-                }
-            }
         }
     </script>
 </body>
