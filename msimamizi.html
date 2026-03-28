@@ -14,6 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
@@ -874,6 +875,11 @@
                 <i class="fa-solid fa-microphone" style="color: #10b981;"></i> Mauzo kwa Sauti
             </button>
             
+            <button onclick="openSmartScanModal(); toggleSidebar()" style="background: linear-gradient(135deg, #ede9fe, #e0e7ff); border: 1px solid #c4b5fd;">
+                <i class="fa-solid fa-camera" style="color: #7c3aed;"></i> Smart Scan AI
+                <span style="font-size:0.65em; background: linear-gradient(135deg, #7c3aed, #3b82f6); color:white; padding:2px 8px; border-radius:20px; margin-left:auto;">AI</span>
+            </button>
+            
             <button onclick="addProduct(); toggleSidebar()"><i class="fa-solid fa-box-open" style="color: #64748b;"></i> Ingiza Mzigo</button>
             <button onclick="scrollToElement('debt-section'); toggleSidebar()"><i class="fa-solid fa-hand-holding-dollar" style="color: #d97706;"></i> Madeni ya Wateja</button>
             <button onclick="addDailyExpense(); toggleSidebar()"><i class="fa-solid fa-money-bill-wave" style="color: #ef4444;"></i> Matumizi Kwenye Faida</button>
@@ -1311,6 +1317,139 @@
             </div>
         </div>
     </div>
+    <!-- SMART SCAN AI MODAL -->
+    <div id="smartScanModal" class="modal">
+        <div class="modal-content" style="max-width: 500px; padding: 0; overflow: hidden; border-radius: var(--radius-lg); border: 1px solid rgba(124,58,237,0.2);">
+            
+            <!-- Header with gradient -->
+            <div style="background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%); padding: 20px 25px; color: white; position: relative; overflow: hidden;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:rgba(255,255,255,0.1); border-radius:50%;"></div>
+                <div style="position:absolute; bottom:-20px; left:50px; width:60px; height:60px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h3 style="margin:0; font-family:'Poppins',sans-serif; font-size:1.3em;">
+                            <i class="fa-solid fa-wand-magic-sparkles" style="margin-right:8px;"></i> Smart Scan AI
+                        </h3>
+                        <p style="margin:5px 0 0; font-size:0.8em; opacity:0.85;">Piga picha ya daftari lako — AI itasoma na kuingiza data</p>
+                    </div>
+                    <span class="close-btn" onclick="closeModal('smartScanModal')" style="color:white; font-size:28px; cursor:pointer; position:relative; z-index:2;">&times;</span>
+                </div>
+            </div>
+
+            <div style="padding: 20px 25px;">
+                <!-- Step 1: Camera / Upload -->
+                <div id="scanStep1">
+                    <div style="text-align:center; padding: 30px 0;">
+                        <div style="width:100px; height:100px; margin:0 auto 20px; background: linear-gradient(135deg, #ede9fe, #e0e7ff); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 25px rgba(124,58,237,0.2);">
+                            <i class="fa-solid fa-camera" style="font-size:2.5em; color:#7c3aed;"></i>
+                        </div>
+                        <p style="color:var(--text-muted); font-size:0.9em; margin-bottom:20px;">Piga picha ya daftari la mauzo au chagua picha kutoka galari</p>
+                        
+                        <input type="file" id="scanImageInput" accept="image/*" capture="environment" style="display:none;" onchange="handleScanImage(event)">
+                        
+                        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                            <button onclick="triggerCameraScan()" 
+                                style="background: linear-gradient(135deg, #7c3aed, #6d28d9); color:white; border:none; padding:14px 28px; border-radius:var(--radius-sm); font-size:1em; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:10px; box-shadow: 0 6px 20px rgba(124,58,237,0.35); transition:0.3s; font-family:'Inter',sans-serif;">
+                                <i class="fa-solid fa-camera"></i> Piga Picha
+                            </button>
+                            <button onclick="document.getElementById('scanImageInput').removeAttribute('capture'); document.getElementById('scanImageInput').click()" 
+                                style="background:white; color:#7c3aed; border:2px solid #c4b5fd; padding:14px 28px; border-radius:var(--radius-sm); font-size:1em; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:10px; transition:0.3s; font-family:'Inter',sans-serif;">
+                                <i class="fa-solid fa-image"></i> Galari
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Processing overlay -->
+                <div id="scanStep2" style="display:none; text-align:center; padding:40px 0;">
+                    <div style="position:relative; width:120px; height:120px; margin:0 auto 25px;">
+                        <div style="position:absolute; inset:0; border:4px solid #e5e7eb; border-radius:50%;"></div>
+                        <div class="scan-spinner" style="position:absolute; inset:0; border:4px solid transparent; border-top-color:#7c3aed; border-right-color:#3b82f6; border-radius:50%; animation: scanSpin 1s linear infinite;"></div>
+                        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-brain" style="font-size:2em; color:#7c3aed; animation: scanPulse 2s ease-in-out infinite;"></i>
+                        </div>
+                    </div>
+                    <h4 style="margin:0 0 8px; color:var(--text-main); font-family:'Poppins',sans-serif;">AI Inasoma Daftari...</h4>
+                    <p id="scanProgressText" style="color:var(--text-muted); font-size:0.85em; margin:0;">Inaandaa...</p>
+                    <div style="width:100%; background:#e5e7eb; border-radius:20px; height:8px; margin-top:20px; overflow:hidden;">
+                        <div id="scanProgressBar" style="height:100%; width:0%; background: linear-gradient(90deg, #7c3aed, #3b82f6); border-radius:20px; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Preview & Edit results -->
+                <div id="scanStep3" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h4 style="margin:0; color:var(--text-main); font-family:'Poppins',sans-serif;">
+                            <i class="fa-solid fa-list-check" style="color:#10b981; margin-right:8px;"></i> Matokeo ya Scan
+                        </h4>
+                        <span id="scanResultCount" style="background:#ecfdf5; color:#059669; padding:4px 12px; border-radius:20px; font-size:0.8em; font-weight:600;"></span>
+                    </div>
+                    
+                    <!-- Date field for scanned sales -->
+                    <div id="scanDateSection" style="background:#fffdf2; padding:15px; border-radius:var(--radius-sm); border-left:4px solid #f59e0b; margin-bottom:15px;">
+                        <label style="color:#d97706; font-weight:600; font-size:0.9em; display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                            <i class="fa-solid fa-calendar-day"></i> Tarehe ya Mauzo
+                        </label>
+                        <input type="date" id="scanSaleDate" style="width:100%; padding:10px; border:1px solid #fde68a; border-radius:8px; font-family:'Inter',sans-serif; background:white; margin-bottom:4px;" required>
+                        <p id="scanDateDetectedMsg" style="font-size:0.78em; color:#059669; margin:4px 0 0; display:none;">
+                            <i class="fa-solid fa-circle-check"></i> <span id="scanDateDetectedText"></span>
+                        </p>
+                        <p id="scanDateRequiredMsg" style="font-size:0.78em; color:#ef4444; margin:4px 0 0; display:none;">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Tarehe haikusomeka kwenye picha. Tafadhali weka tarehe kwa mkono.
+                        </p>
+                    </div>
+
+                    <p style="font-size:0.8em; color:var(--text-muted); margin-bottom:15px; background:#f8fafc; padding:10px; border-radius:8px; border-left:3px solid #7c3aed;">
+                        <i class="fa-solid fa-circle-info" style="color:#7c3aed;"></i> Hakiki na rekebisha data kabla ya kuhifadhi. Bonyeza kwenye seli kubadilisha.
+                    </p>
+
+                    <div style="overflow-x:auto; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.9em;">
+                            <thead>
+                                <tr style="background: linear-gradient(135deg, #f5f3ff, #eff6ff);">
+                                    <th style="padding:12px 10px; text-align:left; font-weight:600; color:#7c3aed; font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Bidhaa</th>
+                                    <th style="padding:12px 10px; text-align:center; font-weight:600; color:#7c3aed; font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Idadi</th>
+                                    <th style="padding:12px 10px; text-align:right; font-weight:600; color:#7c3aed; font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Bei (TZS)</th>
+                                    <th style="padding:12px 6px; text-align:center; width:40px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="scanResultsBody"></tbody>
+                        </table>
+                    </div>
+
+                    <button onclick="addScanRow()" style="width:100%; margin-top:10px; padding:10px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; color:var(--text-muted); cursor:pointer; font-family:'Inter',sans-serif; font-size:0.9em; transition:0.2s;">
+                        <i class="fa-solid fa-plus"></i> Ongeza Mstari
+                    </button>
+
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button onclick="resetScan()" style="flex:1; padding:14px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:var(--radius-sm); color:var(--text-muted); font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:0.2s;">
+                            <i class="fa-solid fa-rotate-left"></i> Scan Tena
+                        </button>
+                        <button id="saveScanBtn" onclick="saveScanResults()" style="flex:2; padding:14px; background: linear-gradient(135deg, #7c3aed, #3b82f6); color:white; border:none; border-radius:var(--radius-sm); font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; font-size:1em; box-shadow: 0 6px 20px rgba(124,58,237,0.3); transition:0.3s;">
+                            <i class="fa-solid fa-check-double"></i> Hifadhi Kwenye Mauzo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes scanSpin { to { transform: rotate(360deg); } }
+        @keyframes scanPulse { 0%,100% { transform: scale(1); opacity:1; } 50% { transform: scale(1.15); opacity:0.7; } }
+        
+        #smartScanModal .modal-content { animation: scanModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes scanModalIn { from { transform: scale(0.8) translateY(30px); opacity:0; } to { transform: scale(1) translateY(0); opacity:1; } }
+        
+        #scanResultsBody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
+        #scanResultsBody tr:hover { background: #faf5ff; }
+        #scanResultsBody input { width:100%; border:1px solid transparent; background:transparent; padding:8px 6px; font-family:'Inter',sans-serif; font-size:0.95em; border-radius:6px; transition:0.2s; }
+        #scanResultsBody input:focus { outline:none; border-color:#c4b5fd; background:white; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+        #scanResultsBody input[type="number"] { text-align:center; }
+        #scanResultsBody .scan-delete-btn { background:none; border:none; color:#ef4444; cursor:pointer; padding:6px; border-radius:6px; transition:0.2s; font-size:1.1em; }
+        #scanResultsBody .scan-delete-btn:hover { background:#fef2f2; }
+    </style>
+
     <div id="toast-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -3665,6 +3804,523 @@
                 }, 600);
             }, 1000);
         });
+
+        // ===== SMART SCAN AI LOGIC (UPGRADED) =====
+        let scanResults = [];
+        let scanDetectedDate = null; // Date extracted from OCR
+
+        // Swahili month mapping for date extraction
+        const SWAHILI_MONTHS = {
+            'januari': '01', 'jan': '01',
+            'februari': '02', 'feb': '02',
+            'machi': '03', 'mac': '03',
+            'aprili': '04', 'apr': '04',
+            'mei': '05',
+            'juni': '06', 'jun': '06',
+            'julai': '07', 'jul': '07',
+            'agosti': '08', 'ago': '08',
+            'septemba': '09', 'sep': '09', 'sept': '09',
+            'oktoba': '10', 'okt': '10',
+            'novemba': '11', 'nov': '11',
+            'desemba': '12', 'des': '12', 'dec': '12',
+            // English fallback
+            'january': '01', 'february': '02', 'march': '03', 'april': '04',
+            'may': '05', 'june': '06', 'july': '07', 'august': '08',
+            'september': '09', 'october': '10', 'november': '11', 'december': '12'
+        };
+
+        // Common Swahili product/unit terms for recognition
+        const SWAHILI_UNITS = {
+            'lita': 'Lita', 'lt': 'Lita', 'l': 'Lita',
+            'kilo': 'Kg', 'kg': 'Kg', 'kgs': 'Kg', 'kilogramu': 'Kg',
+            'gramu': 'g', 'g': 'g',
+            'mfuko': 'Mfuko', 'mifuko': 'Mifuko',
+            'pakiti': 'Pakiti', 'pkt': 'Pakiti',
+            'kipande': 'Kipande', 'vipande': 'Vipande', 'pcs': 'Pcs',
+            'ndoo': 'Ndoo', 'kopo': 'Kopo', 'boksi': 'Boksi',
+            'gunia': 'Gunia', 'debe': 'Debe', 'karatasi': 'Karatasi',
+            'chupa': 'Chupa', 'sanduku': 'Sanduku', 'kreti': 'Kreti'
+        };
+
+        // Common Swahili product names dictionary for fuzzy matching
+        const SWAHILI_PRODUCTS = [
+            'mchele', 'sukari', 'unga', 'maharage', 'nyama', 'samaki', 'mayai',
+            'maziwa', 'mafuta', 'chumvi', 'chai', 'kahawa', 'sabuni', 'maji',
+            'mkate', 'ndizi', 'nyanya', 'vitunguu', 'pilipili', 'karanga',
+            'nazi', 'embe', 'papai', 'machungwa', 'limau', 'nanasi',
+            'viazi', 'mihogo', 'ngano', 'sembe', 'dona', 'nguru',
+            'dagaa', 'maandazi', 'chapati', 'soda', 'bia', 'juisi',
+            'simu', 'nguo', 'viatu', 'korosho', 'ufuta', 'dengu',
+            'bamia', 'mchicha', 'spinachi', 'kabichi', 'karoti', 'parachichi'
+        ];
+
+        // Sales-related Swahili keywords for content validation
+        const SALES_KEYWORDS = [
+            'mauzo', 'mauza', 'kuuza', 'bidhaa', 'bei', 'jumla', 'kiasi',
+            'idadi', 'orodha', 'daftari', 'risiti', 'stakabadhi', 'ankara',
+            'hesabu', 'tsh', 'tzs', 'shs', 'shilingi', 'tarehe',
+            'mteja', 'wateja', 'deni', 'taslimu', 'total', 'price',
+            'qty', 'quantity', 'amount', 'sale', 'sold', 'receipt',
+            ...SWAHILI_PRODUCTS
+        ];
+
+        function openSmartScanModal() {
+            if (currentBusinessIndex === null) {
+                showToast("Tafadhali fungua biashara kwanza kabla ya kutumia Smart Scan.", "error");
+                return;
+            }
+            resetScan();
+            openModal('smartScanModal');
+        }
+
+        function resetScan() {
+            document.getElementById('scanStep1').style.display = 'block';
+            document.getElementById('scanStep2').style.display = 'none';
+            document.getElementById('scanStep3').style.display = 'none';
+            document.getElementById('scanImageInput').value = '';
+            scanResults = [];
+            scanDetectedDate = null;
+        }
+
+        // Check if camera is available
+        async function checkCameraAvailability() {
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                    return false;
+                }
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                return devices.some(d => d.kind === 'videoinput');
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Override the camera button click to check availability first
+        async function triggerCameraScan() {
+            const hasCamera = await checkCameraAvailability();
+            if (!hasCamera) {
+                showToast("Hamna camera unayoiona kwenye kifaa hiki.", "error");
+                return;
+            }
+            document.getElementById('scanImageInput').setAttribute('capture', 'environment');
+            document.getElementById('scanImageInput').click();
+        }
+
+        // Extract date from OCR text
+        function extractDateFromText(text) {
+            const textLower = text.toLowerCase();
+            
+            // Pattern 1: DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+            let match = textLower.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
+            if (match) {
+                let day = match[1].padStart(2, '0');
+                let month = match[2].padStart(2, '0');
+                let year = match[3];
+                if (year.length === 2) year = (parseInt(year) > 50 ? '19' : '20') + year;
+                if (parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
+                    return `${year}-${month}-${day}`;
+                }
+            }
+
+            // Pattern 2: YYYY-MM-DD (ISO)
+            match = textLower.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+            if (match) {
+                let year = match[1];
+                let month = match[2].padStart(2, '0');
+                let day = match[3].padStart(2, '0');
+                if (parseInt(month) >= 1 && parseInt(month) <= 12 && parseInt(day) >= 1 && parseInt(day) <= 31) {
+                    return `${year}-${month}-${day}`;
+                }
+            }
+
+            // Pattern 3: Swahili/English month names: "15 Januari 2024" or "Januari 15, 2024"
+            const monthNames = Object.keys(SWAHILI_MONTHS).join('|');
+            const regexA = new RegExp(`(\\d{1,2})\\s+(${monthNames})\\s*,?\\s*(\\d{4})`, 'i');
+            const regexB = new RegExp(`(${monthNames})\\s+(\\d{1,2})\\s*,?\\s*(\\d{4})`, 'i');
+            
+            match = textLower.match(regexA);
+            if (match) {
+                const day = match[1].padStart(2, '0');
+                const month = SWAHILI_MONTHS[match[2].toLowerCase()];
+                const year = match[3];
+                if (month) return `${year}-${month}-${day}`;
+            }
+            
+            match = textLower.match(regexB);
+            if (match) {
+                const month = SWAHILI_MONTHS[match[1].toLowerCase()];
+                const day = match[2].padStart(2, '0');
+                const year = match[3];
+                if (month) return `${year}-${month}-${day}`;
+            }
+
+            // Pattern 4: "Tarehe: DD/MM/YYYY" or "Tarehe DD MM YYYY"
+            match = textLower.match(/tarehe\s*:?\s*(\d{1,2})[\/\-\.\s]+(\d{1,2})[\/\-\.\s]+(\d{2,4})/);
+            if (match) {
+                let day = match[1].padStart(2, '0');
+                let month = match[2].padStart(2, '0');
+                let year = match[3];
+                if (year.length === 2) year = (parseInt(year) > 50 ? '19' : '20') + year;
+                if (parseInt(month) >= 1 && parseInt(month) <= 12) return `${year}-${month}-${day}`;
+            }
+
+            return null; // No date found
+        }
+
+        // Validate if text looks like a sales record
+        function validateSalesContent(text, parsedItems) {
+            const textLower = text.toLowerCase();
+            
+            // Count how many sales-related keywords appear
+            let keywordHits = 0;
+            for (const keyword of SALES_KEYWORDS) {
+                if (textLower.includes(keyword)) keywordHits++;
+            }
+
+            // Check if there are numbers that could be prices (>=100 TZS)
+            const priceNumbers = (text.match(/\b\d{3,}\b/g) || []).length;
+
+            // Check if parsed items have valid name+price combos
+            const validItems = parsedItems.filter(r => r.name.trim().length >= 2 && r.price >= 100);
+
+            // Decision logic:
+            // Must have at least 1 keyword hit AND (some price numbers OR valid items)
+            if (keywordHits >= 1 && (priceNumbers >= 1 || validItems.length >= 1)) {
+                return true;
+            }
+            // If we got valid parsed items with reasonable data
+            if (validItems.length >= 2) {
+                return true;
+            }
+            // If lots of numbers that look like prices
+            if (priceNumbers >= 3) {
+                return true;
+            }
+
+            return false;
+        }
+
+        // Normalize Swahili product names and units
+        function normalizeSwahiliText(name) {
+            let normalized = name.trim();
+            
+            // Capitalize first letter of each word
+            normalized = normalized.replace(/\b\w/g, c => c.toUpperCase());
+            
+            // Normalize common unit abbreviations
+            for (const [abbrev, full] of Object.entries(SWAHILI_UNITS)) {
+                const regex = new RegExp(`\\b${abbrev}\\b`, 'gi');
+                normalized = normalized.replace(regex, full);
+            }
+            
+            return normalized;
+        }
+
+        async function handleScanImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Show processing step
+            document.getElementById('scanStep1').style.display = 'none';
+            document.getElementById('scanStep2').style.display = 'block';
+            
+            const progressBar = document.getElementById('scanProgressBar');
+            const progressText = document.getElementById('scanProgressText');
+
+            try {
+                // Use Swahili + English for better recognition
+                const worker = await Tesseract.createWorker('eng+swa', 1, {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            const pct = Math.round(m.progress * 100);
+                            progressBar.style.width = pct + '%';
+                            progressText.textContent = `Inasoma maandishi... ${pct}%`;
+                        } else if (m.status === 'loading language traineddata') {
+                            progressText.textContent = 'Inapakia lugha ya AI (Kiswahili + English)...';
+                            progressBar.style.width = '15%';
+                        } else if (m.status === 'initializing api') {
+                            progressText.textContent = 'Inaandaa AI engine...';
+                            progressBar.style.width = '30%';
+                        }
+                    }
+                });
+
+                // Set Tesseract parameters for better Swahili handwriting
+                await worker.setParameters({
+                    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,/-:×xX@=+()\'\"',
+                    preserve_interword_spaces: '1'
+                });
+
+                const { data: { text } } = await worker.recognize(file);
+                await worker.terminate();
+
+                progressBar.style.width = '100%';
+                progressText.textContent = 'Inachambua data...';
+
+                // Step 1: Extract date from text
+                scanDetectedDate = extractDateFromText(text);
+
+                // Step 2: Parse items
+                scanResults = parseOCRText(text);
+
+                // Step 3: Validate content is actually sales data
+                const isSalesData = validateSalesContent(text, scanResults);
+                
+                if (!isSalesData) {
+                    showToast("Haya sio mauzo. Tafadhali piga picha ya orodha halali ya mauzo.", "error");
+                    resetScan();
+                    return;
+                }
+
+                setTimeout(() => {
+                    renderScanResults();
+                    setupScanDateField();
+                    document.getElementById('scanStep2').style.display = 'none';
+                    document.getElementById('scanStep3').style.display = 'block';
+                }, 500);
+
+            } catch (err) {
+                console.error('OCR Error:', err);
+                showToast("Kuna shida kwenye kusoma picha. Jaribu tena na picha nyingine.", "error");
+                resetScan();
+            }
+        }
+
+        function setupScanDateField() {
+            const dateInput = document.getElementById('scanSaleDate');
+            const detectedMsg = document.getElementById('scanDateDetectedMsg');
+            const detectedText = document.getElementById('scanDateDetectedText');
+            const requiredMsg = document.getElementById('scanDateRequiredMsg');
+            const saveBtn = document.getElementById('saveScanBtn');
+
+            if (scanDetectedDate) {
+                dateInput.value = scanDetectedDate;
+                detectedMsg.style.display = 'block';
+                detectedText.textContent = `Tarehe iliyosomeka: ${formatDate(scanDetectedDate)}`;
+                requiredMsg.style.display = 'none';
+                saveBtn.disabled = false;
+                saveBtn.style.opacity = '1';
+            } else {
+                dateInput.value = '';
+                detectedMsg.style.display = 'none';
+                requiredMsg.style.display = 'block';
+                saveBtn.disabled = true;
+                saveBtn.style.opacity = '0.5';
+            }
+
+            // Listen for manual date input to enable save
+            dateInput.addEventListener('input', function() {
+                if (this.value) {
+                    saveBtn.disabled = false;
+                    saveBtn.style.opacity = '1';
+                    requiredMsg.style.display = 'none';
+                    if (!scanDetectedDate) {
+                        detectedMsg.style.display = 'block';
+                        detectedText.textContent = 'Tarehe imewekwa kwa mkono.';
+                    }
+                } else {
+                    saveBtn.disabled = true;
+                    saveBtn.style.opacity = '0.5';
+                    requiredMsg.style.display = 'block';
+                }
+            });
+        }
+
+        function parseOCRText(rawText) {
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+            const results = [];
+            
+            for (let line of lines) {
+                // Skip obvious headers/noise/date lines
+                if (/^(tarehe|date|jina|bidhaa|product|bei|price|idadi|qty|jumla|total|---)/i.test(line)) continue;
+                if (/^[\d\/\-\.]+$/.test(line)) continue;
+                // Skip lines that are purely date patterns
+                if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}$/.test(line)) continue;
+                // Skip Swahili headers
+                if (/^(orodha|mauzo|risiti|stakabadhi|ankara|daftari|hesabu)\s*(ya|za|la)/i.test(line)) continue;
+                
+                let name = '';
+                let quantity = 1;
+                let price = 0;
+                
+                // Normalize separators
+                let cleaned = line.replace(/[|]/g, ' ').replace(/\s+/g, ' ');
+                
+                // Handle "5k" = 5000, "10k" = 10000
+                cleaned = cleaned.replace(/(\d+)\s*k\b/gi, (m, num) => String(parseInt(num) * 1000));
+                
+                // Handle Swahili quantity terms: "2 lita", "3 kilo", "5 mfuko"
+                // These help identify quantities
+                
+                // Extract all numbers from the line
+                const numbers = [];
+                const numberPattern = /\b(\d[\d,\.]*)\b/g;
+                let match;
+                while ((match = numberPattern.exec(cleaned)) !== null) {
+                    const num = parseFloat(match[1].replace(/,/g, ''));
+                    if (!isNaN(num) && num > 0) {
+                        numbers.push({ value: num, index: match.index, length: match[0].length });
+                    }
+                }
+
+                if (numbers.length === 0) continue;
+                
+                // Remove all numbers to get the product name
+                let nameCandidate = cleaned;
+                nameCandidate = nameCandidate.replace(/\b\d[\d,\.]*\b/g, ' ')
+                    .replace(/[x×@\-=]/gi, ' ')
+                    .replace(/\b(tsh|tzs|shs?|\/=|pcs?|pc|pieces?|idadi|qty)\b/gi, ' ')
+                    .replace(/\s+/g, ' ').trim();
+
+                if (nameCandidate.length < 2 && numbers.length < 2) continue;
+                
+                // Normalize Swahili product name
+                name = normalizeSwahiliText(nameCandidate) || 'Bidhaa';
+
+                if (numbers.length >= 3) {
+                    const sorted = [...numbers].sort((a, b) => a.value - b.value);
+                    quantity = sorted[0].value <= 500 ? Math.round(sorted[0].value) : 1;
+                    price = sorted[sorted.length - 1].value;
+                    if (sorted.length >= 3 && Math.abs(sorted[2].value - sorted[0].value * sorted[1].value) < 10) {
+                        quantity = Math.round(sorted[0].value);
+                        price = sorted[1].value;
+                    }
+                } else if (numbers.length === 2) {
+                    const n1 = numbers[0].value;
+                    const n2 = numbers[1].value;
+                    if (n1 < n2 && n1 <= 500) {
+                        quantity = Math.round(n1);
+                        price = n2;
+                    } else if (n2 < n1 && n2 <= 500) {
+                        quantity = Math.round(n2);
+                        price = n1;
+                    } else {
+                        quantity = 1;
+                        price = Math.max(n1, n2);
+                    }
+                } else if (numbers.length === 1) {
+                    price = numbers[0].value;
+                    quantity = 1;
+                }
+
+                if (price > 0 && name) {
+                    results.push({ name: name.substring(0, 50), quantity: quantity, price: price });
+                }
+            }
+
+            if (results.length === 0) {
+                results.push({ name: '', quantity: 1, price: 0 });
+            }
+
+            return results;
+        }
+
+        function renderScanResults() {
+            const tbody = document.getElementById('scanResultsBody');
+            tbody.innerHTML = '';
+            document.getElementById('scanResultCount').textContent = `${scanResults.length} bidhaa`;
+
+            scanResults.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="padding:4px 6px;"><input type="text" value="${item.name}" onchange="scanResults[${idx}].name=this.value" placeholder="Jina la bidhaa"></td>
+                    <td style="padding:4px 6px;"><input type="number" value="${item.quantity}" min="1" onchange="scanResults[${idx}].quantity=parseInt(this.value)||1" style="width:60px;"></td>
+                    <td style="padding:4px 6px;"><input type="number" value="${item.price}" min="0" onchange="scanResults[${idx}].price=parseFloat(this.value)||0" style="width:90px; text-align:right;"></td>
+                    <td style="padding:4px 2px; text-align:center;"><button class="scan-delete-btn" onclick="removeScanRow(${idx})"><i class="fa-solid fa-trash-can"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function addScanRow() {
+            scanResults.push({ name: '', quantity: 1, price: 0 });
+            renderScanResults();
+        }
+
+        function removeScanRow(idx) {
+            scanResults.splice(idx, 1);
+            renderScanResults();
+        }
+
+        async function saveScanResults() {
+            const sys = capitalSystems[currentBusinessIndex];
+            if (!sys) { showToast("Hakuna biashara iliyochaguliwa.", "error"); return; }
+
+            // Get the date from the date field
+            const saleDate = document.getElementById('scanSaleDate').value;
+            if (!saleDate) {
+                showToast("Tafadhali weka tarehe ya mauzo kabla ya kuhifadhi.", "error");
+                return;
+            }
+
+            // Filter valid rows
+            const validItems = scanResults.filter(r => r.name.trim() && r.price > 0 && r.quantity > 0);
+            if (validItems.length === 0) {
+                showToast("Hakuna data sahihi ya kuhifadhi. Hakiki taarifa na jaribu tena.", "error");
+                return;
+            }
+
+            let savedCount = 0;
+
+            for (const item of validItems) {
+                // Try to match to existing product
+                let matchedIndex = -1;
+                const nameLower = item.name.toLowerCase().trim();
+                
+                sys.products.forEach((p, i) => {
+                    if (p.name.toLowerCase().includes(nameLower) || nameLower.includes(p.name.toLowerCase())) {
+                        matchedIndex = i;
+                    }
+                });
+
+                if (matchedIndex >= 0) {
+                    const product = sys.products[matchedIndex];
+                    const salePrice = item.price;
+                    
+                    sys.sales.push({
+                        date: saleDate, // Use extracted/manual date, not today
+                        productIndex: matchedIndex,
+                        quantity: item.quantity,
+                        totalPrice: salePrice * item.quantity
+                    });
+                    product.currentQuantity = Math.max(0, product.currentQuantity - item.quantity);
+                    savedCount++;
+                } else {
+                    const newProduct = {
+                        name: item.name,
+                        costPriceTotal: 0,
+                        initialQuantity: item.quantity,
+                        currentQuantity: 0,
+                        costPriceRetail: 0,
+                        sellingPriceRetail: item.price,
+                        dateAdded: saleDate
+                    };
+                    sys.products.push(newProduct);
+                    const newIndex = sys.products.length - 1;
+                    
+                    sys.sales.push({
+                        date: saleDate, // Use extracted/manual date
+                        productIndex: newIndex,
+                        quantity: item.quantity,
+                        totalPrice: item.price * item.quantity
+                    });
+                    savedCount++;
+                }
+            }
+
+            await saveData(sys);
+            renderBusinessDetails();
+            closeModal('smartScanModal');
+            
+            const dateLabel = formatDate(saleDate);
+            const isHistorical = saleDate < new Date().toISOString().slice(0, 10);
+            if (isHistorical) {
+                showToast(`Smart Scan: Bidhaa ${savedCount} zimehifadhiwa kwenye mauzo ya tarehe ${dateLabel} (kumbukumbu ya nyuma)!`, "success");
+            } else {
+                showToast(`Smart Scan: Bidhaa ${savedCount} zimehifadhiwa kwenye mauzo ya ${dateLabel}!`, "success");
+            }
+        }
+        // ===== END SMART SCAN AI =====
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
