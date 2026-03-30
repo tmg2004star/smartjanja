@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -1617,7 +1618,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // ===== HUGGING FACE ACCESS TOKEN (HARDCODED) =====
-        const HF_TOKEN = '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';
+        // Token is now handled server-side via Supabase Edge Function
 
         const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M';
@@ -2045,7 +2046,7 @@
             const todayStr = new Date().toISOString().slice(0, 10);
             const alertKey = `alerts_shown_${sys.id}_${todayStr}`;
             
-            if (sessionStorage.getItem(alertKey)) return;
+            if (alertKey in sessionStorage) return;
             
             // 1. Alert ya Stoo
             const lowStock = sys.products.filter(p => p.currentQuantity <= 5 && p.currentQuantity > 0);
@@ -4058,81 +4059,59 @@
             });
         }
 
-        async function callHuggingFaceVLM(base64Image, token, productNames) {
-            const productList = productNames.join(', ');
-            const prompt = `You are analyzing a handwritten Swahili sales record photo. Extract ALL sales items.
+        /**
+         * RUKSA YA AI SCANNER ILIYOREKEBISHWA
+         * Inabadilisha picha kuwa ArrayBuffer kwa ajili ya uthabiti wa Edge Functions.
+         */
+        async function callHuggingFaceVLM(imageBlob) {
+            const supabaseUrl = SUPABASE_URL;
+            const supabaseKey = SUPABASE_ANON_KEY;
 
-IMPORTANT INSTRUCTIONS:
-1. Look for a DATE (tarehe) on the image. Common formats: DD/MM/YYYY, DD-MM-YYYY, or Swahili month names (Januari, Februari, Machi, Aprili, Mei, Juni, Julai, Agosti, Septemba, Oktoba, Novemba, Desemba).
-2. Extract each item with: product name (bidhaa), quantity (idadi), unit price (bei), total (jumla).
-3. Understand Swahili terms: idadi=quantity, bei=price, jumla=total, kilo=kg, lita=liter, dazeni=dozen, pakiti=packet.
-4. If you see product names similar to these existing inventory items, use the EXACT name from this list: [${productList}]
-5. For example: if you see "Biskuti" and the list has "Biscuit", use "Biscuit". If "Mchele" matches "Mchele 5kg", use "Mchele 5kg".
+            // MABADILIKO: Convert blob to ArrayBuffer (Buffer) kabla ya kutuma
+            const arrayBuffer = await imageBlob.arrayBuffer();
 
-Return ONLY a valid JSON array (no markdown, no explanation):
-[{"date":"YYYY-MM-DD","product":"string","quantity":number,"price":number,"total":number}]
-
-If no date is found, set date to null. If the image is NOT a sales record, return: [{"error":"not_sales"}]`;
-
-            const response = await fetch('https://api-inference.huggingface.co/models/Qwen/Qwen2-VL-7B-Instruct', {
+            const response = await fetch(`${supabaseUrl}/functions/v1/smart-scan`, {
                 method: 'POST',
-                mode: 'cors',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/octet-stream', // Hardcoded kwa uthabiti
                 },
-                body: JSON.stringify({
-                    inputs: [
-                        {
-                            role: "user",
-                            content: [
-                                { type: "text", text: prompt },
-                                { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
-                            ]
-                        }
-                    ],
-                    parameters: {
-                        max_new_tokens: 2048,
-                        temperature: 0.1
-                    }
-                })
+                body: arrayBuffer, // Tuma buffer badala ya blob moja kwa moja
             });
 
             if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`HF API Error (${response.status}): ${errText}`);
+                const errorDetail = await response.text();
+                throw new Error(`Edge Function Error: ${response.status} - ${errorDetail}`);
             }
 
-            const data = await response.json();
-            // Extract generated text
-            let generatedText = '';
-            if (Array.isArray(data) && data[0]?.generated_text) {
-                const msgs = data[0].generated_text;
-                if (Array.isArray(msgs)) {
-                    const last = msgs[msgs.length - 1];
-                    generatedText = typeof last === 'string' ? last : (last.content || JSON.stringify(last));
-                } else {
-                    generatedText = typeof msgs === 'string' ? msgs : JSON.stringify(msgs);
+            const rawResponse = await response.json();
+
+            // Hakiki muundo wa jibu (Robust Parsing)
+            let parsedResponse;
+            if (Array.isArray(rawResponse)) {
+                parsedResponse = rawResponse;
+            } else if (typeof rawResponse === 'string') {
+                try {
+                    parsedResponse = JSON.parse(rawResponse);
+                    if (!Array.isArray(parsedResponse)) {
+                        throw new Error('Parsed response is not an array.');
+                    }
+                } catch (e) {
+                    console.error('Failed to parse AI response:', e);
+                    throw new Error(`AI haikurudisha muundo sahihi. Jibu: ${JSON.stringify(rawResponse).substring(0, 200)}`);
                 }
-            } else if (typeof data === 'string') {
-                generatedText = data;
+            } else if (rawResponse && typeof rawResponse === 'object' && !Array.isArray(rawResponse)) {
+                // Kama ni object moja, iweke kwenye array
+                parsedResponse = [rawResponse];
             } else {
-                generatedText = JSON.stringify(data);
+                throw new Error(`AI haikurudisha muundo sahihi. Jibu: ${JSON.stringify(rawResponse).substring(0, 200)}`);
             }
 
-            // Parse JSON from response
-            const jsonMatch = generatedText.match(/\[[\s\S]*?\]/);
-            if (!jsonMatch) throw new Error('AI haikuweza kusoma picha hii. Jaribu picha nyingine.');
-
-            return JSON.parse(jsonMatch[0]);
+            return parsedResponse;
         }
 
         async function startMultiScan() {
             if (scanSelectedFiles.length === 0) return;
-
-            // Use hardcoded token
-            const token = HF_TOKEN;
 
             const sys = capitalSystems[currentBusinessIndex];
             const productNames = sys.products.map(p => p.name);
@@ -4160,8 +4139,7 @@ If no date is found, set date to null. If the image is NOT a sales record, retur
                 document.getElementById('scanProgressDetail').textContent = `Picha ${i + 1} / ${totalImages} — Tafadhali subiri`;
 
                 try {
-                    const base64 = await fileToBase64(file);
-                    const items = await callHuggingFaceVLM(base64, token, productNames);
+                    const items = await callHuggingFaceVLM(file);
 
                     // Validate sales content
                     if (items.length === 1 && items[0].error === 'not_sales') {
