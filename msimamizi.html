@@ -1210,7 +1210,7 @@
                     <div class="section-header" style="margin-bottom: 10px; border-bottom: none; padding-bottom: 0;">
                         <h2>Usimamizi wa Stoo</h2>
                     </div>
-                    <button class="panel-add-btn hidden-fab" id="fab-store" onclick="addProduct()" title="Ingiza Mzigo"><i class="fa-solid fa-plus"></i></button>
+                    
                     
                     <button class="accordion-btn" id="toggleProductsBtn">
                         <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-light);"></i> Tazama Orodha ya Bidhaa</span>
@@ -1232,11 +1232,6 @@
                     <div class="section-header">
                         <h2>Ripoti ya Mauzo (Taslimu)</h2>
                         <button id="backToSalesDatesBtn" class="back-button" style="display: none;"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
-                    </div>
-                    <button class="panel-add-btn hidden-fab" id="fab-sales" onclick="toggleSaleAddPopup()" title="Weka Mauzo"><i class="fa-solid fa-plus"></i></button>
-                    <div class="sale-add-popup" id="saleAddPopup">
-                        <button onclick="addSale(); closeSaleAddPopup()"><i class="fa-solid fa-pen" style="color: #3b82f6;"></i> Andika Mauzo</button>
-                        <button onclick="openVoiceSaleModal(); closeSaleAddPopup()"><i class="fa-solid fa-microphone" style="color: #10b981;"></i> Mauzo kwa Sauti</button>
                     </div>
                     <ul id="sales-date-list" class="item-list"></ul>
                     <div id="daily-sales-detail" style="display: none;">
@@ -1274,7 +1269,7 @@
                     <div class="section-header" style="border-bottom: 1px dashed #fcd34d;">
                         <h2 style="color: #d97706;"><i class="fa-solid fa-book-open" style="margin-right:8px;"></i> Madeni ya Wateja</h2>
                     </div>
-                    <button class="panel-add-btn btn-amber hidden-fab" id="fab-debts" onclick="addSaleAsDebt()" title="Ongeza Deni"><i class="fa-solid fa-plus"></i></button>
+                    
                     <div style="background: #fef2f2; color: #b91c1c; padding: 18px; border-radius: var(--radius-sm); margin-bottom: 20px; font-weight: 700; font-size: 1.1em; display: flex; justify-content: space-between; border: 1px dashed #fca5a5;">
                         <span>Jumla Unayodaiwa:</span>
                         <span id="total-debts-amount" style="font-family: 'Poppins', sans-serif;">TZS 0</span>
@@ -1289,7 +1284,7 @@
                     <div class="section-header">
                         <h2>Matumizi ya Kila Siku (Kwenye Faida)</h2>
                     </div>
-                    <button class="panel-add-btn btn-red hidden-fab" id="fab-daily-exp" onclick="addDailyExpense()" title="Ongeza Matumizi"><i class="fa-solid fa-plus"></i></button>
+                    
                     <ul id="daily-expense-date-list" class="item-list"></ul>
                     <div id="daily-expenses-detail" style="display: none;">
                         <h4 id="daily-expenses-title"></h4>
@@ -1330,7 +1325,7 @@
                     <div class="section-header">
                         <h2>Matumizi Kwenye Mtaji Halisi</h2>
                     </div>
-                    <button class="panel-add-btn btn-purple hidden-fab" id="fab-capital-exp" onclick="addCapitalExpense()" title="Ongeza Matumizi ya Mtaji"><i class="fa-solid fa-plus"></i></button>
+                    
                     <ul id="capital-expense-date-list" class="item-list"></ul>
                     <div id="daily-capital-expenses-detail" style="display: none;">
                         <h4 id="daily-capital-expenses-title"></h4>
@@ -1761,17 +1756,22 @@
             'capital-exp': 'fab-capital-exp'
         };
 
-        function updateFabVisibility(sectionId) {
-            // Hide all FABs
+        function hideAllFabs() {
             document.querySelectorAll('.panel-add-btn').forEach(btn => btn.classList.add('hidden-fab'));
+            closeSaleAddPopup();
+        }
+
+        function updateFabVisibility(sectionId) {
+            hideAllFabs();
+            // Only show FAB if we're on the business page (not capital or graph page)
+            const businessPage = document.getElementById('business-page');
+            if (businessPage && businessPage.classList.contains('hidden')) return;
             // Show the FAB for active section
             const fabId = FAB_MAP[sectionId];
             if (fabId) {
                 const fab = document.getElementById(fabId);
                 if (fab) fab.classList.remove('hidden-fab');
             }
-            // Close sale popup if switching away
-            closeSaleAddPopup();
         }
 
         function switchBottomSection(sectionId) {
@@ -2369,6 +2369,7 @@
             businessPage.classList.add('hidden');
             capitalPage.classList.remove('hidden');
             showBottomNav(false);
+            hideAllFabs();
             updateToolbarTitle('SmartJanja');
             renderCapitalList();
         }
@@ -2386,6 +2387,7 @@
             document.getElementById('business-page').classList.add('hidden');
             document.getElementById('graph-page').classList.remove('hidden');
             showBottomNav(false);
+            hideAllFabs();
             updateToolbarTitle('Grafu ya Mauzo');
             renderGraph();
         }
@@ -4761,5 +4763,15 @@
         // ===== END MULTI-IMAGE AI SCANNER =====
 
     </script>
+<!-- FAB Buttons - Root Level for proper fixed positioning -->
+<button class="panel-add-btn hidden-fab" id="fab-store" onclick="addProduct()" title="Ingiza Mzigo"><i class="fa-solid fa-plus"></i></button>
+<button class="panel-add-btn hidden-fab" id="fab-sales" onclick="toggleSaleAddPopup()" title="Weka Mauzo"><i class="fa-solid fa-plus"></i></button>
+<div class="sale-add-popup" id="saleAddPopup">
+    <button onclick="addSale(); closeSaleAddPopup()"><i class="fa-solid fa-pen" style="color: #3b82f6;"></i> Andika Mauzo</button>
+    <button onclick="openVoiceSaleModal(); closeSaleAddPopup()"><i class="fa-solid fa-microphone" style="color: #10b981;"></i> Mauzo kwa Sauti</button>
+</div>
+<button class="panel-add-btn btn-amber hidden-fab" id="fab-debts" onclick="addSaleAsDebt()" title="Ongeza Deni"><i class="fa-solid fa-plus"></i></button>
+<button class="panel-add-btn btn-red hidden-fab" id="fab-daily-exp" onclick="addDailyExpense()" title="Ongeza Matumizi"><i class="fa-solid fa-plus"></i></button>
+<button class="panel-add-btn btn-purple hidden-fab" id="fab-capital-exp" onclick="addCapitalExpense()" title="Ongeza Matumizi ya Mtaji"><i class="fa-solid fa-plus"></i></button>
 </body>
 </html>
