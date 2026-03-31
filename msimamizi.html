@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="sw">
 <head>
@@ -681,6 +680,44 @@
         /* Push content below toolbar */
         body { padding-top: 56px; padding-bottom: 80px; }
 
+        /* ===== PANEL ADD BUTTONS (FIXED FAB AT BOTTOM) ===== */
+        .panel-add-btn {
+            width: 52px; height: 52px; border-radius: 50%;
+            border: none; background: var(--primary-light);
+            color: white; font-size: 1.4em; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            z-index: 999;
+        }
+        .panel-add-btn:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(59,130,246,0.5); }
+        .panel-add-btn:active { transform: scale(0.95); }
+        .panel-add-btn.btn-amber { background: #d97706; box-shadow: 0 4px 12px rgba(217,119,6,0.4); }
+        .panel-add-btn.btn-amber:hover { box-shadow: 0 6px 16px rgba(217,119,6,0.5); }
+        .panel-add-btn.btn-red { background: #ef4444; box-shadow: 0 4px 12px rgba(239,68,68,0.4); }
+        .panel-add-btn.btn-red:hover { box-shadow: 0 6px 16px rgba(239,68,68,0.5); }
+        .panel-add-btn.btn-purple { background: #7c3aed; box-shadow: 0 4px 12px rgba(124,58,237,0.4); }
+        .panel-add-btn.btn-purple:hover { box-shadow: 0 6px 16px rgba(124,58,237,0.5); }
+        .panel-add-btn.hidden-fab { display: none; }
+
+        /* Sales add popup - anchored to FAB */
+        .sale-add-popup {
+            display: none; position: fixed; bottom: 150px; right: 20px; z-index: 1000;
+            background: white; border-radius: var(--radius-sm); box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color); overflow: hidden; min-width: 200px;
+        }
+        .sale-add-popup.show { display: block; }
+        .sale-add-popup button {
+            width: 100%; padding: 14px 18px; background: none; border: none;
+            text-align: left; font-size: 0.95em; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif;
+            color: var(--text-main); transition: background 0.15s;
+        }
+        .sale-add-popup button:hover { background: var(--bg-body); }
+        .sale-add-popup button + button { border-top: 1px solid var(--border-color); }
+
         /* ===== BOTTOM NAVIGATION BAR ===== */
         .bottom-nav {
             position: fixed;
@@ -1113,16 +1150,6 @@
             <button onclick="openAIScannerModal(); toggleSidebar()" style="background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(52,211,153,0.1)); border: 1px solid rgba(16,185,129,0.3);">
                 <i class="fa-solid fa-camera" style="color: #10b981;"></i> Smart Scan AI (Picha Nyingi)
             </button>
-            <button onclick="addSale(); toggleSidebar()"><i class="fa-solid fa-cart-arrow-down" style="color: #3b82f6;"></i> Weka Mauzo</button>
-            
-            <button onclick="openVoiceSaleModal(); toggleSidebar()" style="background: #ecfdf5; border: 1px solid #a7f3d0;">
-                <i class="fa-solid fa-microphone" style="color: #10b981;"></i> Mauzo kwa Sauti
-            </button>
-            
-            <button onclick="addProduct(); toggleSidebar()"><i class="fa-solid fa-box-open" style="color: #64748b;"></i> Ingiza Mzigo</button>
-            <button onclick="scrollToElement('debt-section'); toggleSidebar()"><i class="fa-solid fa-hand-holding-dollar" style="color: #d97706;"></i> Madeni ya Wateja</button>
-            <button onclick="addDailyExpense(); toggleSidebar()"><i class="fa-solid fa-money-bill-wave" style="color: #ef4444;"></i> Matumizi Kwenye Faida</button>
-            <button onclick="addCapitalExpense(); toggleSidebar()"><i class="fa-solid fa-wallet" style="color: #dc2626;"></i> Matumizi Kwenye Mtaji</button>
             <button onclick="renderPurchaseHistory(); toggleSidebar()"><i class="fa-solid fa-clipboard-list" style="color: #475569;"></i> Kumbukumbu (Stoo)</button>
             <button onclick="openReportModal(); toggleSidebar()" style="background: #eff6ff; border: 1px dashed #93c5fd;"><i class="fa-solid fa-file-invoice" style="color: #2563eb;"></i> Toa Ripoti</button>
         </div>
@@ -1183,6 +1210,7 @@
                     <div class="section-header" style="margin-bottom: 10px; border-bottom: none; padding-bottom: 0;">
                         <h2>Usimamizi wa Stoo</h2>
                     </div>
+                    <button class="panel-add-btn hidden-fab" id="fab-store" onclick="addProduct()" title="Ingiza Mzigo"><i class="fa-solid fa-plus"></i></button>
                     
                     <button class="accordion-btn" id="toggleProductsBtn">
                         <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-light);"></i> Tazama Orodha ya Bidhaa</span>
@@ -1204,6 +1232,11 @@
                     <div class="section-header">
                         <h2>Ripoti ya Mauzo (Taslimu)</h2>
                         <button id="backToSalesDatesBtn" class="back-button" style="display: none;"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
+                    </div>
+                    <button class="panel-add-btn hidden-fab" id="fab-sales" onclick="toggleSaleAddPopup()" title="Weka Mauzo"><i class="fa-solid fa-plus"></i></button>
+                    <div class="sale-add-popup" id="saleAddPopup">
+                        <button onclick="addSale(); closeSaleAddPopup()"><i class="fa-solid fa-pen" style="color: #3b82f6;"></i> Andika Mauzo</button>
+                        <button onclick="openVoiceSaleModal(); closeSaleAddPopup()"><i class="fa-solid fa-microphone" style="color: #10b981;"></i> Mauzo kwa Sauti</button>
                     </div>
                     <ul id="sales-date-list" class="item-list"></ul>
                     <div id="daily-sales-detail" style="display: none;">
@@ -1241,6 +1274,7 @@
                     <div class="section-header" style="border-bottom: 1px dashed #fcd34d;">
                         <h2 style="color: #d97706;"><i class="fa-solid fa-book-open" style="margin-right:8px;"></i> Madeni ya Wateja</h2>
                     </div>
+                    <button class="panel-add-btn btn-amber hidden-fab" id="fab-debts" onclick="addSaleAsDebt()" title="Ongeza Deni"><i class="fa-solid fa-plus"></i></button>
                     <div style="background: #fef2f2; color: #b91c1c; padding: 18px; border-radius: var(--radius-sm); margin-bottom: 20px; font-weight: 700; font-size: 1.1em; display: flex; justify-content: space-between; border: 1px dashed #fca5a5;">
                         <span>Jumla Unayodaiwa:</span>
                         <span id="total-debts-amount" style="font-family: 'Poppins', sans-serif;">TZS 0</span>
@@ -1255,6 +1289,7 @@
                     <div class="section-header">
                         <h2>Matumizi ya Kila Siku (Kwenye Faida)</h2>
                     </div>
+                    <button class="panel-add-btn btn-red hidden-fab" id="fab-daily-exp" onclick="addDailyExpense()" title="Ongeza Matumizi"><i class="fa-solid fa-plus"></i></button>
                     <ul id="daily-expense-date-list" class="item-list"></ul>
                     <div id="daily-expenses-detail" style="display: none;">
                         <h4 id="daily-expenses-title"></h4>
@@ -1295,6 +1330,7 @@
                     <div class="section-header">
                         <h2>Matumizi Kwenye Mtaji Halisi</h2>
                     </div>
+                    <button class="panel-add-btn btn-purple hidden-fab" id="fab-capital-exp" onclick="addCapitalExpense()" title="Ongeza Matumizi ya Mtaji"><i class="fa-solid fa-plus"></i></button>
                     <ul id="capital-expense-date-list" class="item-list"></ul>
                     <div id="daily-capital-expenses-detail" style="display: none;">
                         <h4 id="daily-capital-expenses-title"></h4>
@@ -1331,15 +1367,38 @@
                 <h1 style="color: #9333ea;">Grafu ya Mauzo</h1>
             </div>
             <div class="section">
-                <label>Chagua Muda wa Kuangalia:</label>
-                <select id="graphTimeframe" onchange="renderGraph()" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Inter', sans-serif;">
+                <label style="font-weight:600; margin-bottom:8px; display:block;">Chagua Muda wa Kuangalia:</label>
+                <select id="graphTimeframe" onchange="onGraphTimeframeChange()" style="width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Inter', sans-serif;">
                     <option value="wiki">Siku 7 Zilizopita (Wiki)</option>
                     <option value="mwezi">Siku 30 Zilizopita (Mwezi)</option>
-                    <option value="mwaka">Mwaka Huu (Kwa Miezi)</option>
+                    <option value="mwaka">Mwaka (Kwa Miezi)</option>
+                    <option value="custom">Tarehe Maalum</option>
                 </select>
+                
+                <!-- Year selector for 'mwaka' -->
+                <div id="yearSelectorBox" style="display:none; margin-bottom:12px;">
+                    <label style="font-size:0.9em; color:var(--text-muted);">Chagua Mwaka:</label>
+                    <select id="graphYear" onchange="renderGraph()" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-family:'Inter',sans-serif; margin-top:4px;"></select>
+                </div>
+                
+                <!-- Custom date range for 'custom' -->
+                <div id="customDateBox" style="display:none; margin-bottom:12px;">
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:120px;">
+                            <label style="font-size:0.85em; color:var(--text-muted);">Kuanzia:</label>
+                            <input type="text" id="graphDateFrom" placeholder="DD/MM/YYYY" maxlength="10" onchange="renderGraph()" oninput="autoFormatDate(this)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-family:'Inter',sans-serif; margin-top:4px;">
+                        </div>
+                        <div style="flex:1; min-width:120px;">
+                            <label style="font-size:0.85em; color:var(--text-muted);">Hadi:</label>
+                            <input type="text" id="graphDateTo" placeholder="DD/MM/YYYY" maxlength="10" onchange="renderGraph()" oninput="autoFormatDate(this)" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-family:'Inter',sans-serif; margin-top:4px;">
+                        </div>
+                    </div>
+                </div>
+                
                 <div style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                     <canvas id="salesChart" width="400" height="250"></canvas>
                 </div>
+                <div id="graphSummary" style="margin-top:12px; padding:12px; background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(168,85,247,0.03)); border-radius:12px; text-align:center; font-weight:600; color:#7c3aed; display:none;"></div>
             </div>
         </div>
 
@@ -1378,7 +1437,23 @@
             <input type="text" id="productName" placeholder="Mfano: Simu aina ya Samsung" required>
             <label>Jumla ya Bei Uliyonunulia (Mzigo wote)</label>
             <input type="number" id="costPriceTotal" placeholder="TZS" required>
-            <label>Idadi ya Bidhaa (Pcs)</label>
+            <label>Kipimo cha Bidhaa</label>
+            <select id="productUnit" onchange="onUnitChange()">
+                <option value="pcs">Pcs (Vipande)</option>
+                <option value="dozen">Dazani (Dozen)</option>
+                <option value="carton">Katoni (Carton)</option>
+                <option value="crate">Kreti (Crate)</option>
+                <option value="lita">Lita</option>
+                <option value="kilo">Kilo</option>
+                <option value="mfuko">Mfuko</option>
+                <option value="sanduku">Sanduku</option>
+            </select>
+            <div id="piecesPerUnitDiv" style="display:none; background: #fffdf2; padding: 12px; border-radius: var(--radius-sm); border-left: 4px solid #f59e0b; margin-bottom: 12px;">
+                <label style="color: #d97706; margin-bottom: 6px;" id="piecesPerUnitLabel">Kipande ngapi kwa Dazani moja?</label>
+                <input type="number" id="piecesPerUnit" placeholder="Mfano: 12" min="1" oninput="calculatePricesAndProfit()">
+                <p style="font-size: 0.78em; color: var(--text-muted); margin-top: 4px; margin-bottom: 0;">Hii inasaidia mfumo kuhesabu bei kwa kipande kimoja.</p>
+            </div>
+            <label id="quantityLabel">Idadi ya Bidhaa (Pcs)</label>
             <input type="number" id="productQuantity" placeholder="Ziko ngapi?" required>
             <label>Bei ya Kununulia (Kwa Moja) - Inajipiga</label>
             <input type="number" id="costPriceRetail" placeholder="TZS" required readonly>
@@ -1398,7 +1473,7 @@
             <h3 id="saleModalTitle">Weka Mauzo Mpya</h3>
             <input type="hidden" id="saleIndex">
             <label>Tarehe ya Mauzo</label>
-            <input type="date" id="saleDate" required>
+            <input type="text" id="saleDate" placeholder="DD/MM/YYYY" maxlength="10" oninput="autoFormatDate(this)" required>
             <label>Chagua Bidhaa Iliyouzwa</label>
             <select id="saleProductName" required>
                 <option value="">-- Chagua Bidhaa --</option>
@@ -1474,7 +1549,7 @@
             <h3 id="dailyExpenseModalTitle">Matumizi ya Kila Siku</h3>
             <input type="hidden" id="dailyExpenseIndex">
             <label>Tarehe</label>
-            <input type="date" id="dailyExpenseDate" required>
+            <input type="text" id="dailyExpenseDate" placeholder="DD/MM/YYYY" maxlength="10" oninput="autoFormatDate(this)" required>
             <label>Aina ya Matumizi</label>
             <input type="text" id="dailyExpenseName" placeholder="Mfano: Nauli, Chakula, n.k" required>
             <label>Kiasi</label>
@@ -1489,7 +1564,7 @@
             <h3 id="capitalExpenseModalTitle">Matumizi ya Mtaji</h3>
             <input type="hidden" id="capitalExpenseIndex">
             <label>Tarehe</label>
-            <input type="date" id="capitalExpenseDate" required>
+            <input type="text" id="capitalExpenseDate" placeholder="DD/MM/YYYY" maxlength="10" oninput="autoFormatDate(this)" required>
             <label>Maelezo ya Matumizi</label>
             <input type="text" id="capitalExpenseName" placeholder="Mfano: Kodi ya Fremu" required>
             <label>Kiasi kilichotumika</label>
@@ -1537,9 +1612,9 @@
             
             <div id="customDateDiv" class="custom-date-fields">
                 <label>Kuanzia Tarehe:</label>
-                <input type="date" id="startDateFilter">
+                <input type="text" id="startDateFilter" placeholder="DD/MM/YYYY" maxlength="10" oninput="autoFormatDate(this)">
                 <label>Mpaka Tarehe:</label>
-                <input type="date" id="endDateFilter" style="margin-bottom:0;">
+                <input type="text" id="endDateFilter" placeholder="DD/MM/YYYY" maxlength="10" oninput="autoFormatDate(this)" style="margin-bottom:0;">
             </div>
             
             <label style="margin-top: 20px;">Chagua Aina ya Faili Kisha Pakua:</label>
@@ -1576,6 +1651,27 @@
                 <p class="upload-hint">Unaweza kuchagua picha nyingi kwa wakati mmoja (3, 5, au zaidi)</p>
             </div>
             <input type="file" id="scanFileInput" accept="image/*" multiple style="display:none;" onchange="handleScanFilesSelected(event)">
+            <input type="file" id="scanCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleScanFilesSelected(event)">
+            
+            <!-- Camera Button -->
+            <button class="scan-action-btn" onclick="document.getElementById('scanCameraInput').click()" style="background: linear-gradient(135deg, #10b981, #059669); margin-bottom: 10px;">
+                <i class="fa-solid fa-camera"></i> Piga Picha
+            </button>
+
+            <!-- Raw OCR Preview -->
+            <div id="rawOcrPreview" style="display:none; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 15px; margin: 10px 0; max-height: 300px; overflow-y: auto;">
+                <h4 style="color: #10b981; margin-bottom: 8px;"><i class="fa-solid fa-eye"></i> Maandishi Yaliyosomwa:</h4>
+                <pre id="rawOcrText" style="color: #e2e8f0; white-space: pre-wrap; font-size: 0.9em; line-height: 1.5;"></pre>
+                <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="confirmStructuredParse()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        <i class="fa-solid fa-check"></i> Ndiyo, Hifadhi Mauzo
+                    </button>
+                    <button onclick="cancelStructuredParse()" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        <i class="fa-solid fa-xmark"></i> Hapana, Acha
+                    </button>
+                </div>
+                <p style="color: #94a3b8; text-align: center; margin-top: 8px; font-size: 0.85em;">Je, ungependa kuhifadhi taarifa hizi kwenye mauzo?</p>
+            </div>
 
             <!-- Image Preview Gallery -->
             <div id="scanPreviewGallery" class="scan-preview-gallery"></div>
@@ -1620,8 +1716,8 @@
         // ===== HUGGING FACE ACCESS TOKEN (HARDCODED) =====
         // Token is now handled server-side via Supabase Edge Function
 
-        const SUPABASE_URL = 'https://dbtqwpwuktyqgnznxthw.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidHF3cHd1a3R5cWduem54dGh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDYwMjcsImV4cCI6MjA3Mjg4MjAyN30.aMbbK6r76HLusW4HfBr3bsGcYXFJHg_Cm-qPdWYh79M';
+        const SUPABASE_URL = 'https://gmjkchlsmxypfnpydgtg.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtamtjaGxzbXh5cGZucHlkZ3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MTc3NTcsImV4cCI6MjA5MDQ5Mzc1N30.7kpD_Rkj2BZdsRbHBHzlOIRlWnAz1ie1eg60vWbtGFA';
        
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1657,17 +1753,36 @@
         // --- BOTTOM NAVIGATION LOGIC ---
         let currentBottomSection = 'store';
 
+        const FAB_MAP = {
+            'store': 'fab-store',
+            'sales': 'fab-sales',
+            'debts': 'fab-debts',
+            'daily-exp': 'fab-daily-exp',
+            'capital-exp': 'fab-capital-exp'
+        };
+
+        function updateFabVisibility(sectionId) {
+            // Hide all FABs
+            document.querySelectorAll('.panel-add-btn').forEach(btn => btn.classList.add('hidden-fab'));
+            // Show the FAB for active section
+            const fabId = FAB_MAP[sectionId];
+            if (fabId) {
+                const fab = document.getElementById(fabId);
+                if (fab) fab.classList.remove('hidden-fab');
+            }
+            // Close sale popup if switching away
+            closeSaleAddPopup();
+        }
+
         function switchBottomSection(sectionId) {
             currentBottomSection = sectionId;
-            // Hide all section pages
             document.querySelectorAll('.nav-section-page').forEach(p => p.classList.remove('active-section'));
-            // Show the target
             const target = document.getElementById('section-' + sectionId);
             if (target) target.classList.add('active-section');
-            // Update nav items
             document.querySelectorAll('.bottom-nav-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.section === sectionId);
             });
+            updateFabVisibility(sectionId);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1725,6 +1840,34 @@
             }
         }
         // ----------------------------------------------------
+
+        // --- SALE ADD POPUP LOGIC ---
+        function toggleSaleAddPopup() {
+            const popup = document.getElementById('saleAddPopup');
+            popup.classList.toggle('show');
+        }
+        function closeSaleAddPopup() {
+            document.getElementById('saleAddPopup').classList.remove('show');
+        }
+        // Close popup when clicking outside
+        document.addEventListener('click', function(e) {
+            const popup = document.getElementById('saleAddPopup');
+            if (popup && !e.target.closest('#saleAddPopup') && !e.target.closest('.panel-add-btn')) {
+                popup.classList.remove('show');
+            }
+        });
+
+        // --- ADD SALE AS DEBT (opens sale modal with debt checkbox pre-checked) ---
+        function addSaleAsDebt() {
+            addSale();
+            setTimeout(() => {
+                const debtCheck = document.getElementById('isDebtCheck');
+                if (debtCheck && !debtCheck.checked) {
+                    debtCheck.checked = true;
+                    debtCheck.dispatchEvent(new Event('change'));
+                }
+            }, 100);
+        }
 
         document.getElementById('isDebtCheck').addEventListener('change', function() {
             document.getElementById('debtCustomerNameDiv').style.display = this.checked ? 'block' : 'none';
@@ -2046,7 +2189,7 @@
             const todayStr = new Date().toISOString().slice(0, 10);
             const alertKey = `alerts_shown_${sys.id}_${todayStr}`;
             
-            if (alertKey in sessionStorage) return;
+            if (sessionStorage.getItem(alertKey)) return;
             
             // 1. Alert ya Stoo
             const lowStock = sys.products.filter(p => p.currentQuantity <= 5 && p.currentQuantity > 0);
@@ -2087,7 +2230,7 @@
             
             if (fastProduct && maxSold > 0) {
                 setTimeout(() => {
-                    showToast(`Pongezi! Bidhaa inayoongoza kuuzwa wiki hii ni: ${fastProduct} (${maxSold} Pcs)`, "success");
+                    showToast(`Pongezi! Bidhaa inayoongoza kuuzwa wiki hii ni: ${fastProduct} (${maxSold})`, "success");
                 }, 2500);
             }
             
@@ -2102,6 +2245,73 @@
 
         function formatNumber(number) { return Number(number).toLocaleString('en-US'); }
         function formatDate(dateString) { const options = { year: 'numeric', month: 'short', day: 'numeric' }; const date = new Date(dateString + 'T00:00:00'); return date.toLocaleDateString('sw-TZ', options); }
+        
+        // DD/MM/YYYY helper functions
+        function autoFormatDate(input) {
+            let v = input.value.replace(/[^0-9]/g, '');
+            if (v.length > 8) v = v.substring(0, 8);
+            if (v.length >= 5) {
+                input.value = v.substring(0, 2) + '/' + v.substring(2, 4) + '/' + v.substring(4);
+            } else if (v.length >= 3) {
+                input.value = v.substring(0, 2) + '/' + v.substring(2);
+            } else {
+                input.value = v;
+            }
+        }
+        function parseDDMMYYYY(str) {
+            // Convert DD/MM/YYYY to YYYY-MM-DD
+            if (!str) return '';
+            const parts = str.split('/');
+            if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+                return parts[2] + '-' + parts[1] + '-' + parts[0];
+            }
+            // If already YYYY-MM-DD format, return as is
+            if (str.match(/^\d{4}-\d{2}-\d{2}$/)) return str;
+            return '';
+        }
+        function formatDateToDDMMYYYY(isoDate) {
+            // Convert YYYY-MM-DD to DD/MM/YYYY
+            if (!isoDate) return '';
+            const parts = isoDate.split('-');
+            if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+            return isoDate;
+        }
+        function getTodayDDMMYYYY() {
+            const d = new Date();
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return dd + '/' + mm + '/' + yyyy;
+        }
+        
+        // Unit labels
+        const UNIT_LABELS = {
+            'pcs': 'Pcs', 'dozen': 'Dazani', 'carton': 'Katoni', 'crate': 'Kreti',
+            'lita': 'Lita', 'kilo': 'Kilo', 'mfuko': 'Mfuko', 'sanduku': 'Sanduku'
+        };
+        const UNIT_QUESTIONS = {
+            'dozen': 'Kipande ngapi kwa Dazani moja?',
+            'carton': 'Kipande ngapi kwa Katoni moja?',
+            'crate': 'Chupa ngapi kwa Kreti moja?',
+            'mfuko': 'Kipande ngapi kwa Mfuko mmoja?',
+            'sanduku': 'Kipande ngapi kwa Sanduku moja?'
+        };
+        function onUnitChange() {
+            const unit = document.getElementById('productUnit').value;
+            const div = document.getElementById('piecesPerUnitDiv');
+            const label = document.getElementById('piecesPerUnitLabel');
+            const qtyLabel = document.getElementById('quantityLabel');
+            if (UNIT_QUESTIONS[unit]) {
+                div.style.display = 'block';
+                label.textContent = UNIT_QUESTIONS[unit];
+                qtyLabel.textContent = 'Idadi (' + UNIT_LABELS[unit] + ')';
+            } else {
+                div.style.display = 'none';
+                document.getElementById('piecesPerUnit').value = '';
+                qtyLabel.textContent = 'Idadi ya Bidhaa (' + (UNIT_LABELS[unit] || 'Pcs') + ')';
+            }
+            calculatePricesAndProfit();
+        }
         function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
         function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
         function closeModals() { document.querySelectorAll('.modal').forEach(modal => { modal.style.display = 'none'; }); }
@@ -2167,7 +2377,8 @@
             if (currentBusinessIndex === null) return;
             const currentSystem = capitalSystems[currentBusinessIndex];
             document.getElementById('capital-amount-text').textContent = `TZS ${formatNumber(currentSystem.capital)}`;
-            renderProductList(); renderSalesDates(); renderDailyExpenseDates(); renderCapitalExpenseDates(); renderDebts(); 
+            renderProductList(); renderSalesDates(); renderDailyExpenseDates(); renderCapitalExpenseDates(); renderDebts();
+            updateFabVisibility(currentBottomSection);
         }
 
         // --- MAPINDUZI 1: UKURASA WA GRAFU YA BIASHARA ---
@@ -2188,6 +2399,41 @@
             }
         }
 
+        function onGraphTimeframeChange() {
+            const tf = document.getElementById('graphTimeframe').value;
+            document.getElementById('yearSelectorBox').style.display = tf === 'mwaka' ? 'block' : 'none';
+            document.getElementById('customDateBox').style.display = tf === 'custom' ? 'block' : 'none';
+            
+            if (tf === 'mwaka') {
+                populateYearSelector();
+            }
+            renderGraph();
+        }
+
+        function populateYearSelector() {
+            const sys = capitalSystems[currentBusinessIndex];
+            const yearsSet = new Set();
+            const currentYear = new Date().getFullYear();
+            yearsSet.add(currentYear);
+            
+            sys.sales.forEach(sale => {
+                if (sale.date) {
+                    const y = parseInt(sale.date.substring(0, 4));
+                    if (!isNaN(y)) yearsSet.add(y);
+                }
+            });
+            
+            const years = Array.from(yearsSet).sort((a, b) => b - a);
+            const sel = document.getElementById('graphYear');
+            sel.innerHTML = '';
+            years.forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                sel.appendChild(opt);
+            });
+        }
+
         function renderGraph() {
             const timeframe = document.getElementById('graphTimeframe').value;
             const sys = capitalSystems[currentBusinessIndex];
@@ -2201,31 +2447,36 @@
             
             let labels = [];
             let dataPoints = [];
+            let totalSales = 0;
             
             const today = new Date();
             let startDate = new Date();
             
             if (timeframe === 'wiki') {
-                startDate.setDate(today.getDate() - 6); // Siku 7 (leo ikiwemo)
+                startDate.setDate(today.getDate() - 6);
                 for(let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
                     const dStr = d.toISOString().slice(0, 10);
-                    labels.push(formatDate(dStr).slice(0, 6)); // E.g. "Mar 21"
-                    dataPoints.push(salesByDate[dStr] || 0);
+                    labels.push(formatDate(dStr).slice(0, 6));
+                    const val = salesByDate[dStr] || 0;
+                    dataPoints.push(val);
+                    totalSales += val;
                 }
             } 
             else if (timeframe === 'mwezi') {
-                startDate.setDate(today.getDate() - 29); // Siku 30
+                startDate.setDate(today.getDate() - 29);
                 for(let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
-                     const dStr = d.toISOString().slice(0, 10);
-                    labels.push(d.getDate()); // Tarehe tu
-                    dataPoints.push(salesByDate[dStr] || 0);
+                    const dStr = d.toISOString().slice(0, 10);
+                    labels.push(d.getDate());
+                    const val = salesByDate[dStr] || 0;
+                    dataPoints.push(val);
+                    totalSales += val;
                 }
             } 
             else if (timeframe === 'mwaka') {
-                // Miezi yote 12 ya mwaka huu
+                const selectedYear = parseInt(document.getElementById('graphYear').value) || today.getFullYear();
                 for(let m = 0; m < 12; m++) {
                     let monthSales = 0;
-                    const monthStr = `${today.getFullYear()}-${String(m+1).padStart(2, '0')}`; // E.g. "2026-03"
+                    const monthStr = `${selectedYear}-${String(m+1).padStart(2, '0')}`;
                     
                     Object.keys(salesByDate).forEach(k => {
                         if(k.startsWith(monthStr)) {
@@ -2233,14 +2484,59 @@
                         }
                     });
                     
-                    labels.push(new Date(today.getFullYear(), m, 1).toLocaleString('sw-TZ', { month: 'short' }));
+                    labels.push(new Date(selectedYear, m, 1).toLocaleString('sw-TZ', { month: 'short' }));
                     dataPoints.push(monthSales);
+                    totalSales += monthSales;
+                }
+            }
+            else if (timeframe === 'custom') {
+                const fromStr = parseDDMMYYYY(document.getElementById('graphDateFrom').value);
+                const toStr = parseDDMMYYYY(document.getElementById('graphDateTo').value);
+                if (!fromStr || !toStr) return;
+                
+                const from = new Date(fromStr);
+                const to = new Date(toStr);
+                if (from > to) { showToast("Tarehe ya mwisho lazima iwe baada ya ya kwanza.", "warning"); return; }
+                
+                const diffDays = Math.ceil((to - from) / (1000 * 60 * 60 * 24)) + 1;
+                
+                if (diffDays <= 31) {
+                    // Show daily
+                    for(let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+                        const dStr = d.toISOString().slice(0, 10);
+                        labels.push(d.getDate() + '/' + (d.getMonth()+1));
+                        const val = salesByDate[dStr] || 0;
+                        dataPoints.push(val);
+                        totalSales += val;
+                    }
+                } else {
+                    // Show monthly
+                    let current = new Date(from.getFullYear(), from.getMonth(), 1);
+                    const endMonth = new Date(to.getFullYear(), to.getMonth(), 1);
+                    while (current <= endMonth) {
+                        const monthStr = `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2, '0')}`;
+                        let monthSales = 0;
+                        Object.keys(salesByDate).forEach(k => {
+                            if(k.startsWith(monthStr)) {
+                                const kDate = new Date(k);
+                                if (kDate >= from && kDate <= to) monthSales += salesByDate[k];
+                            }
+                        });
+                        labels.push(current.toLocaleString('sw-TZ', { month: 'short', year: '2-digit' }));
+                        dataPoints.push(monthSales);
+                        totalSales += monthSales;
+                        current.setMonth(current.getMonth() + 1);
+                    }
                 }
             }
             
+            // Show summary
+            const summaryEl = document.getElementById('graphSummary');
+            summaryEl.style.display = 'block';
+            summaryEl.textContent = `Jumla ya Mauzo: TZS ${formatNumber(totalSales)}`;
+            
             const ctx = document.getElementById('salesChart').getContext('2d');
             
-            // Futa grafu ya zamani kama ipo
             if (salesChartInstance) {
                 salesChartInstance.destroy();
             }
@@ -2256,7 +2552,7 @@
                         backgroundColor: 'rgba(168, 85, 247, 0.1)',
                         borderWidth: 3,
                         fill: true,
-                        tension: 0.4 // Inafanya mstari kuwa laini
+                        tension: 0.4
                     }]
                 },
                 options: {
@@ -2287,7 +2583,7 @@
                 li.innerHTML = `
                     <div class="item-info">
                         <strong>${product.name}</strong>
-                        <span>Stoo ipo: <b style="color:var(--text-main);">${product.currentQuantity}</b> pcs</span>
+                        <span>Stoo ipo: <b style="color:var(--text-main);">${product.currentQuantity}</b> ${UNIT_LABELS[product.unit] || 'Pcs'}</span>
                         <span>Bei: <span style="color:var(--primary); font-weight:600;">TZS ${formatNumber(product.sellingPriceRetail)}</span></span>
                     </div>
                     <div class="dropdown">
@@ -2385,7 +2681,7 @@
             sortedDates.forEach(date => {
                 const totalDailySales = salesByDate[date].reduce((sum, sale) => sum + sale.totalPrice, 0);
                 const totalDailyProfit = salesByDate[date].reduce((sum, sale) => {
-                    const product = currentSystem.products[sale.productIndex];
+                    const product = (sale.productIndex !== undefined && sale.productIndex >= 0) ? currentSystem.products[sale.productIndex] : null;
                     if(!product) return sum;
                     const profitPerItem = product.sellingPriceRetail - product.costPriceRetail;
                     return sum + (profitPerItem * sale.quantity);
@@ -2418,16 +2714,18 @@
             let totalProfit = 0;
 
             salesForDate.forEach((sale, index) => {
-                const product = currentSystem.products[sale.productIndex];
-                if(!product) return;
-                const profitPerItem = product.sellingPriceRetail - product.costPriceRetail;
+                const product = (sale.productIndex !== undefined && sale.productIndex >= 0) ? currentSystem.products[sale.productIndex] : null;
+                const productName = product ? product.name : (sale.productName || 'Bidhaa (Scan)');
+                const profitPerItem = product ? (product.sellingPriceRetail - product.costPriceRetail) : 0;
                 const profit = profitPerItem * sale.quantity;
 
+                const saleGlobalIndex = currentSystem.sales.indexOf(sale);
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
-                        <span style="font-weight:600;">${product.name}</span>
+                        <span style="font-weight:600;">${productName}</span>
                         ${sale.wasDebt ? '<br><small style="color:var(--warning);">(Deni Lililolipwa)</small>' : ''}
+                        ${!product ? '<br><small style="color:var(--primary-light);">(Kutoka Scan)</small>' : ''}
                     </td>
                     <td>${sale.quantity}</td>
                     <td style="font-weight:600;">TZS ${formatNumber(sale.totalPrice)}</td>
@@ -2436,8 +2734,8 @@
                         <div class="dropdown">
                             <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                             <div class="dropdown-content" style="right: 0; min-width: 120px;">
-                                <button onclick="editSale(${currentSystem.sales.indexOf(sale)})"><i class="fa-solid fa-pen-to-square" style="width:20px; color:var(--text-muted);"></i> Badilisha</button>
-                                <button onclick="deleteSale(${currentSystem.sales.indexOf(sale)})"><i class="fa-solid fa-trash-can" style="width:20px; color:var(--danger);"></i> Futa</button>
+                                <button onclick="editSale(${saleGlobalIndex})"><i class="fa-solid fa-pen-to-square" style="width:20px; color:var(--text-muted);"></i> Badilisha</button>
+                                <button onclick="deleteSale(${saleGlobalIndex})"><i class="fa-solid fa-trash-can" style="width:20px; color:var(--danger);"></i> Futa</button>
                             </div>
                         </div>
                     </td>
@@ -2714,6 +3012,10 @@
             sellingPriceRetailInput.value = '';
             projectedProfitTotalSpan.textContent = 'TZS 0';
             projectedProfitRetailSpan.textContent = 'TZS 0';
+            document.getElementById('productUnit').value = 'pcs';
+            document.getElementById('piecesPerUnit').value = '';
+            document.getElementById('piecesPerUnitDiv').style.display = 'none';
+            document.getElementById('quantityLabel').textContent = 'Idadi ya Bidhaa (Pcs)';
             
             if (!productsAccordion.classList.contains('show')) {
                 toggleProductsBtn.click();
@@ -2730,16 +3032,24 @@
             const sellingPriceRetail = parseFloat(sellingPriceRetailInput.value);
             const costPriceRetail = parseFloat(costPriceRetailInput.value);
             const index = productIndexInput.value;
+            const unit = document.getElementById('productUnit').value;
+            const piecesPerUnit = parseInt(document.getElementById('piecesPerUnit').value) || 0;
+            
+            // Calculate total pieces for stock
+            const totalPieces = (UNIT_QUESTIONS[unit] && piecesPerUnit > 0) ? quantity * piecesPerUnit : quantity;
 
             if (name && !isNaN(costPriceTotal) && !isNaN(quantity) && !isNaN(sellingPriceRetail)) {
                 if (index === '') {
                     const newProduct = {
                         name: name,
                         costPriceTotal: costPriceTotal,
-                        initialQuantity: quantity,
-                        currentQuantity: quantity,
+                        initialQuantity: totalPieces,
+                        currentQuantity: totalPieces,
                         costPriceRetail: costPriceRetail,
                         sellingPriceRetail: sellingPriceRetail,
+                        unit: unit,
+                        piecesPerUnit: piecesPerUnit > 0 ? piecesPerUnit : 1,
+                        enteredQuantity: quantity,
                         dateAdded: new Date().toISOString().slice(0, 10)
                     };
                     currentSystem.products.push(newProduct);
@@ -2754,10 +3064,13 @@
                     
                     product.name = name;
                     product.costPriceTotal = newTotalCost;
-                    product.initialQuantity = quantity;
-                    product.currentQuantity = quantity;
+                    product.initialQuantity = totalPieces;
+                    product.currentQuantity = totalPieces;
                     product.costPriceRetail = costPriceRetail;
                     product.sellingPriceRetail = sellingPriceRetail;
+                    product.unit = unit;
+                    product.piecesPerUnit = piecesPerUnit > 0 ? piecesPerUnit : 1;
+                    product.enteredQuantity = quantity;
                 }
                 await saveData(currentSystem); 
                 renderBusinessDetails();
@@ -2775,9 +3088,14 @@
             productIndexInput.value = index;
             document.getElementById('productName').value = product.name;
             costPriceTotalInput.value = product.costPriceTotal;
-            productQuantityInput.value = product.initialQuantity;
+            productQuantityInput.value = product.enteredQuantity || product.initialQuantity;
             costPriceRetailInput.value = product.costPriceRetail;
             sellingPriceRetailInput.value = product.sellingPriceRetail;
+            // Restore unit settings
+            const unit = product.unit || 'pcs';
+            document.getElementById('productUnit').value = unit;
+            document.getElementById('piecesPerUnit').value = product.piecesPerUnit || '';
+            onUnitChange();
             calculatePricesAndProfit();
             openModal('addProductModal');
         }
@@ -2798,7 +3116,7 @@
         function addSale() {
             saleBeingEdited = null;
             document.getElementById('saleIndex').value = '';
-            document.getElementById('saleDate').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('saleDate').value = getTodayDDMMYYYY();
             document.getElementById('saleQuantity').value = '';
             document.getElementById('actualSalePrice').value = ''; 
             document.getElementById('liveSaleTotal').style.display = 'none'; 
@@ -2830,7 +3148,7 @@
         }
 
         async function saveSale() {
-            const date = saleDateInput.value;
+            const date = parseDDMMYYYY(saleDateInput.value);
             const productIndex = parseInt(saleProductNameSelect.value);
             const quantity = parseInt(saleQuantityInput.value);
             
@@ -2899,7 +3217,7 @@
             const sale = currentSystem.sales[index];
 
             document.getElementById('saleIndex').value = index;
-            document.getElementById('saleDate').value = sale.date;
+            document.getElementById('saleDate').value = formatDateToDDMMYYYY(sale.date);
             
             document.getElementById('debtToggleContainer').style.display = 'none';
 
@@ -2929,9 +3247,11 @@
             if (confirm('Una uhakika unataka kufuta mauzo haya? (Bidhaa zitarudi stoo)')) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
                 const sale = currentSystem.sales[index];
-                const product = currentSystem.products[sale.productIndex];
+                const product = (sale.productIndex !== undefined && sale.productIndex >= 0) ? currentSystem.products[sale.productIndex] : null;
 
-                product.currentQuantity += sale.quantity;
+                if (product) {
+                    product.currentQuantity += sale.quantity;
+                }
                 currentSystem.sales.splice(index, 1);
                 
                 await saveData(currentSystem); 
@@ -3145,7 +3465,7 @@
         function addDailyExpense() {
             dailyExpenseBeingEdited = null;
             document.getElementById('dailyExpenseIndex').value = '';
-            document.getElementById('dailyExpenseDate').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('dailyExpenseDate').value = getTodayDDMMYYYY();
             document.getElementById('dailyExpenseName').value = '';
             document.getElementById('dailyExpenseAmount').value = '';
             dailyExpenseModalTitle.textContent = 'Matumizi ya Kila Siku';
@@ -3153,7 +3473,7 @@
         }
 
         async function saveDailyExpense() {
-            const date = dailyExpenseDateInput.value;
+            const date = parseDDMMYYYY(dailyExpenseDateInput.value);
             const name = dailyExpenseNameInput.value;
             const amount = parseFloat(dailyExpenseAmountInput.value);
             const index = dailyExpenseIndexInput.value;
@@ -3184,7 +3504,7 @@
             dailyExpenseBeingEdited = { index: index };
             dailyExpenseModalTitle.textContent = 'Badilisha Matumizi';
             document.getElementById('dailyExpenseIndex').value = index;
-            document.getElementById('dailyExpenseDate').value = expense.date;
+            document.getElementById('dailyExpenseDate').value = formatDateToDDMMYYYY(expense.date);
             document.getElementById('dailyExpenseName').value = expense.name;
             document.getElementById('dailyExpenseAmount').value = expense.amount;
             openModal('addDailyExpenseModal');
@@ -3207,7 +3527,7 @@
         function addCapitalExpense() {
             capitalExpenseBeingEdited = null;
             document.getElementById('capitalExpenseIndex').value = '';
-            document.getElementById('capitalExpenseDate').value = new Date().toISOString().slice(0, 10);
+            document.getElementById('capitalExpenseDate').value = getTodayDDMMYYYY();
             document.getElementById('capitalExpenseName').value = '';
             document.getElementById('capitalExpenseAmount').value = '';
             capitalExpenseAlert.style.display = 'none';
@@ -3216,7 +3536,7 @@
         }
 
         async function saveCapitalExpense() {
-            const date = capitalExpenseDateInput.value;
+            const date = parseDDMMYYYY(capitalExpenseDateInput.value);
             const name = capitalExpenseNameInput.value;
             const amount = parseFloat(capitalExpenseAmountInput.value);
             const index = capitalExpenseIndexInput.value;
@@ -3260,7 +3580,7 @@
             capitalExpenseBeingEdited = { index: index };
             capitalExpenseModalTitle.textContent = 'Badilisha Matumizi Mtaji';
             document.getElementById('capitalExpenseIndex').value = index;
-            document.getElementById('capitalExpenseDate').value = expense.date;
+            document.getElementById('capitalExpenseDate').value = formatDateToDDMMYYYY(expense.date);
             document.getElementById('capitalExpenseName').value = expense.name;
             document.getElementById('capitalExpenseAmount').value = expense.amount;
             openModal('addCapitalExpenseModal');
@@ -3308,13 +3628,20 @@
             const costTotal = parseFloat(costPriceTotalInput.value);
             const quantity = parseInt(productQuantityInput.value);
             const sellingPrice = parseFloat(sellingPriceRetailInput.value);
+            const unit = document.getElementById('productUnit').value;
+            const piecesPerUnit = parseInt(document.getElementById('piecesPerUnit').value) || 0;
+            
+            // Total pieces = quantity * piecesPerUnit (if bulk unit), else just quantity
+            const totalPieces = (UNIT_QUESTIONS[unit] && piecesPerUnit > 0) ? quantity * piecesPerUnit : quantity;
 
             if (!isNaN(costTotal) && !isNaN(quantity) && quantity > 0) {
-                const costRetail = costTotal / quantity;
+                // Bei ya kununulia kwa kipande kimoja
+                const costRetail = costTotal / totalPieces;
                 costPriceRetailInput.value = costRetail.toFixed(2);
                 
                 if (!isNaN(sellingPrice)) {
-                    const profitTotal = (sellingPrice - costRetail) * quantity;
+                    // sellingPrice = bei ya kuuzia kipande kimoja
+                    const profitTotal = (sellingPrice - costRetail) * totalPieces;
                     const profitRetail = sellingPrice - costRetail;
                     projectedProfitTotalSpan.textContent = `TZS ${profitTotal.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
                     projectedProfitRetailSpan.textContent = `TZS ${profitRetail.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
@@ -3370,8 +3697,8 @@
                 startDate = new Date(startDate.getFullYear(), 0, 1);
                 endDate = new Date(endDate.getFullYear(), 11, 31, 23,59,59,999);
             } else if (timeframe === 'custom') {
-                const sDate = document.getElementById('startDateFilter').value;
-                const eDate = document.getElementById('endDateFilter').value;
+                const sDate = parseDDMMYYYY(document.getElementById('startDateFilter').value);
+                const eDate = parseDDMMYYYY(document.getElementById('endDateFilter').value);
                 if (!sDate || !eDate) {
                     showToast("Tafadhali chagua tarehe zote mbili (Kuanzia na Mpaka).", "error");
                     return null;
@@ -4059,139 +4386,170 @@
             });
         }
 
-        /**
-         * RUKSA YA AI SCANNER ILIYOREKEBISHWA
-         * Inabadilisha picha kuwa ArrayBuffer kwa ajili ya uthabiti wa Edge Functions.
-         */
-        async function callHuggingFaceVLM(imageBlob) {
-            const supabaseUrl = SUPABASE_URL;
-            const supabaseKey = SUPABASE_ANON_KEY;
-
-            // MABADILIKO: Convert blob to ArrayBuffer (Buffer) kabla ya kutuma
+        // Step 1: Raw OCR scan
+        async function callGroqRawScan(imageBlob) {
             const arrayBuffer = await imageBlob.arrayBuffer();
-
-            const response = await fetch(`${supabaseUrl}/functions/v1/smart-scan`, {
+            const response = await fetch(`${SUPABASE_URL}/functions/v1/groq-scan?mode=raw`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${supabaseKey}`,
-                    'Content-Type': 'application/octet-stream', // Hardcoded kwa uthabiti
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/octet-stream'
                 },
-                body: arrayBuffer, // Tuma buffer badala ya blob moja kwa moja
+                body: arrayBuffer
             });
 
             if (!response.ok) {
-                const errorDetail = await response.text();
-                throw new Error(`Edge Function Error: ${response.status} - ${errorDetail}`);
+                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                throw new Error(errorData.error || 'Raw scan failed');
             }
 
-            const rawResponse = await response.json();
-
-            // Hakiki muundo wa jibu (Robust Parsing)
-            let parsedResponse;
-            if (Array.isArray(rawResponse)) {
-                parsedResponse = rawResponse;
-            } else if (typeof rawResponse === 'string') {
-                try {
-                    parsedResponse = JSON.parse(rawResponse);
-                    if (!Array.isArray(parsedResponse)) {
-                        throw new Error('Parsed response is not an array.');
-                    }
-                } catch (e) {
-                    console.error('Failed to parse AI response:', e);
-                    throw new Error(`AI haikurudisha muundo sahihi. Jibu: ${JSON.stringify(rawResponse).substring(0, 200)}`);
-                }
-            } else if (rawResponse && typeof rawResponse === 'object' && !Array.isArray(rawResponse)) {
-                // Kama ni object moja, iweke kwenye array
-                parsedResponse = [rawResponse];
-            } else {
-                throw new Error(`AI haikurudisha muundo sahihi. Jibu: ${JSON.stringify(rawResponse).substring(0, 200)}`);
-            }
-
-            return parsedResponse;
+            const data = await response.json();
+            return data.rawText || '';
         }
+
+        // Step 2: Structured parse
+        async function callGroqStructuredParse(rawText) {
+            const response = await fetch(`${SUPABASE_URL}/functions/v1/groq-scan?mode=structured`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ rawText })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                throw new Error(errorData.error || 'Structured parse failed');
+            }
+
+            return await response.json();
+        }
+
+        // Store raw text for confirmation flow
+        let pendingRawText = '';
+        let pendingProductNames = [];
+
+        function confirmStructuredParse() {
+            document.getElementById('rawOcrPreview').style.display = 'none';
+            processStructuredParse();
+        }
+
+        function cancelStructuredParse() {
+            document.getElementById('rawOcrPreview').style.display = 'none';
+            document.getElementById('scanUploadZone').style.display = 'block';
+            document.getElementById('startScanBtn').style.display = 'flex';
+            pendingRawText = '';
+            showToast('Scan imesitishwa.', 'info');
+        }
+
+        async function processStructuredParse() {
+            const progressOverlay = document.getElementById('scanProgressOverlay');
+            document.getElementById('scanProgressText').textContent = 'Inachambua data ya mauzo...';
+            document.getElementById('scanProgressBarFill').style.width = '70%';
+            progressOverlay.classList.add('active');
+
+            try {
+                const items = await callGroqStructuredParse(pendingRawText);
+                
+                const sys = capitalSystems[currentBusinessIndex];
+                const productNames = sys.products.map(p => p.name);
+
+                scanResults = [];
+                items.forEach(item => {
+                    const normalizedProduct = normalizeProductName(item.product_name, productNames);
+                    scanResults.push({
+                        date: item.sale_date || null,
+                        product: normalizedProduct || item.product_name,
+                        quantity: Number(item.quantity) || 1,
+                        price: Number(item.unit_price) || 0,
+                        total: Number(item.total_amount) || (Number(item.quantity) * Number(item.unit_price)) || 0,
+                        imageIndex: 0
+                    });
+                });
+
+                document.getElementById('scanProgressBarFill').style.width = '100%';
+                document.getElementById('scanProgressText').textContent = 'Imekamilika!';
+                await new Promise(resolve => setTimeout(resolve, 800));
+                progressOverlay.classList.remove('active');
+
+                if (scanResults.length === 0) {
+                    showToast("Hakuna matokeo ya mauzo yaliyopatikana.", "error");
+                    document.getElementById('scanUploadZone').style.display = 'block';
+                    document.getElementById('startScanBtn').style.display = 'flex';
+                    return;
+                }
+
+                renderScanResults();
+            } catch (err) {
+                progressOverlay.classList.remove('active');
+                console.error('Structured parse error:', err);
+                showToast('Hitilafu katika kuchambua data: ' + err.message, 'error');
+                document.getElementById('scanUploadZone').style.display = 'block';
+                document.getElementById('startScanBtn').style.display = 'flex';
+            }
+        }
+
 
         async function startMultiScan() {
             if (scanSelectedFiles.length === 0) return;
 
             const sys = capitalSystems[currentBusinessIndex];
-            const productNames = sys.products.map(p => p.name);
+            pendingProductNames = sys.products.map(p => p.name);
 
-            // Show progress, hide upload zone
+            // Show progress
             document.getElementById('scanUploadZone').style.display = 'none';
             document.getElementById('startScanBtn').style.display = 'none';
             document.getElementById('scanResultsSection').style.display = 'none';
             const progressOverlay = document.getElementById('scanProgressOverlay');
             progressOverlay.classList.add('active');
 
-            scanResults = [];
+            let allRawText = '';
             const totalImages = scanSelectedFiles.length;
             let errors = [];
 
-            // Process images ONE BY ONE to avoid rate limits
             for (let i = 0; i < totalImages; i++) {
                 const file = scanSelectedFiles[i];
-                const imgIndex = i;
-
-                // Update progress indicator
                 const pct = Math.round(((i) / totalImages) * 100);
                 document.getElementById('scanProgressBarFill').style.width = pct + '%';
-                document.getElementById('scanProgressText').textContent = `Inachakata picha ya ${i + 1} kati ya ${totalImages}...`;
-                document.getElementById('scanProgressDetail').textContent = `Picha ${i + 1} / ${totalImages} — Tafadhali subiri`;
+                document.getElementById('scanProgressText').textContent = `Inasoma picha ya ${i + 1} kati ya ${totalImages}...`;
+                document.getElementById('scanProgressDetail').textContent = `Picha ${i + 1} / ${totalImages}`;
 
                 try {
-                    const items = await callHuggingFaceVLM(file);
-
-                    // Validate sales content
-                    if (items.length === 1 && items[0].error === 'not_sales') {
-                        errors.push(`Picha ${imgIndex + 1}: Haya sio mauzo.`);
-                        continue;
-                    }
-
-                    items.forEach(item => {
-                        if (item.error) return;
-                        // Normalize product name against inventory
-                        const normalizedProduct = normalizeProductName(item.product, productNames);
-                        scanResults.push({
-                            date: item.date || null,
-                            product: normalizedProduct,
-                            quantity: Number(item.quantity) || 1,
-                            price: Number(item.price) || 0,
-                            total: Number(item.total) || (Number(item.quantity) * Number(item.price)) || 0,
-                            imageIndex: imgIndex
-                        });
-                    });
+                    const rawText = await callGroqRawScan(file);
+                    allRawText += (allRawText ? '\n---\n' : '') + rawText;
                 } catch (err) {
-                    console.error(`Scan error for image ${imgIndex + 1}:`, err);
-                    errors.push(`Picha ${imgIndex + 1}: ${err.message}`);
+                    console.error(`Scan error for image ${i + 1}:`, err);
+                    errors.push(`Picha ${i + 1}: ${err.message}`);
                 }
 
-                // Small delay between images to avoid rate limits
                 if (i < totalImages - 1) {
                     await new Promise(resolve => setTimeout(resolve, 1500));
                 }
             }
 
-            // Final progress
             document.getElementById('scanProgressBarFill').style.width = '100%';
-            document.getElementById('scanProgressText').textContent = 'Imekamilika!';
-            document.getElementById('scanProgressDetail').textContent = `Picha zote ${totalImages} zimechakatwa.`;
-
-            await new Promise(resolve => setTimeout(resolve, 800));
+            document.getElementById('scanProgressText').textContent = 'Kusoma kumekamilika!';
+            await new Promise(resolve => setTimeout(resolve, 600));
             progressOverlay.classList.remove('active');
 
             if (errors.length > 0) {
                 errors.forEach(e => showToast(e, 'warning'));
             }
 
-            if (scanResults.length === 0) {
-                showToast("Hakuna matokeo ya mauzo yaliyopatikana kwenye picha hizo.", "error");
+            if (!allRawText.trim()) {
+                showToast("Hakuna maandishi yaliyosomwa kwenye picha.", "error");
                 document.getElementById('scanUploadZone').style.display = 'block';
                 document.getElementById('startScanBtn').style.display = 'flex';
                 return;
             }
 
-            renderScanResults();
+            // Show raw text for user confirmation
+            pendingRawText = allRawText;
+            document.getElementById('rawOcrText').textContent = allRawText;
+            document.getElementById('rawOcrPreview').style.display = 'block';
         }
+
 
         function normalizeProductName(scannedName, productNames) {
             if (!scannedName) return scannedName;
@@ -4259,14 +4617,14 @@
                         </div>
                         <div class="scan-date-input-row">
                             <i class="fa-regular fa-calendar-plus"></i>
-                            <input type="date" onchange="updateGroupDate(this, [${items.map(i => i.globalIndex).join(',')}])" value="">
+                            <input type="text" placeholder="DD/MM/YYYY" maxlength="10" oninput="autoFormatDate(this)" onchange="updateGroupDate(this, [${items.map(i => i.globalIndex).join(',')}])" value="">
                         </div>
                     `;
                 } else {
                     headerHTML += `
                         <div class="scan-date-input-row" style="border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.08);">
                             <i class="fa-solid fa-check-circle" style="color: #10b981;"></i>
-                            <input type="date" value="${dateKey}" onchange="updateGroupDate(this, [${items.map(i => i.globalIndex).join(',')}])">
+                            <input type="text" value="${formatDateToDDMMYYYY(dateKey)}" placeholder="DD/MM/YYYY" maxlength="10" oninput="autoFormatDate(this)" onchange="updateGroupDate(this, [${items.map(i => i.globalIndex).join(',')}])">
                             <span style="color: #10b981;">✓</span>
                         </div>
                     `;
@@ -4300,7 +4658,7 @@
         }
 
         function updateGroupDate(input, indices) {
-            const newDate = input.value;
+            const newDate = parseDDMMYYYY(input.value);
             indices.forEach(idx => {
                 if (scanResults[idx]) {
                     scanResults[idx].date = newDate || null;
@@ -4347,10 +4705,13 @@
 
             const sys = capitalSystems[currentBusinessIndex];
             let savedCount = 0;
-            let skippedCount = 0;
 
             for (const item of scanResults) {
-                // Find matching product in inventory
+                const quantity = item.quantity;
+                const unitPrice = item.price > 0 ? item.price : 0;
+                const totalPrice = quantity * unitPrice;
+
+                // Find matching product in inventory (for reference only, don't create new)
                 let productIndex = -1;
                 for (let i = 0; i < sys.products.length; i++) {
                     if (sys.products[i].name.toLowerCase() === item.product.toLowerCase()) {
@@ -4358,7 +4719,6 @@
                         break;
                     }
                 }
-
                 // Partial match fallback
                 if (productIndex === -1) {
                     for (let i = 0; i < sys.products.length; i++) {
@@ -4371,26 +4731,10 @@
                     }
                 }
 
-                if (productIndex === -1) {
-                    skippedCount++;
-                    continue;
-                }
-
-                const product = sys.products[productIndex];
-                const quantity = item.quantity;
-                const unitPrice = item.price > 0 ? item.price : product.sellingPriceRetail;
-                const totalPrice = quantity * unitPrice;
-
-                // Check stock
-                if (quantity > product.currentQuantity) {
-                    showToast(`${product.name}: Idadi (${quantity}) inazidi stoo (${product.currentQuantity}). Imerukwa.`, "warning");
-                    skippedCount++;
-                    continue;
-                }
-
-                // Use existing saveSale format
+                // Save sale directly - DO NOT add to store/products
                 const transactionData = {
                     date: item.date,
+                    productName: item.product,
                     productIndex: productIndex,
                     quantity: quantity,
                     totalPrice: totalPrice,
@@ -4398,7 +4742,11 @@
                 };
 
                 sys.sales.push(transactionData);
-                product.currentQuantity -= quantity;
+                
+                // Only reduce stock if product exists in store
+                if (productIndex !== -1) {
+                    sys.products[productIndex].currentQuantity -= quantity;
+                }
                 savedCount++;
             }
 
@@ -4406,10 +4754,6 @@
                 await saveData(sys);
                 renderBusinessDetails();
                 showToast(`Mauzo ${savedCount} yamehifadhiwa kikamilifu!`, "success");
-            }
-
-            if (skippedCount > 0) {
-                showToast(`Bidhaa ${skippedCount} hazikupatikana stoo na zimerukwa.`, "warning");
             }
 
             closeAIScanner();
