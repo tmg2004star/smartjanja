@@ -1931,10 +1931,12 @@
                 if (isOnline) {
                     badge.className = 'network-badge network-online';
                     badge.innerHTML = '<i class="fa-solid fa-wifi"></i> Mtandaoni';
-                    showToast("Upo mtandaoni sasa. Mabadiliko yako yanahifadhiwa.", "success");
-                    if (getSafeLocalStorage('sj_pending_sync') === 'true') {
-                        syncDataToSupabase();
-                    }
+                    showToast("Upo mtandaoni sasa. Inasawazisha taarifa...", "success");
+                    // Full bidirectional sync when coming online
+                    fullSync().then(() => {
+                        showToast("Taarifa zimesawazishwa kikamilifu!", "success");
+                    }).catch(() => {});
+                
                 } else {
                     badge.className = 'network-badge network-offline';
                     badge.innerHTML = '<i class="fa-solid fa-wifi-slash"></i> Nje ya Mtandao';
@@ -2053,6 +2055,7 @@
                 return;
             }
             try {
+                // 1. Pakia data ya simu kwanza (offline-first)
                 const offlineData = await db.capital_systems.where('business_id').equals(currentBusinessId).toArray();
                 if (offlineData && offlineData.length > 0) {
                     capitalSystems = offlineData;
@@ -2062,81 +2065,110 @@
                         sys.sales = sys.sales || [];
                         sys.dailyExpenses = sys.dailyExpenses || [];
                         sys.capitalExpenses = sys.capitalExpenses || [];
-                        sys.reinvestment_history = sys.reinvestment_history || []; // Historia ya makato
+                        sys.reinvestment_history = sys.reinvestment_history || [];
                     });
                     renderCapitalList();
                 }
+
+                // 2. Kama internet ipo, sawazisha na Supabase (push + pull)
                 if (navigator.onLine) {
-                    syncDataToSupabase();
+                    await fullSync();
                 }
             } catch (err) {
                 console.error("Error loading from local DB:", err);
             }
         }
-        
-        async function saveData(systemData) {
-            if (!systemData || !systemData.id) return;
-            systemData.debts = systemData.debts || [];
 
-            const index = capitalSystems.findIndex(s => s.id === systemData.id);
-            if(index !== -1) {
-                capitalSystems[index] = systemData;
-            } else {
-                capitalSystems.push(systemData);
-            }
-            
-            const dataToSave = {
-                id: systemData.id,
-                name: systemData.name,
-                capital: systemData.capital,
-                original_capital: systemData.original_capital, 
-                description: systemData.description,
-                products: systemData.products,
-                sales: systemData.sales,
-                dailyExpenses: systemData.dailyExpenses,
-                capitalExpenses: systemData.capitalExpenses,
-                debts: systemData.debts, 
-                business_id: currentBusinessId,
-                reinvestment_amount: systemData.reinvestment_amount,
-                last_reinvestment_date: systemData.last_reinvestment_date,
-                reinvestment_history: systemData.reinvestment_history
-            };
-            
+        // === FULL BIDIRECTIONAL SYNC ===
+        async function fullSync() {
             try {
-                await db.capital_systems.put(dataToSave);
-                setSafeLocalStorage('sj_pending_sync', 'true');
-                if (navigator.onLine) {
-                    syncDataToSupabase();
-                }
+                // STEP 1: Push local changes to Supabase (kama zipo pending)
+                await pushToSupabase();
+
+                // STEP 2: Pull data from Supabase and merge into local DB
+                await pullFromSupabase();
+
             } catch (err) {
-                console.error("Error saving to local DB:", err);
-                showToast("Kumbukumbu ya simu imejaa au imezuiwa.", "error");
+                console.error("Full sync failed:", err);
             }
         }
 
-        async function syncDataToSupabase() {
-            if (getSafeLocalStorage('sj_pending_sync') !== 'true') return;
-
+        // Push local data to Supabase
+        async function pushToSupabase() {
             try {
+                // Delete items that were deleted offline
                 let deletedItems = JSON.parse(getSafeLocalStorage('sj_deleted_items') || '[]');
-                for (let id of deletedItems) {
-                     await supabaseClient.from('capital_systems').delete().eq('id', id);
+                if (deletedItems.length > 0) {
+                    for (let id of deletedItems) {
+                        await supabaseClient.from('capital_systems').delete().eq('id', id);
+                    }
+                    setSafeLocalStorage('sj_deleted_items', '[]');
                 }
-                setSafeLocalStorage('sj_deleted_items', '[]');
 
+                // Push all local data
                 const localData = await db.capital_systems.toArray();
                 if (localData && localData.length > 0) {
                     const { error } = await supabaseClient.from('capital_systems').upsert(localData, { onConflict: 'id' });
-                    
-                    if (!error) {
-                        setSafeLocalStorage('sj_pending_sync', 'false');
+                    if (error) {
+                        console.error("Push to Supabase failed:", error);
+                        return;
                     }
-                } else {
-                     setSafeLocalStorage('sj_pending_sync', 'false');
+                }
+                setSafeLocalStorage('sj_pending_sync', 'false');
+            } catch (err) {
+                console.error("Push failed:", err);
+            }
+        }
+
+        // Pull data from Supabase and save to local DB
+        async function pullFromSupabase() {
+            try {
+                if (!currentBusinessId) return;
+
+                const { data: remoteData, error } = await supabaseClient
+                    .from('capital_systems')
+                    .select('*')
+                    .eq('business_id', currentBusinessId);
+
+                if (error) {
+                    console.error("Pull from Supabase failed:", error);
+                    return;
+                }
+
+                if (remoteData && remoteData.length > 0) {
+                    // Save remote data to local Dexie DB
+                    for (let item of remoteData) {
+                        item.debts = item.debts || [];
+                        item.products = item.products || [];
+                        item.sales = item.sales || [];
+                        item.dailyExpenses = item.dailyExpenses || [];
+                        item.capitalExpenses = item.capitalExpenses || [];
+                        item.reinvestment_history = item.reinvestment_history || [];
+                        await db.capital_systems.put(item);
+                    }
+
+                    // Reload from local DB to get merged data
+                    const mergedData = await db.capital_systems.where('business_id').equals(currentBusinessId).toArray();
+                    capitalSystems = mergedData;
+                    capitalSystems.forEach(sys => {
+                        sys.debts = sys.debts || [];
+                        sys.products = sys.products || [];
+                        sys.sales = sys.sales || [];
+                        sys.dailyExpenses = sys.dailyExpenses || [];
+                        sys.capitalExpenses = sys.capitalExpenses || [];
+                        sys.reinvestment_history = sys.reinvestment_history || [];
+                    });
+                    renderCapitalList();
                 }
             } catch (err) {
-                console.error("Sync failed, will try later:", err);
+                console.error("Pull failed:", err);
             }
+        }
+
+        // Legacy sync function - now calls fullSync
+        async function syncDataToSupabase() {
+            if (!navigator.onLine) return;
+            await fullSync();
         }
 
         // --- MAPINDUZI 2: LOGIC YA KUKATA FAIDA NA KUWEKA KWENYE MTAJI ---
