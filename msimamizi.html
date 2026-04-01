@@ -680,33 +680,61 @@
         /* Push content below toolbar */
         body { padding-top: 56px; padding-bottom: 80px; }
 
-        /* ===== PANEL ADD BUTTONS (FAB STYLE IN SECTION HEADERS) ===== */
-        .panel-add-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            border: 2px solid var(--primary-light); background: var(--primary-light);
-            color: white; font-size: 1.2em; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(59,130,246,0.3);
-            position: relative;
+        /* ===== FAB PULSE ANIMATION ===== */
+        @keyframes fab-pulse {
+            0%, 100% { box-shadow: 0 4px 12px rgba(59,130,246,0.4); transform: translateZ(0) scale(1); }
+            50% { box-shadow: 0 0 20px 8px rgba(59,130,246,0.3); transform: translateZ(0) scale(1.05); }
         }
-        .panel-add-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
-        .panel-add-btn.btn-amber { border-color: #d97706; background: #d97706; box-shadow: 0 2px 8px rgba(217,119,6,0.3); }
-        .panel-add-btn.btn-amber:hover { box-shadow: 0 4px 12px rgba(217,119,6,0.4); }
-        .panel-add-btn.btn-red { border-color: #ef4444; background: #ef4444; box-shadow: 0 2px 8px rgba(239,68,68,0.3); }
-        .panel-add-btn.btn-red:hover { box-shadow: 0 4px 12px rgba(239,68,68,0.4); }
-        .panel-add-btn.btn-purple { border-color: #7c3aed; background: #7c3aed; box-shadow: 0 2px 8px rgba(124,58,237,0.3); }
-        .panel-add-btn.btn-purple:hover { box-shadow: 0 4px 12px rgba(124,58,237,0.4); }
+        @keyframes fab-pulse-amber {
+            0%, 100% { box-shadow: 0 4px 12px rgba(217,119,6,0.4); transform: translateZ(0) scale(1); }
+            50% { box-shadow: 0 0 20px 8px rgba(217,119,6,0.3); transform: translateZ(0) scale(1.05); }
+        }
+        @keyframes fab-pulse-red {
+            0%, 100% { box-shadow: 0 4px 12px rgba(239,68,68,0.4); transform: translateZ(0) scale(1); }
+            50% { box-shadow: 0 0 20px 8px rgba(239,68,68,0.3); transform: translateZ(0) scale(1.05); }
+        }
+        @keyframes fab-pulse-purple {
+            0%, 100% { box-shadow: 0 4px 12px rgba(124,58,237,0.4); transform: translateZ(0) scale(1); }
+            50% { box-shadow: 0 0 20px 8px rgba(124,58,237,0.3); transform: translateZ(0) scale(1.05); }
+        }
 
-        /* Sales add popup */
+        /* ===== PANEL ADD BUTTONS (FIXED FAB AT BOTTOM) ===== */
+        .panel-add-btn {
+            width: 52px; height: 52px; border-radius: 50%;
+            border: none; background: var(--primary-light);
+            color: white; font-size: 22px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            animation: fab-pulse 2s cubic-bezier(0.4,0,0.6,1) infinite;
+            position: fixed !important;
+            bottom: 90px !important;
+            right: 20px !important;
+            z-index: 9999 !important;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .panel-add-btn:hover { animation: none; transform: translateZ(0) scale(1.1); box-shadow: 0 6px 16px rgba(59,130,246,0.5); }
+        .panel-add-btn:active { animation: none; transform: translateZ(0) scale(0.95); }
+        .panel-add-btn.btn-amber { background: #d97706; animation-name: fab-pulse-amber; }
+        .panel-add-btn.btn-amber:hover { animation: none; box-shadow: 0 6px 16px rgba(217,119,6,0.5); }
+        .panel-add-btn.btn-red { background: #ef4444; animation-name: fab-pulse-red; }
+        .panel-add-btn.btn-red:hover { animation: none; box-shadow: 0 6px 16px rgba(239,68,68,0.5); }
+        .panel-add-btn.btn-purple { background: #7c3aed; animation-name: fab-pulse-purple; }
+        .panel-add-btn.btn-purple:hover { animation: none; box-shadow: 0 6px 16px rgba(124,58,237,0.5); }
+        .panel-add-btn.hidden-fab { display: none !important; }
+
+        /* Sales add popup - anchored to FAB */
         .sale-add-popup {
-            display: none; position: absolute; top: 48px; right: 0; z-index: 100;
+            display: none; position: fixed; bottom: 150px; right: 20px; z-index: 1000;
             background: white; border-radius: var(--radius-sm); box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color); overflow: hidden; min-width: 180px;
+            border: 1px solid var(--border-color); overflow: hidden; min-width: 200px;
         }
         .sale-add-popup.show { display: block; }
         .sale-add-popup button {
-            width: 100%; padding: 12px 16px; background: none; border: none;
-            text-align: left; font-size: 0.9em; font-weight: 600; cursor: pointer;
+            width: 100%; padding: 14px 18px; background: none; border: none;
+            text-align: left; font-size: 0.95em; font-weight: 600; cursor: pointer;
             display: flex; align-items: center; gap: 10px; font-family: 'Inter', sans-serif;
             color: var(--text-main); transition: background 0.15s;
         }
@@ -1204,8 +1232,8 @@
                 <div class="section">
                     <div class="section-header" style="margin-bottom: 10px; border-bottom: none; padding-bottom: 0;">
                         <h2>Usimamizi wa Stoo</h2>
-                        <button class="panel-add-btn" onclick="addProduct()" title="Ingiza Mzigo"><i class="fa-solid fa-plus"></i></button>
                     </div>
+                    
                     
                     <button class="accordion-btn" id="toggleProductsBtn">
                         <span><i class="fa-solid fa-boxes-stacked" style="margin-right: 8px; color: var(--primary-light);"></i> Tazama Orodha ya Bidhaa</span>
@@ -1224,18 +1252,9 @@
                 <!-- SALES SECTION -->
                 <div class="nav-section-page" id="section-sales">
                 <div class="section">
-                    <div class="section-header" style="position: relative;">
+                    <div class="section-header">
                         <h2>Ripoti ya Mauzo (Taslimu)</h2>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <button id="backToSalesDatesBtn" class="back-button" style="display: none;"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
-                            <div style="position: relative;">
-                                <button class="panel-add-btn" onclick="toggleSaleAddPopup()" title="Weka Mauzo"><i class="fa-solid fa-plus"></i></button>
-                                <div class="sale-add-popup" id="saleAddPopup">
-                                    <button onclick="addSale(); closeSaleAddPopup()"><i class="fa-solid fa-pen" style="color: #3b82f6;"></i> Andika Mauzo</button>
-                                    <button onclick="openVoiceSaleModal(); closeSaleAddPopup()"><i class="fa-solid fa-microphone" style="color: #10b981;"></i> Mauzo kwa Sauti</button>
-                                </div>
-                            </div>
-                        </div>
+                        <button id="backToSalesDatesBtn" class="back-button" style="display: none;"><i class="fa-solid fa-arrow-left"></i> Rudi</button>
                     </div>
                     <ul id="sales-date-list" class="item-list"></ul>
                     <div id="daily-sales-detail" style="display: none;">
@@ -1272,8 +1291,8 @@
                 <div class="section" id="debt-section" style="border: 1px solid #fde68a; background: #fffdf2;">
                     <div class="section-header" style="border-bottom: 1px dashed #fcd34d;">
                         <h2 style="color: #d97706;"><i class="fa-solid fa-book-open" style="margin-right:8px;"></i> Madeni ya Wateja</h2>
-                        <button class="panel-add-btn btn-amber" onclick="addSaleAsDebt()" title="Ongeza Deni"><i class="fa-solid fa-plus"></i></button>
                     </div>
+                    
                     <div style="background: #fef2f2; color: #b91c1c; padding: 18px; border-radius: var(--radius-sm); margin-bottom: 20px; font-weight: 700; font-size: 1.1em; display: flex; justify-content: space-between; border: 1px dashed #fca5a5;">
                         <span>Jumla Unayodaiwa:</span>
                         <span id="total-debts-amount" style="font-family: 'Poppins', sans-serif;">TZS 0</span>
@@ -1287,8 +1306,8 @@
                 <div class="section">
                     <div class="section-header">
                         <h2>Matumizi ya Kila Siku (Kwenye Faida)</h2>
-                        <button class="panel-add-btn btn-red" onclick="addDailyExpense()" title="Ongeza Matumizi"><i class="fa-solid fa-plus"></i></button>
                     </div>
+                    
                     <ul id="daily-expense-date-list" class="item-list"></ul>
                     <div id="daily-expenses-detail" style="display: none;">
                         <h4 id="daily-expenses-title"></h4>
@@ -1328,8 +1347,8 @@
                 <div class="section">
                     <div class="section-header">
                         <h2>Matumizi Kwenye Mtaji Halisi</h2>
-                        <button class="panel-add-btn btn-purple" onclick="addCapitalExpense()" title="Ongeza Matumizi ya Mtaji"><i class="fa-solid fa-plus"></i></button>
                     </div>
+                    
                     <ul id="capital-expense-date-list" class="item-list"></ul>
                     <div id="daily-capital-expenses-detail" style="display: none;">
                         <h4 id="daily-capital-expenses-title"></h4>
@@ -1752,17 +1771,41 @@
         // --- BOTTOM NAVIGATION LOGIC ---
         let currentBottomSection = 'store';
 
+        const FAB_MAP = {
+            'store': 'fab-store',
+            'sales': 'fab-sales',
+            'debts': 'fab-debts',
+            'daily-exp': 'fab-daily-exp',
+            'capital-exp': 'fab-capital-exp'
+        };
+
+        function hideAllFabs() {
+            document.querySelectorAll('.panel-add-btn').forEach(btn => btn.classList.add('hidden-fab'));
+            closeSaleAddPopup();
+        }
+
+        function updateFabVisibility(sectionId) {
+            hideAllFabs();
+            // Only show FAB if we're on the business page (not capital or graph page)
+            const businessPage = document.getElementById('business-page');
+            if (businessPage && businessPage.classList.contains('hidden')) return;
+            // Show the FAB for active section
+            const fabId = FAB_MAP[sectionId];
+            if (fabId) {
+                const fab = document.getElementById(fabId);
+                if (fab) fab.classList.remove('hidden-fab');
+            }
+        }
+
         function switchBottomSection(sectionId) {
             currentBottomSection = sectionId;
-            // Hide all section pages
             document.querySelectorAll('.nav-section-page').forEach(p => p.classList.remove('active-section'));
-            // Show the target
             const target = document.getElementById('section-' + sectionId);
             if (target) target.classList.add('active-section');
-            // Update nav items
             document.querySelectorAll('.bottom-nav-item').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.section === sectionId);
             });
+            updateFabVisibility(sectionId);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -2349,6 +2392,7 @@
             businessPage.classList.add('hidden');
             capitalPage.classList.remove('hidden');
             showBottomNav(false);
+            hideAllFabs();
             updateToolbarTitle('SmartJanja');
             renderCapitalList();
         }
@@ -2357,7 +2401,8 @@
             if (currentBusinessIndex === null) return;
             const currentSystem = capitalSystems[currentBusinessIndex];
             document.getElementById('capital-amount-text').textContent = `TZS ${formatNumber(currentSystem.capital)}`;
-            renderProductList(); renderSalesDates(); renderDailyExpenseDates(); renderCapitalExpenseDates(); renderDebts(); 
+            renderProductList(); renderSalesDates(); renderDailyExpenseDates(); renderCapitalExpenseDates(); renderDebts();
+            updateFabVisibility(currentBottomSection);
         }
 
         // --- MAPINDUZI 1: UKURASA WA GRAFU YA BIASHARA ---
@@ -2365,6 +2410,7 @@
             document.getElementById('business-page').classList.add('hidden');
             document.getElementById('graph-page').classList.remove('hidden');
             showBottomNav(false);
+            hideAllFabs();
             updateToolbarTitle('Grafu ya Mauzo');
             renderGraph();
         }
@@ -4740,5 +4786,15 @@
         // ===== END MULTI-IMAGE AI SCANNER =====
 
     </script>
+<!-- FAB Buttons - Root Level for proper fixed positioning -->
+<button class="panel-add-btn hidden-fab" id="fab-store" onclick="addProduct()" title="Ingiza Mzigo"><i class="fa-solid fa-plus"></i></button>
+<button class="panel-add-btn hidden-fab" id="fab-sales" onclick="toggleSaleAddPopup()" title="Weka Mauzo"><i class="fa-solid fa-plus"></i></button>
+<div class="sale-add-popup" id="saleAddPopup">
+    <button onclick="addSale(); closeSaleAddPopup()"><i class="fa-solid fa-pen" style="color: #3b82f6;"></i> Andika Mauzo</button>
+    <button onclick="openVoiceSaleModal(); closeSaleAddPopup()"><i class="fa-solid fa-microphone" style="color: #10b981;"></i> Mauzo kwa Sauti</button>
+</div>
+<button class="panel-add-btn btn-amber hidden-fab" id="fab-debts" onclick="addSaleAsDebt()" title="Ongeza Deni"><i class="fa-solid fa-plus"></i></button>
+<button class="panel-add-btn btn-red hidden-fab" id="fab-daily-exp" onclick="addDailyExpense()" title="Ongeza Matumizi"><i class="fa-solid fa-plus"></i></button>
+<button class="panel-add-btn btn-purple hidden-fab" id="fab-capital-exp" onclick="addCapitalExpense()" title="Ongeza Matumizi ya Mtaji"><i class="fa-solid fa-plus"></i></button>
 </body>
 </html>
