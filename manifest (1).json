@@ -1,0 +1,44 @@
+{
+  "background_color": "#ffffff",
+  "dir": "auto",
+  "display": "standalone",
+  "name": "SmartJanja",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "smartjanja",
+  "start_url": "https://tmg2004star.github.io/smartjanja/",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "https://tmg2004star.github.io/smartjanja/smart.png",
+      "type": "image/png",
+      "sizes": "500x500",
+      "isSquare": true,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 500,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ],
+  "description": "Smart Janja is a powerful, offline-first digital business management solution developed by TMG Platform, designed to transform how small and medium-sized businesses manage their daily operations.\nThe platform enables business owners to record their sales effortlessly and automatically generates accurate, real-time reports—daily, weekly, monthly, and yearly—without requiring any manual calculations or accounting expertise.\nBuilt specifically for accessibility and real-world environments, Smart Janja works seamlessly without internet connectivity and is completely free to use, making it highly practical for small-scale traders operating in low-resource settings.\nBy converting simple sales inputs into clear business insights, Smart Janja empowers entrepreneurs to understand their performance, make smarter decisions, and grow sustainably.\nMore than just a tool, Smart Janja is a step toward digitizing informal businesses and unlocking their potential in the modern digital economy.",
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://tmg2004star.github.io/smartjanja/",
+      "id": ""
+    }
+  ],
+  "categories": [
+    "books",
+    "business",
+    "finance",
+    "government",
+    "productivity",
+    "shopping",
+    "social"
+  ],
+  "lang": "sw"
+}
