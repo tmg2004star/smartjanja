@@ -1083,6 +1083,156 @@
             color: rgba(255,255,255,0.6); font-size: 0.8em;
             margin-bottom: 6px; display: block;
         }
+
+        /* ===== WELCOME / ONBOARDING SCREEN ===== */
+        #welcome-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            background: linear-gradient(160deg, #f8fafc 0%, #eef4ff 100%);
+        }
+        #welcome-screen .welcome-hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        /* Sub-views inside welcome screen (banner -> choice auto transition) */
+        #welcome-screen .welcome-view {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: welcomeFadeIn .45s ease both;
+        }
+        #welcome-screen .welcome-view.active { display: flex; }
+        @keyframes welcomeFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        #welcome-banner-view .welcome-hero { margin-bottom: 0; }
+        #welcome-banner-view .welcome-hero .logo-circle {
+            animation: logoPulse 1.6s ease-in-out infinite;
+        }
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); box-shadow: var(--shadow-glow); }
+            50%      { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(99,102,241,0.08), var(--shadow-glow); }
+        }
+        #welcome-screen .welcome-hero .logo-circle {
+            width: 84px; height: 84px; border-radius: 50%;
+            background: var(--primary-gradient);
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; font-size: 36px;
+            box-shadow: var(--shadow-glow);
+            margin-bottom: 18px;
+        }
+        #welcome-screen h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2em;
+            color: var(--text-main);
+            margin: 0 0 8px;
+        }
+        #welcome-screen p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.05em;
+            margin: 0;
+            max-width: 360px;
+        }
+        .welcome-choice-grid {
+            display: grid; gap: 18px;
+            width: 100%; max-width: 440px;
+        }
+        .welcome-choice {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 22px 20px;
+            display: flex; align-items: center; gap: 16px;
+            cursor: pointer; text-align: left;
+            transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+            box-shadow: var(--shadow-md);
+            font-family: 'Inter', sans-serif;
+        }
+        .welcome-choice:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
+        .welcome-choice.existing { border-color: #c7d2fe; }
+        .welcome-choice.existing:hover { border-color: var(--primary-light); }
+        .welcome-choice.new { border-color: #fde68a; }
+        .welcome-choice.new:hover { border-color: var(--accent); }
+        .welcome-choice .wc-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; font-size: 22px; flex-shrink: 0;
+        }
+        .welcome-choice.existing .wc-icon { background: var(--primary-gradient); }
+        .welcome-choice.new .wc-icon { background: var(--accent-gradient); }
+        .welcome-choice .wc-text strong {
+            display: block; font-size: 1.1em; color: var(--text-main); margin-bottom: 4px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .welcome-choice .wc-text span { color: var(--text-muted); font-size: .9em; }
+
+        /* ===== SPLIT FUNDS CARDS ===== */
+        .funds-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0 20px;
+        }
+        .fund-card {
+            position: relative;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            color: white;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        .fund-card .fund-label {
+            font-size: .8em; opacity: .9; display: block; margin-bottom: 6px;
+            text-transform: uppercase; letter-spacing: .5px; font-weight: 600;
+        }
+        .fund-card .fund-amount {
+            font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.3em;
+            display: block; word-break: break-all;
+        }
+        .fund-card .fund-hint {
+            font-size: .72em; opacity: .85; margin-top: 6px; display: block;
+        }
+        .fund-card.capital { background: var(--primary-gradient); }
+        .fund-card.profit  { background: linear-gradient(135deg, #047857 0%, #10b981 100%); }
+        @media (max-width: 380px) {
+            .funds-split { grid-template-columns: 1fr; }
+        }
+
+        /* Profit indicator inside daily expenses panel */
+        .profit-indicator {
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1px solid #6ee7b7;
+            border-left: 5px solid #10b981;
+            padding: 14px 16px; border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+        .profit-indicator .pi-label {
+            color: #047857; font-weight: 600; font-size: .9em;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .profit-indicator .pi-amount {
+            font-family: 'Poppins', sans-serif; font-weight: 700;
+            color: #065f46; font-size: 1.15em;
+        }
+
+        /* Visual cue for capital expense section */
+        #section-capital-exp .section { border-left: 5px solid var(--primary-light); }
+        #section-daily-exp .section   { border-left: 5px solid #10b981; }
+
+        /* Portfolio empty state */
+        .portfolio-empty {
+            text-align: center; padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .portfolio-empty i { font-size: 48px; color: #cbd5e1; margin-bottom: 12px; }
     </style>
 </head>
 <body>
@@ -1099,10 +1249,10 @@
          <div class="toolbar-left">
               <!--<button id="logoutBtn" class="add-btn btn-danger">
             <i class="fa-solid fa-right-from-bracket"></i> Toka
-        </button>-->
+        </button>
             <button class="toolbar-btn" id="toolbarBackBtn" onclick="handleToolbarBack()" title="Rudi">
                 <i class="fa-solid fa-arrow-left"></i>
-            </button> 
+            </button> -->
            
         </div>
         <!--<div class="toolbar-center" id="toolbarTitle">SmartJanja</div>-->
@@ -1181,30 +1331,77 @@
 
 
     <div id="main-content" class="hidden">
-       
-        <div class="container" style="padding-bottom: 0;">
-            
-            
+
+        <!-- ===== WELCOME / ONBOARDING SCREEN ===== -->
+        <div id="welcome-screen">
+
+            <!-- Sub-view 1: Karibu banner (auto-transitions to choice) -->
+            <div id="welcome-banner-view" class="welcome-view active">
+                <div class="welcome-hero">
+                    <div class="logo-circle"><i class="fa-solid fa-store"></i></div>
+                    <h1 id="welcome-text-onboard">Karibu, Msimamizi 👋</h1>
+                    <p class="subtitle">Tunaandaa chaguzi zako za biashara…</p>
+                </div>
+            </div>
+
+            <!-- Sub-view 2: Chagua njia ya kuanza (existing vs new) -->
+            <div id="welcome-choice-view" class="welcome-view">
+                <div class="welcome-hero">
+                    <div class="logo-circle"><i class="fa-solid fa-store"></i></div>
+                    <h1>Chagua Aina ya Biashara</h1>
+                    <p class="subtitle">Chagua njia ya kuanza kusimamia biashara yako kwa SmartJanja.</p>
+                </div>
+                <div class="welcome-choice-grid">
+                    <button type="button" class="welcome-choice existing" onclick="startExistingBusinessFlow()">
+                        <span class="wc-icon"><i class="fa-solid fa-briefcase"></i></span>
+                        <span class="wc-text">
+                            <strong>Nina biashara tayari</strong>
+                            <span>Sajili biashara uliyonayo na uendelee kuiweka kumbukumbu.</span>
+                        </span>
+                    </button>
+                    <button type="button" class="welcome-choice new" onclick="startNewBusinessFlow()">
+                        <span class="wc-icon"><i class="fa-solid fa-rocket"></i></span>
+                        <span class="wc-text">
+                            <strong>Nataka kuanza biashara mpya</strong>
+                            <span>Anzisha biashara mpya kwa kuweka jina na mtaji wa kuanzia.</span>
+                        </span>
+                    </button>
+                </div>
+                <div style="margin-top: 28px;">
+                    <button id="logoutBtnWelcome" class="add-btn btn-danger" style="background: transparent; color: var(--danger); border: 1px solid #fecaca;">
+                        <i class="fa-solid fa-right-from-bracket"></i> Toka
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div id="capital-page" class="container">
+        <div class="container" style="padding-bottom: 0;">
+
+
+        </div>
+
+        <div id="capital-page" class="container hidden">
             <div class="header">
-                <h1 id="welcome-text">Karibu, Msimamizi 👋</h1>
+                <h1 id="welcome-text">Business Portfolio 📊</h1>
                     <div class="header-actions">
-                    
+
+                        <button id="backToWelcomeBtn" class="add-btn" style="background: #f1f5f9; color: var(--text-main);" onclick="goBackToWelcome()">
+                            <i class="fa-solid fa-arrow-left"></i> Rudi
+                        </button>
+
                         <button id="logoutBtn" class="add-btn btn-danger">
                             <i class="fa-solid fa-right-from-bracket"></i> Toka
                         </button>
-                    
+
                         <button id="addCapitalBtn" class="add-btn">
-            <i class="fa-solid fa-plus"></i> Mtaji
+            <i class="fa-solid fa-plus"></i> Ongeza
         </button>
-                   
-                </div>  
+
+                </div>
             </div>
             <div class="section">
                 <div class="section-header">
-                    <h2>Historia ya Biashara/Mitaji</h2>
+                    <h2 id="portfolio-heading">Biashara Zako</h2>
                 </div>
                 <ul id="capital-list">
                 </ul>
@@ -1216,15 +1413,23 @@
                 <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
                     <h1 id="business-title" style="margin: 0; flex-grow: 1; font-size: 1.5em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></h1>
                 </div>
-                
-              <!--  <div id="capital-balance" style="margin-top: 20px;">
-                    <div class="card-decoration-1"></div>
-                    <div class="card-decoration-2"></div>
-                    <span class="capital-label">Jumla ya Mtaji (Unaobaki)</span>
-                    <span id="capital-amount-text">TZS 0</span>
-                </div>-->
             </div>
-        
+
+            <!-- ===== SPLIT FUNDS DISPLAY ===== -->
+            <div class="funds-split">
+                <div class="fund-card capital">
+                    <span class="fund-label" id="fund-capital-label"><i class="fa-solid fa-wallet"></i> Mtaji Halisi</span>
+                    <span class="fund-amount" id="fund-capital-amount">TZS 0</span>
+                    <span class="fund-hint" id="fund-capital-hint">Hupungua kwa matumizi ya mtaji / mzigo</span>
+                </div>
+                <div class="fund-card profit">
+                    <span class="fund-label"><i class="fa-solid fa-coins"></i> Faida Iliyopo</span>
+                    <span class="fund-amount" id="fund-profit-amount">TZS 0</span>
+                    <span class="fund-hint">Hupungua kwa matumizi ya kila siku</span>
+                </div>
+            </div>
+
+
             <div id="sales-system-content">
                 
                 <!-- STORE SECTION -->
@@ -1305,9 +1510,15 @@
                 <div class="nav-section-page" id="section-daily-exp">
                 <div class="section">
                     <div class="section-header">
-                        <h2>Matumizi ya Kila Siku (Kwenye Faida)</h2>
+                        <h2><i class="fa-solid fa-money-bill-wave" style="color:#10b981; margin-right:6px;"></i> Matumizi ya Kila Siku (Kwenye Faida)</h2>
                     </div>
-                    
+
+                    <!-- Profit indicator: shows current Available Profit -->
+                    <div class="profit-indicator">
+                        <span class="pi-label"><i class="fa-solid fa-coins"></i> Faida Iliyopo Sasa:</span>
+                        <span class="pi-amount" id="profit-indicator-amount">TZS 0</span>
+                    </div>
+
                     <ul id="daily-expense-date-list" class="item-list"></ul>
                     <div id="daily-expenses-detail" style="display: none;">
                         <h4 id="daily-expenses-title"></h4>
@@ -1428,20 +1639,28 @@
             <h2 id="capitalModalTitle">Weka Mtaji Mpya</h2>
             <div id="addCapitalForm">
                 <input type="hidden" id="capitalIndex">
-                <label>Jina la Biashara / Mtaji</label>
+                <input type="hidden" id="capitalMode" value="new">
+                <label>Jina la Biashara</label>
                 <input type="text" id="capitalName" placeholder="Mfano: Duka la Nguo" required>
-                <label>Kiasi cha Mtaji</label>
-                <input type="number" id="capitalAmount" placeholder="TZS" required>
-                
-                <div style="background: #f0fdfa; padding: 15px; border-radius: 12px; border-left: 4px solid #0d9488; margin-bottom: 15px;">
-                    <label style="color: #0f766e;">Kiasi cha Kukata Kila Siku ili Kukuza Mtaji (Tsh)</label>
-                    <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">Mfumo utakata kiasi hiki kwenye faida ya kila siku (baada ya masaa 24) na kukiongeza kwenye mtaji.</p>
-                    <input type="number" id="capitalReinvestAmount" placeholder="Mfano: 2000 (Sio lazima)" value="0" style="margin-bottom:0;">
+
+                <div id="capitalAmountSection">
+                    <label>Kiasi cha Mtaji</label>
+                    <input type="number" id="capitalAmount" placeholder="TZS" required>
+
+                    <div style="background: #f0fdfa; padding: 15px; border-radius: 12px; border-left: 4px solid #0d9488; margin-bottom: 15px;">
+                        <label style="color: #0f766e;">Kiasi cha Kukata Kila Siku ili Kukuza Mtaji (Tsh)</label>
+                        <p style="font-size: 0.8em; color: var(--text-muted); margin-top: 0; margin-bottom: 10px;">Mfumo utakata kiasi hiki kwenye faida ya kila siku (baada ya masaa 24) na kukiongeza kwenye mtaji.</p>
+                        <input type="number" id="capitalReinvestAmount" placeholder="Mfano: 2000 (Sio lazima)" value="0" style="margin-bottom:0;">
+                    </div>
+                </div>
+
+                <div id="existingBusinessNote" style="display:none; background:#eff6ff; border-left:4px solid var(--primary-light); padding:12px 14px; border-radius:10px; margin-bottom:15px; font-size:.9em; color:#1e3a8a;">
+                    <i class="fa-solid fa-circle-info"></i> Unasajili biashara <b>iliyopo tayari</b>. Hauhitajiki kuweka mtaji wa kuanzia — utaongeza mauzo na matumizi moja kwa moja.
                 </div>
 
                 <label>Maelezo mafupi (Hiari)</label>
                 <textarea id="capitalDescription" placeholder="Andika maelezo hapa..." rows="3"></textarea>
-                <button id="saveCapitalBtn" class="btn-modal">Hifadhi Mtaji</button>
+                <button id="saveCapitalBtn" class="btn-modal">Hifadhi</button>
             </div>
         </div>
     </div>
@@ -1952,6 +2171,18 @@
         let currentBusinessId = getBusinessIdFromUrl() || getSafeLocalStorage('sj_current_biz_id');
         let capitalSystems = [];
         let currentBusinessIndex = null;
+        // ===== FLOW MODE: 'existing' (biashara zilizopo) au 'new' (biashara mpya) =====
+        // Vyumba viwili visivyo-shareiana data hata kidogo.
+        let currentFlow = getSafeLocalStorage('sj_current_flow') || null;
+        function setCurrentFlow(flow) {
+            currentFlow = flow;
+            if (flow) setSafeLocalStorage('sj_current_flow', flow);
+        }
+        function systemBelongsToCurrentFlow(sys) {
+            if (!currentFlow) return true;
+            const sysFlow = sys.flow || (sys.is_existing ? 'existing' : 'new');
+            return sysFlow === currentFlow;
+        }
         let saleBeingEdited = null;
         let dailyExpenseBeingEdited = null;
         let capitalExpenseBeingEdited = null;
@@ -2410,7 +2641,10 @@
 
         function renderCapitalList() {
             capitalList.innerHTML = '';
+            let visibleCount = 0;
             capitalSystems.forEach((system, index) => {
+                if (!systemBelongsToCurrentFlow(system)) return;
+                visibleCount++;
                 const li = document.createElement('li');
                 li.className = 'list-item clickable-capital';
                 li.dataset.index = index;
@@ -2435,6 +2669,15 @@
                 li.querySelector('.capital-clickable-area').onclick = () => showBusinessPage(index);
                 capitalList.appendChild(li);
             });
+            // Empty state kwa chumba hiki
+            if (visibleCount === 0 && currentFlow) {
+                const empty = document.createElement('li');
+                empty.style.cssText = 'list-style:none; padding:24px; text-align:center; color:var(--text-muted); background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px;';
+                empty.innerHTML = currentFlow === 'existing'
+                    ? '<i class="fa-solid fa-briefcase" style="font-size:28px; color:#94a3b8;"></i><br><br>Hakuna biashara iliyopo bado.<br><strong>Bonyeza "Ongeza" kusajili biashara yako ya kwanza.</strong>'
+                    : '<i class="fa-solid fa-rocket" style="font-size:28px; color:#94a3b8;"></i><br><br>Hakuna biashara mpya bado.<br><strong>Bonyeza "Ongeza" kuanzisha biashara mpya.</strong>';
+                capitalList.appendChild(empty);
+            }
         }
 
         async function showBusinessPage(index) {
@@ -2465,11 +2708,160 @@
             updateToolbarTitle('SmartJanja');
             renderCapitalList();
         }
-        
+
+        // ===== ONBOARDING FLOW HELPERS =====
+        let _welcomeBannerTimer = null;
+        function _setWelcomeSubView(name) {
+            const banner = document.getElementById('welcome-banner-view');
+            const choice = document.getElementById('welcome-choice-view');
+            if (!banner || !choice) return;
+            if (name === 'banner') {
+                banner.classList.add('active');
+                choice.classList.remove('active');
+            } else {
+                banner.classList.remove('active');
+                choice.classList.add('active');
+            }
+        }
+        function showWelcomeScreen(opts) {
+            // opts.showBanner = true -> onyesha "Karibu" kwanza, kisha auto-tembea kwenye chaguo
+            // opts.showBanner = false (au goBack) -> nenda moja kwa moja kwenye page ya chaguo
+            const showBanner = !!(opts && opts.showBanner);
+            currentBusinessIndex = null;
+            document.getElementById('welcome-screen').style.display = 'flex';
+            capitalPage.classList.add('hidden');
+            businessPage.classList.add('hidden');
+            const gp = document.getElementById('graph-page'); if (gp) gp.classList.add('hidden');
+            showBottomNav(false);
+            hideAllFabs();
+            updateToolbarTitle('SmartJanja');
+
+            if (_welcomeBannerTimer) { clearTimeout(_welcomeBannerTimer); _welcomeBannerTimer = null; }
+            if (showBanner) {
+                _setWelcomeSubView('banner');
+                _welcomeBannerTimer = setTimeout(() => {
+                    _setWelcomeSubView('choice');
+                    _welcomeBannerTimer = null;
+                }, 1600);
+            } else {
+                _setWelcomeSubView('choice');
+            }
+        }
+        function showPortfolio() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            capitalPage.classList.remove('hidden');
+            businessPage.classList.add('hidden');
+            showBottomNav(false);
+            hideAllFabs();
+            renderCapitalList();
+        }
+        function goBackToWelcome() {
+            // Rudi nyuma kwenye page ya chaguo (sio refresh, sio banner tena)
+            currentFlow = null;
+            try { localStorage.removeItem('sj_current_flow'); } catch(e) {}
+            showWelcomeScreen({ showBanner: false });
+        }
+
+        function startExistingBusinessFlow() {
+            setCurrentFlow('existing');
+            showPortfolio();
+            const heading = document.getElementById('portfolio-heading') || document.getElementById('welcome-text');
+            if (heading) heading.textContent = 'Biashara Zako Zilizopo 📋';
+            renderCapitalList();
+            // Kama hakuna biashara yoyote kwenye chumba hiki, fungua moja kwa moja form
+            const hasAny = capitalSystems.some(s => systemBelongsToCurrentFlow(s));
+            if (!hasAny) addCapital('existing');
+        }
+        function startNewBusinessFlow() {
+            setCurrentFlow('new');
+            showPortfolio();
+            const heading = document.getElementById('portfolio-heading') || document.getElementById('welcome-text');
+            if (heading) heading.textContent = 'Biashara Zako Mpya 🚀';
+            renderCapitalList();
+            const hasAny = capitalSystems.some(s => systemBelongsToCurrentFlow(s));
+            if (!hasAny) addCapital('new');
+        }
+
+        // ===== Helpers: profit per sale and totals =====
+        function getSaleProfit(sys, sale) {
+            if (!sys || !sale) return 0;
+            const product = (sale.productIndex !== undefined && sale.productIndex >= 0)
+                ? sys.products[sale.productIndex] : null;
+            if (!product) return 0;
+            const profitPerItem = (product.sellingPriceRetail || 0) - (product.costPriceRetail || 0);
+            return profitPerItem * (sale.quantity || 0);
+        }
+
+        // ===== AVAILABLE PROFIT (Faida Iliyopo) =====
+        // Sum of sale profits - sum of dailyExpenses. Capital expenses do NOT touch profit.
+        function getAvailableProfit(sys) {
+            if (!sys) return 0;
+            let totalProfit = 0;
+            (sys.sales || []).forEach(sale => { totalProfit += getSaleProfit(sys, sale); });
+            const totalDailyExp = (sys.dailyExpenses || []).reduce((a, e) => a + (e.amount || 0), 0);
+            return totalProfit - totalDailyExp;
+        }
+
+        // ===== EXISTING FLOW: Pesa Iliyopo =====
+        // For existing businesses we don't know the original capital. So:
+        //   Pesa Iliyopo = sum(cost portion of each sale) - sum(capital expenses)
+        // Faida (profit portion) huondolewa automatic na huingia kwenye "Faida Iliyopo".
+        // Adding products does NOT decrease cash here (we never paid from a tracked wallet).
+        function isExistingSystem(sys) {
+            if (!sys) return false;
+            const f = sys.flow || (sys.is_existing ? 'existing' : 'new');
+            return f === 'existing';
+        }
+        function getCashAvailableExisting(sys) {
+            if (!sys) return 0;
+            let costFromSales = 0;
+            (sys.sales || []).forEach(sale => {
+                const total = sale.totalPrice || 0;
+                const profit = getSaleProfit(sys, sale);
+                costFromSales += (total - profit); // sehemu ya gharama tu
+            });
+            const capExp = (sys.capitalExpenses || []).reduce((a, e) => a + (e.amount || 0), 0);
+            return costFromSales - capExp;
+        }
+
         function renderBusinessDetails() {
             if (currentBusinessIndex === null) return;
             const currentSystem = capitalSystems[currentBusinessIndex];
-            document.getElementById('capital-amount-text').textContent = `TZS ${formatNumber(currentSystem.capital)}`;
+            const existing = isExistingSystem(currentSystem);
+
+            const capEl = document.getElementById('fund-capital-amount');
+            const proEl = document.getElementById('fund-profit-amount');
+            const piEl  = document.getElementById('profit-indicator-amount');
+            const capLabelEl = document.getElementById('fund-capital-label');
+            const capHintEl  = document.getElementById('fund-capital-hint');
+
+            const availProfit = getAvailableProfit(currentSystem);
+            const cashValue = existing ? getCashAvailableExisting(currentSystem) : currentSystem.capital;
+
+            if (capEl) capEl.textContent = `TZS ${formatNumber(cashValue)}`;
+            if (proEl) proEl.textContent = `TZS ${formatNumber(availProfit)}`;
+            if (piEl)  piEl.textContent  = `TZS ${formatNumber(availProfit)}`;
+
+            // Toggle label/hint based on flow
+            if (capLabelEl) {
+                capLabelEl.innerHTML = existing
+                    ? '<i class="fa-solid fa-money-bill-wave"></i> Pesa Iliyopo'
+                    : '<i class="fa-solid fa-wallet"></i> Mtaji Halisi';
+            }
+            if (capHintEl) {
+                capHintEl.textContent = existing
+                    ? 'Inaongezeka kwa mauzo (gharama tu); faida huenda kwa Faida Iliyopo'
+                    : 'Hupungua kwa matumizi ya mtaji / mzigo';
+            }
+
+            // Legacy text (capital expense panel header)
+            const legacyEl = document.getElementById('capital-amount-text');
+            if (legacyEl) legacyEl.textContent = `TZS ${formatNumber(cashValue)}`;
+            const legacyLabel = document.querySelector('#capital-balance .capital-label');
+            if (legacyLabel) {
+                legacyLabel.textContent = existing ? 'Pesa Iliyopo' : 'Jumla ya Mtaji (Unaobaki)';
+            }
+
             renderProductList(); renderSalesDates(); renderDailyExpenseDates(); renderCapitalExpenseDates(); renderDebts();
             updateFabVisibility(currentBottomSection);
         }
@@ -3002,77 +3394,107 @@
             }
         }
 
-        async function addCapital() {
-            capitalModalTitle.textContent = 'Weka Mtaji Mpya';
+        async function addCapital(mode) {
+            const isExisting = mode === 'existing';
+            document.getElementById('capitalMode').value = isExisting ? 'existing' : 'new';
+            capitalModalTitle.textContent = isExisting ? 'Sajili Biashara Iliyopo' : 'Anzisha Biashara Mpya';
             capitalIndexInput.value = '';
             capitalNameInput.value = '';
             capitalAmountInput.value = '';
             capitalDescriptionInput.value = '';
-            
-            // Set default value kwa makato ya mtaji mpya
             document.getElementById('capitalReinvestAmount').value = '0';
-            
+
+            document.getElementById('capitalAmountSection').style.display = isExisting ? 'none' : 'block';
+            document.getElementById('existingBusinessNote').style.display = isExisting ? 'block' : 'none';
+            capitalAmountInput.required = !isExisting;
+
             openModal('addCapitalModal');
         }
 
         async function saveCapital() {
-            const name = capitalNameInput.value;
-            const amount = parseFloat(capitalAmountInput.value);
+            const name = capitalNameInput.value.trim();
             const description = capitalDescriptionInput.value;
             const index = capitalIndexInput.value;
+            const mode = document.getElementById('capitalMode').value || 'new';
+            const isExisting = mode === 'existing';
+
+            const rawAmount = parseFloat(capitalAmountInput.value);
+            const amount = isExisting ? 0 : (isNaN(rawAmount) ? NaN : rawAmount);
             const reinvestAmount = parseFloat(document.getElementById('capitalReinvestAmount').value) || 0;
 
-            if (name && !isNaN(amount)) {
-                if (index === '') {
-                    const newSystem = {
-                        id: generateUUID(), 
-                        name: name,
-                        capital: amount,
-                        original_capital: amount, 
-                        description: description,
-                        products: [],
-                        sales: [],
-                        dailyExpenses: [],
-                        capitalExpenses: [],
-                        debts: [],
-                        reinvestment_amount: reinvestAmount,
-                        last_reinvestment_date: new Date().toISOString().slice(0, 10),
-                        reinvestment_history: []
-                    };
-                    await saveData(newSystem);
-                } else {
-                    const system = capitalSystems[parseInt(index)];
-                    
+            if (!name) {
+                showToast("Tafadhali jaza jina la biashara.", "error");
+                return;
+            }
+            if (!isExisting && (isNaN(amount) || amount < 0)) {
+                showToast("Tafadhali jaza kiasi sahihi cha mtaji.", "error");
+                return;
+            }
+
+            if (index === '') {
+                const newSystem = {
+                    id: generateUUID(),
+                    name: name,
+                    capital: amount,
+                    original_capital: amount,
+                    description: description,
+                    is_existing: isExisting,
+                    flow: currentFlow || (isExisting ? 'existing' : 'new'),
+                    products: [],
+                    sales: [],
+                    dailyExpenses: [],
+                    capitalExpenses: [],
+                    debts: [],
+                    reinvestment_amount: isExisting ? 0 : reinvestAmount,
+                    last_reinvestment_date: new Date().toISOString().slice(0, 10),
+                    reinvestment_history: []
+                };
+                await saveData(newSystem);
+                closeModal('addCapitalModal');
+                showToast("Biashara imehifadhiwa kikamilifu", "success");
+
+                if (!isExisting) {
+                    const newIndex = capitalSystems.findIndex(s => s.id === newSystem.id);
+                    if (newIndex >= 0) {
+                        showPortfolio();
+                        showBusinessPage(newIndex);
+                        return;
+                    }
+                }
+                showPortfolio();
+            } else {
+                const system = capitalSystems[parseInt(index)];
+                if (!isExisting) {
                     const oldOriginal = system.original_capital !== undefined ? system.original_capital : system.capital;
                     const diff = amount - oldOriginal;
                     system.capital = system.capital + diff;
-                    system.original_capital = amount; 
-                    
-                    system.name = name;
-                    system.description = description;
+                    system.original_capital = amount;
                     system.reinvestment_amount = reinvestAmount;
-                    
-                    await saveData(system);
                 }
+                system.name = name;
+                system.description = description;
+                await saveData(system);
                 renderCapitalList();
                 closeModal('addCapitalModal');
-                showToast("Taarifa za mtaji zimehifadhiwa kikamilifu", "success");
-            } else {
-                showToast("Tafadhali jaza jina la mtaji na kiasi sahihi.", "error");
+                showToast("Taarifa zimehifadhiwa kikamilifu", "success");
             }
         }
 
         function editCapital(index) {
             const system = capitalSystems[index];
-            capitalModalTitle.textContent = 'Badilisha / Makato';
+            const isExisting = !!system.is_existing;
+            document.getElementById('capitalMode').value = isExisting ? 'existing' : 'new';
+            capitalModalTitle.textContent = isExisting ? 'Badilisha Biashara' : 'Badilisha / Makato';
             capitalIndexInput.value = index;
             capitalNameInput.value = system.name;
             capitalAmountInput.value = system.original_capital !== undefined ? system.original_capital : system.capital;
             capitalDescriptionInput.value = system.description || '';
-            
-            // Onyesha kiwango cha makato kilichokuwepo
             document.getElementById('capitalReinvestAmount').value = system.reinvestment_amount || 0;
-            
+
+            document.getElementById('capitalAmountSection').style.display = isExisting ? 'none' : 'block';
+            document.getElementById('existingBusinessNote').style.display = isExisting ? 'block' : 'none';
+            capitalAmountInput.required = !isExisting;
+
             openModal('addCapitalModal');
         }
 
@@ -3133,6 +3555,7 @@
             const totalPieces = (UNIT_QUESTIONS[unit] && piecesPerUnit > 0) ? quantity * piecesPerUnit : quantity;
 
             if (name && !isNaN(costPriceTotal) && !isNaN(quantity) && !isNaN(sellingPriceRetail)) {
+                const existing = isExistingSystem(currentSystem);
                 if (index === '') {
                     const newProduct = {
                         name: name,
@@ -3147,14 +3570,15 @@
                         dateAdded: new Date().toISOString().slice(0, 10)
                     };
                     currentSystem.products.push(newProduct);
-                    currentSystem.capital -= costPriceTotal;
+                    // Existing flow: hatutoi pesa kwenye wallet (hatuijui asili).
+                    if (!existing) currentSystem.capital -= costPriceTotal;
                 } else {
                     const product = currentSystem.products[parseInt(index)];
                     const oldTotalCost = product.costPriceTotal;
                     const newTotalCost = costPriceTotal;
                     const costDifference = newTotalCost - oldTotalCost; 
 
-                    currentSystem.capital -= costDifference;
+                    if (!existing) currentSystem.capital -= costDifference;
                     
                     product.name = name;
                     product.costPriceTotal = newTotalCost;
@@ -3574,19 +3998,33 @@
 
             if (date && name && !isNaN(amount) && amount > 0) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
+
+                // Daily expenses MUST only deduct from Faida Iliyopo, never from capital.
+                const availProfit = getAvailableProfit(currentSystem);
+                let projectedAfter;
                 if (index === '') {
-                    const newExpense = { date, name, amount };
-                    currentSystem.dailyExpenses.push(newExpense);
+                    projectedAfter = availProfit - amount;
+                } else {
+                    const oldAmount = currentSystem.dailyExpenses[parseInt(index)].amount || 0;
+                    projectedAfter = availProfit + oldAmount - amount;
+                }
+                if (projectedAfter < 0) {
+                    showToast(`Faida iliyopo (TZS ${formatNumber(availProfit)}) haitoshi. Tumia "Matumizi ya Mtaji" badala yake.`, "error");
+                    return;
+                }
+
+                if (index === '') {
+                    currentSystem.dailyExpenses.push({ date, name, amount });
                 } else {
                     const oldExpense = currentSystem.dailyExpenses[parseInt(index)];
                     oldExpense.date = date;
                     oldExpense.name = name;
                     oldExpense.amount = amount;
                 }
-                await saveData(currentSystem); 
+                await saveData(currentSystem);
                 renderBusinessDetails();
                 closeModals();
-                showToast("Matumizi yamehifadhiwa", "success");
+                showToast("Matumizi yamehifadhiwa (yamekatwa kwenye faida)", "success");
             } else {
                 showToast("Tafadhali jaza taarifa zote.", "error");
             }
@@ -3637,7 +4075,18 @@
 
             if (date && name && !isNaN(amount) && amount > 0) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
-                if (amount > currentSystem.capital && capitalExpenseBeingEdited === null) {
+                const existing = isExistingSystem(currentSystem);
+
+                // Validation: kwa existing tumia "Pesa Iliyopo"; kwa new tumia capital field.
+                const availableCash = existing ? getCashAvailableExisting(currentSystem) : currentSystem.capital;
+                let projectedAvailable;
+                if (capitalExpenseBeingEdited) {
+                    const oldAmt = currentSystem.capitalExpenses[capitalExpenseBeingEdited.index].amount || 0;
+                    projectedAvailable = availableCash + oldAmt - amount;
+                } else {
+                    projectedAvailable = availableCash - amount;
+                }
+                if (projectedAvailable < 0) {
                     capitalExpenseAlert.style.display = 'block';
                     return;
                 }
@@ -3646,17 +4095,17 @@
                 if (capitalExpenseBeingEdited) {
                     const oldExpense = currentSystem.capitalExpenses[capitalExpenseBeingEdited.index];
                     const oldAmount = oldExpense.amount;
-                    currentSystem.capital += oldAmount; 
-                    
+                    if (!existing) currentSystem.capital += oldAmount;
+
                     oldExpense.date = date;
                     oldExpense.name = name;
                     oldExpense.amount = amount;
 
-                    currentSystem.capital -= amount; 
+                    if (!existing) currentSystem.capital -= amount;
                 } else {
                     const newExpense = { date, name, amount };
                     currentSystem.capitalExpenses.push(newExpense);
-                    currentSystem.capital -= amount; 
+                    if (!existing) currentSystem.capital -= amount;
                 }
                 
                 await saveData(currentSystem); 
@@ -3683,11 +4132,12 @@
         async function deleteCapitalExpense(index) {
             if (confirm('Una uhakika unataka kufuta matumizi haya?')) {
                 const currentSystem = capitalSystems[currentBusinessIndex];
+                const existing = isExistingSystem(currentSystem);
                 const expense = currentSystem.capitalExpenses[index];
-                currentSystem.capital += expense.amount; 
+                if (!existing) currentSystem.capital += expense.amount;
                 currentSystem.capitalExpenses.splice(index, 1);
-                
-                await saveData(currentSystem); 
+
+                await saveData(currentSystem);
                 renderBusinessDetails();
                 if (dailyCapitalExpensesDetail.style.display === 'block') {
                     showDailyCapitalExpenses(expense.date);
@@ -4348,7 +4798,14 @@
             }
         }
 
-        document.getElementById('addCapitalBtn').onclick = addCapital;
+        document.getElementById('addCapitalBtn').onclick = () => {
+            // Ongeza biashara mpya ndani ya chumba cha sasa (existing AU new)
+            if (currentFlow === 'existing') addCapital('existing');
+            else if (currentFlow === 'new') addCapital('new');
+            else showWelcomeScreen({ showBanner: false });
+        };
+        const _logoutBtnW = document.getElementById('logoutBtnWelcome');
+        if (_logoutBtnW) _logoutBtnW.onclick = () => document.getElementById('logoutBtn')?.click();
         document.getElementById('logoutBtn').onclick = logout;
         document.getElementById('saveCapitalBtn').onclick = saveCapital;
         // backToCapitalBtn handler removed - toolbar back button handles this
@@ -4389,6 +4846,10 @@
                     document.getElementById('main-content').classList.remove('hidden');
                     await loadData();
                     updateNetworkStatusUI();
+                    // Kila refresh: futa chumba kilichohifadhiwa, onyesha banner kisha page ya "Chagua Aina ya Biashara"
+                    currentFlow = null;
+                    try { localStorage.removeItem('sj_current_flow'); } catch(e) {}
+                    showWelcomeScreen({ showBanner: true });
                 }, 600);
             }, 1000);
         });
