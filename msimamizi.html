@@ -1716,7 +1716,10 @@
                 <option value="">-- Chagua Bidhaa --</option>
             </select>
             <label>Idadi Iliyouzwa</label>
-            <input type="number" id="saleQuantity" placeholder="Mfano: 2" required>
+            <input type="text" id="saleQuantity" placeholder="Mfano: 2, nusu, robo, kilo moja na nusu" autocomplete="off" required>
+            <p id="quantityHint" style="display:none; font-size: 0.85em; color: var(--success); margin: 4px 0 0 0; font-weight: 600;"></p>
+            <p class="alert-message" id="quantityWordError" style="display: none;"><i class="fa-solid fa-circle-exclamation"></i> Maneno kama "nusu", "robo", "kilo moja" yanaruhusiwa TU kwa bidhaa za <b>kilo</b> au <b>lita</b>. Bidhaa hii si ya kipimo hicho — tafadhali andika namba (mfano: 2).</p>
+            <p class="alert-message" id="quantityParseError" style="display: none;"><i class="fa-solid fa-circle-exclamation"></i> Sijaelewa idadi uliyoandika. Jaribu namba (mfano: 2) au maneno kama "nusu", "robo", "robo tatu", "kilo moja na nusu".</p>
             <p class="alert-message" id="quantityAlert" style="display: none;"><i class="fa-solid fa-circle-exclamation"></i> Idadi uliyoweka inazidi stoo.</p>
             
             <div id="debtToggleContainer">
@@ -3556,6 +3559,21 @@
 
             if (name && !isNaN(costPriceTotal) && !isNaN(quantity) && !isNaN(sellingPriceRetail)) {
                 const existing = isExistingSystem(currentSystem);
+
+                // Hakikisha mtaji unatosha kununua bidhaa (kwa biashara mpya tu — zinazotumia mtaji)
+                if (!existing) {
+                    const availableCapital = currentSystem.capital || 0;
+                    let amountNeeded = costPriceTotal;
+                    if (index !== '') {
+                        const oldProduct = currentSystem.products[parseInt(index)];
+                        amountNeeded = costPriceTotal - (oldProduct.costPriceTotal || 0);
+                    }
+                    if (amountNeeded > availableCapital) {
+                        showToast(`Kiasi hakitoshi! Mtaji uliopo ni TZS ${formatNumber(availableCapital)}, unahitaji TZS ${formatNumber(amountNeeded)}.`, "error");
+                        return;
+                    }
+                }
+
                 if (index === '') {
                     const newProduct = {
                         name: name,
@@ -3639,6 +3657,9 @@
             document.getElementById('actualSalePrice').value = ''; 
             document.getElementById('liveSaleTotal').style.display = 'none'; 
             document.getElementById('quantityAlert').style.display = 'none';
+            document.getElementById('quantityHint').style.display = 'none';
+            document.getElementById('quantityWordError').style.display = 'none';
+            document.getElementById('quantityParseError').style.display = 'none';
             
             document.getElementById('isDebtCheck').checked = false;
             document.getElementById('debtCustomerNameDiv').style.display = 'none';
@@ -3668,12 +3689,15 @@
         async function saveSale() {
             const date = parseDDMMYYYY(saleDateInput.value);
             const productIndex = parseInt(saleProductNameSelect.value);
-            const quantity = parseInt(saleQuantityInput.value);
-            
+
+            // Tumia parser mpya — inakubali namba na maneno (nusu, robo, kilo moja na nusu, n.k.)
+            // Pia hudhibiti uthibitisho wa kipimo (kilo/lita tu kwa maneno).
+            const quantity = getValidatedSaleQuantity();
+
             const actualSaleUnitPrice = parseFloat(actualSalePriceInput.value) || 0;
-            
+
             const currentSystem = capitalSystems[currentBusinessIndex];
-            
+
             const isDebt = document.getElementById('isDebtCheck').checked;
             const customerName = document.getElementById('debtCustomerName').value.trim();
 
@@ -3682,12 +3706,12 @@
                 return;
             }
 
-            if (date && !isNaN(productIndex) && quantity > 0) {
+            if (date && !isNaN(productIndex) && quantity && quantity > 0) {
                 const product = currentSystem.products[productIndex];
-                const totalCalculatedPrice = product.sellingPriceRetail * quantity;
-                
-                const finalSalePrice = actualSaleUnitPrice > 0 ? (actualSaleUnitPrice * quantity) : totalCalculatedPrice;
-                
+                // Bei sahihi: bei_ya_kipimo_kimoja * idadi (mfano kilo @2000: nusu = 1000, robo = 500, robo tatu = 1500)
+                const unitPriceToUse = actualSaleUnitPrice > 0 ? actualSaleUnitPrice : product.sellingPriceRetail;
+                const finalSalePrice = Math.round(unitPriceToUse * quantity);
+
                 if (quantity > product.currentQuantity && saleBeingEdited === null) {
                     document.getElementById('quantityAlert').style.display = 'block';
                     return;
@@ -3725,7 +3749,13 @@
                 closeModals();
                 showToast("Mauzo yamehifadhiwa kikamilifu", "success");
             } else {
-                showToast("Tafadhali jaza taarifa zote za mauzo.", "error");
+                // Kama tatizo ni la idadi tu, ujumbe maalum tayari unaonyeshwa chini ya input.
+                // Vinginevyo onyesha ujumbe wa jumla.
+                const wordErrShown = document.getElementById('quantityWordError').style.display === 'block';
+                const parseErrShown = document.getElementById('quantityParseError').style.display === 'block';
+                if (!wordErrShown && !parseErrShown) {
+                    showToast("Tafadhali jaza taarifa zote za mauzo.", "error");
+                }
             }
         }
         
@@ -4776,21 +4806,184 @@
             downloadBase64File(wordDataUri, `Ripoti_SmartJanja_${data.timeframeLabel.replace(/\s+/g, '_')}.doc`, 'application/msword');
         }
 
+        // === PARSER YA IDADI KWA MANENO (nusu, robo, kilo moja, lita moja na nusu, n.k.) ===
+        // Inarudisha { value: number|null, isWord: boolean, raw: string }
+        function parseQuantityInput(rawText) {
+            if (rawText === null || rawText === undefined) return { value: null, isWord: false, raw: '' };
+            let text = String(rawText).trim().toLowerCase();
+            if (text === '') return { value: null, isWord: false, raw: '' };
+
+            // 1) Namba safi (inakubali decimal: 1.5, 0.5, n.k.)
+            //    Kubadilisha koma kuwa nukta (1,5 -> 1.5)
+            const numericTry = text.replace(',', '.');
+            if (/^\d+(\.\d+)?$/.test(numericTry)) {
+                const v = parseFloat(numericTry);
+                return { value: v, isWord: false, raw: rawText };
+            }
+
+            // 2) Ondoa maneno yasiyo na maana ya hesabu (kipimo: kilo/lita) kabla ya kuhesabu
+            //    Tunaweka pia visawe.
+            // Kawaida: "kilo moja na nusu" -> moja + nusu = 1.5
+            //          "lita mbili"        -> 2
+            //          "nusu kilo"         -> 0.5
+            //          "robo tatu"         -> 0.75
+            //          "kilo moja"         -> 1
+            //          "robo"              -> 0.25
+            //          "nusu"              -> 0.5
+
+            // Safisha: ondoa "ya", punguza nafasi nyingi
+            text = text.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+            // Ondoa kipimo (kilo/lita/kg/l) — hatubadilishi maana
+            text = text.replace(/\b(kilo|kilogramu|kg|lita|litre|liter|l)\b/g, ' ').replace(/\s+/g, ' ').trim();
+            // Ondoa kiunganishi "ya"
+            text = text.replace(/\b(ya|wa)\b/g, ' ').replace(/\s+/g, ' ').trim();
+
+            if (text === '') return { value: null, isWord: true, raw: rawText };
+
+            // Ramani ya namba kwa Kiswahili
+            const numWords = {
+                'sufuri': 0,
+                'moja': 1, 'mmoja': 1,
+                'mbili': 2, 'wawili': 2,
+                'tatu': 3, 'watatu': 3,
+                'nne': 4, 'wanne': 4,
+                'tano': 5, 'watano': 5,
+                'sita': 6,
+                'saba': 7,
+                'nane': 8,
+                'tisa': 9, 'kenda': 9,
+                'kumi': 10
+            };
+            const fractionWords = {
+                'nusu': 0.5,
+                'robo': 0.25,
+                'theluthi': 1/3
+            };
+
+            // Ushughulikiaji maalum: "robo tatu" = 0.75 (3/4)
+            text = text.replace(/\brobo\s+tatu\b/g, '__ROBOTATU__');
+            // "robo mbili" = 0.5 (lakini hii si kawaida) — tutaiacha kama ilivyo
+
+            const tokens = text.split(/\s+/).filter(Boolean);
+            let total = 0;
+            let foundAny = false;
+            let pendingWhole = null; // kushughulikia "moja na nusu" -> 1 + 0.5
+
+            for (let i = 0; i < tokens.length; i++) {
+                const tok = tokens[i];
+                if (tok === 'na') continue; // kiunganishi
+                if (tok === '__ROBOTATU__') {
+                    if (pendingWhole !== null) { total += pendingWhole; pendingWhole = null; }
+                    total += 0.75;
+                    foundAny = true;
+                    continue;
+                }
+                if (numWords.hasOwnProperty(tok)) {
+                    if (pendingWhole !== null) { total += pendingWhole; }
+                    pendingWhole = numWords[tok];
+                    foundAny = true;
+                    continue;
+                }
+                if (fractionWords.hasOwnProperty(tok)) {
+                    if (pendingWhole !== null) { total += pendingWhole; pendingWhole = null; }
+                    total += fractionWords[tok];
+                    foundAny = true;
+                    continue;
+                }
+                // Token isiyojulikana — angalia kama ni namba ndani ya maandishi
+                if (/^\d+(\.\d+)?$/.test(tok.replace(',', '.'))) {
+                    if (pendingWhole !== null) { total += pendingWhole; }
+                    pendingWhole = parseFloat(tok.replace(',', '.'));
+                    foundAny = true;
+                    continue;
+                }
+                // Haijulikani — rudisha kosa
+                return { value: null, isWord: true, raw: rawText, unknown: tok };
+            }
+            if (pendingWhole !== null) total += pendingWhole;
+
+            if (!foundAny) return { value: null, isWord: true, raw: rawText };
+            return { value: total, isWord: true, raw: rawText };
+        }
+
+        // Husaidia kuonyesha thamani kwa umaridadi (0.5 -> "0.5", 1 -> "1", 1.5 -> "1.5")
+        function formatQty(n) {
+            if (n === null || n === undefined || isNaN(n)) return '';
+            // Onyesha hadi tarakimu 3 za desimali, ondoa zero zinazofuata
+            return parseFloat(Number(n).toFixed(3)).toString();
+        }
+
+        // Hupata bidhaa iliyochaguliwa kwenye sale modal
+        function getSelectedSaleProduct() {
+            const currentSystem = capitalSystems[currentBusinessIndex];
+            if (!currentSystem) return null;
+            const idx = parseInt(saleProductNameSelect.value);
+            if (isNaN(idx)) return null;
+            return currentSystem.products[idx] || null;
+        }
+
+        // Inarudisha namba ya idadi kutoka kwenye input, au null kama ni invalid.
+        // Pia hudhibiti onyesho la makosa/hint.
+        function getValidatedSaleQuantity() {
+            const rawEl = document.getElementById('saleQuantity');
+            const hint = document.getElementById('quantityHint');
+            const errWord = document.getElementById('quantityWordError');
+            const errParse = document.getElementById('quantityParseError');
+            hint.style.display = 'none';
+            errWord.style.display = 'none';
+            errParse.style.display = 'none';
+
+            const parsed = parseQuantityInput(rawEl.value);
+            if (parsed.value === null && parsed.raw === '') return null;
+
+            if (parsed.value === null) {
+                errParse.style.display = 'block';
+                return null;
+            }
+
+            // Kama ni neno (sio namba safi), bidhaa LAZIMA iwe kilo au lita
+            if (parsed.isWord) {
+                const product = getSelectedSaleProduct();
+                const unit = product ? (product.unit || 'pcs') : 'pcs';
+                if (unit !== 'kilo' && unit !== 'lita') {
+                    errWord.style.display = 'block';
+                    return null;
+                }
+            }
+
+            // Onyesha hint nzuri
+            if (parsed.isWord) {
+                hint.textContent = `✓ Imeeleweka kama: ${formatQty(parsed.value)}`;
+                hint.style.display = 'block';
+            }
+            return parsed.value;
+        }
+
         function calculateLiveSaleTotal() {
-            const q = parseInt(document.getElementById('saleQuantity').value) || 0;
+            const q = getValidatedSaleQuantity();
             const unitPrice = parseFloat(document.getElementById('actualSalePrice').value) || 0;
             const displayDiv = document.getElementById('liveSaleTotal');
-            
-            if (q > 0 && unitPrice > 0) {
+
+            // Kama hakuna unitPrice ya custom, tumia bei ya bidhaa iliyochaguliwa
+            let effectiveUnitPrice = unitPrice;
+            if (effectiveUnitPrice <= 0) {
+                const product = getSelectedSaleProduct();
+                if (product && product.sellingPriceRetail) effectiveUnitPrice = product.sellingPriceRetail;
+            }
+
+            if (q && q > 0 && effectiveUnitPrice > 0) {
                 displayDiv.style.display = 'block';
-                displayDiv.textContent = `Jumla Itakayoingia: TZS ${formatNumber(q * unitPrice)}`;
+                // Hesabu sahihi: bei_ya_kipimo_kimoja * idadi (mfano: 2000 * 0.5 = 1000)
+                const total = effectiveUnitPrice * q;
+                displayDiv.textContent = `Jumla Itakayoingia: TZS ${formatNumber(Math.round(total))}`;
             } else {
                 displayDiv.style.display = 'none';
             }
         }
-        
+
         document.getElementById('saleQuantity').addEventListener('input', calculateLiveSaleTotal);
         document.getElementById('actualSalePrice').addEventListener('input', calculateLiveSaleTotal);
+        document.getElementById('saleProductName').addEventListener('change', calculateLiveSaleTotal);
 
         function logout() {
             if (confirm('Una uhakika unataka kutoka?')) {
