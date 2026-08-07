@@ -4719,11 +4719,7 @@
 
         function exportToWord(data) {
             const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Ripoti</title><style>table{width:100%; border-collapse:collapse; margin-bottom:20px;} th,td{border:1px solid #ccc; padding:8px; text-align:left;} th{background:#2ecc71; color:white;}</style></head><body>";
-            const footer = "<div style="display:none">
-  <span id="toolbarTitle">SmartJanja</span>
-  <div id="networkStatus" class="network-badge network-online"><i class="fa-solid fa-wifi"></i> Mtandaoni</div>
-</div>
-</body></html>";
+            const footer = "</body></html>";
             
             let content = `
                 <h2>RIPOTI YA MAPATO NA MATUMIZI - ${data.bName.toUpperCase()}</h2>
