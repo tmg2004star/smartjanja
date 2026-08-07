@@ -44,7 +44,7 @@
         /* Toast Notifications Styles */
         #toast-container {
             position: fixed;
-            top: 70px;
+            top: 130px;
             right: 20px;
             z-index: 10001;
             display: flex;
@@ -678,7 +678,7 @@
         }
 
         /* Push content below toolbar */
-        body { padding-top: 62px; padding-bottom: 24px; }
+        body { padding-top: 130px; padding-bottom: 16px; }
 
         /* ===== FAB PULSE ANIMATION ===== */
         @keyframes fab-pulse {
@@ -744,7 +744,7 @@
         /* ===== BOTTOM NAVIGATION BAR ===== */
         .bottom-nav {
             position: fixed;
-            top: 0;
+            top: 56px;
             left: 0;
             right: 0;
             height: 62px;
@@ -753,22 +753,12 @@
             align-items: stretch;
             justify-content: space-around;
             z-index: 9998;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border-bottom: 1px solid var(--border-color);
             padding: 0 4px;
         }
 
-        .nav-util-btn {
-            align-self: center;
-            flex: 0 0 auto;
-            width: 34px; height: 34px;
-            font-size: 0.95em;
-            margin: 0 2px;
-        }
-
-        .bottom-navy { display: none !important; }
-
-        .bottom-navy-legacy {
+        .bottom-navy {
             position: fixed;
             bottom: 0;
             left: 0;
@@ -782,7 +772,7 @@
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
             border-top: 1px solid var(--border-color);
             padding: 0 4px;
-            background-color: #082a45;
+            background-color: #0a2540;
         }
 
 
@@ -1256,12 +1246,24 @@
 
     <!-- BOTTOM NAVIGATION BAR -->
     <div class="bottom-nav" id="bottomNav" style="display:none;">
-        <button class="toolbar-btn nav-util-btn" id="toolbarBackBtn" onclick="handleToolbarBack()" title="Rudi">
-            <i class="fa-solid fa-arrow-left"></i>
-        </button>
-        <button class="toolbar-btn nav-util-btn" onclick="toggleSidebar()" title="Menyu">
-            <i class="fa-solid fa-bars"></i>
-        </button>
+        <div class="top-toolbar" id="topToolbar">
+            <div class="toolbar-left">
+                <button class="toolbar-btn" id="toolbarBackBtn" onclick="handleToolbarBack()" title="Rudi">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleSidebar()" title="Menyu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="toolbar-center" id="toolbarTitle">SmartJanja</div>
+            <div class="toolbar-right">
+                <div class="network-badge-container">
+                    <div id="networkStatus" class="network-badge network-online">
+                        <i class="fa-solid fa-wifi"></i> Mtandaoni
+                    </div>
+                </div>
+            </div>
+        </div>
         <button class="bottom-nav-item active" data-section="store" onclick="switchBottomSection('store')">
             <i class="fa-solid fa-boxes-stacked"></i>
             <span class="nav-label">Stoo</span>
@@ -5539,13 +5541,14 @@ body::after  { background: #35b6f0 !important; opacity: .12 !important; }
   box-shadow: 0 12px 34px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.06);
 }
 .modal { background: rgba(1,10,18,.72) !important; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
-.bottom-nav {
+.top-toolbar, .bottom-nav, .bottom-navy {
   background: linear-gradient(180deg, rgba(8,32,50,.88), rgba(3,18,30,.94)) !important;
   border-color: var(--border-color) !important;
   -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
   color: var(--text-main);
 }
 .bottom-nav { box-shadow: 0 10px 34px rgba(0,0,0,.5); }
+.bottom-navy { box-shadow: 0 -10px 34px rgba(0,0,0,.5); }
 .bottom-nav-item, .nav-label, .toolbar-btn, .accordion-btn, .back-button,
 .section-header, .total-label, h1, h2, h3, h4, label, p, span, div, td, th { color: inherit; }
 .bottom-nav-item.active, .nav-item.active {
@@ -5708,67 +5711,6 @@ button:active, .btn:active, .panel-add-btn:active, .tab:active, .nav-item:active
 
 <script>
 (function () {
-  /* ===== Water-drop sound (WebAudio, no external file) ===== */
-  var actx = null, unlocked = false;
-  function ctx() {
-    try {
-      if (!actx) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; actx = new AC(); }
-      if (actx.state !== 'running') { actx.resume(); }
-    } catch (e) { return null; }
-    return actx;
-  }
-  /* unlock audio on the very first user gesture (autoplay policy) */
-  function unlock() {
-    var a = ctx(); if (!a) return;
-    try {
-      var b = a.createBuffer(1, 1, a.sampleRate), s = a.createBufferSource();
-      s.buffer = b; s.connect(a.destination); s.start(0);
-    } catch (e) {}
-    unlocked = true;
-  }
-  ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'].forEach(function (ev) {
-    document.addEventListener(ev, function once() { unlock(); }, { capture: true, once: false, passive: true });
-  });
-
-  function playDrop(a) {
-    var t = a.currentTime + 0.001;
-    var osc = a.createOscillator(), gain = a.createGain(), flt = a.createBiquadFilter();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1100, t);
-    osc.frequency.exponentialRampToValueAtTime(170, t + 0.16);
-    flt.type = 'lowpass'; flt.frequency.setValueAtTime(3200, t);
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(0.32, t + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
-    osc.connect(flt); flt.connect(gain); gain.connect(a.destination);
-    osc.start(t); osc.stop(t + 0.34);
-
-    /* light splash tail */
-    try {
-      var len = Math.floor(a.sampleRate * 0.12);
-      var buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
-      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
-      var src = a.createBufferSource(), ng = a.createGain(), nf = a.createBiquadFilter();
-      src.buffer = buf; nf.type = 'bandpass'; nf.frequency.value = 1800;
-      ng.gain.value = 0.1;
-      src.connect(nf); nf.connect(ng); ng.connect(a.destination);
-      src.start(t + 0.01);
-    } catch (e) {}
-  }
-  function waterDrop() {
-    var a = ctx(); if (!a) return;
-    if (a.state !== 'running' && a.resume) {
-      /* wait for the resume promise, then play so the first tap is audible too */
-      try {
-        var p = a.resume();
-        if (p && p.then) { p.then(function () { playDrop(a); }).catch(function () {}); return; }
-      } catch (e) {}
-    }
-    playDrop(a);
-  }
-  window.sjWaterDrop = function(){};
-
-
   /* ===== Ripple + sound on any button press ===== */
   function isBtn(el) {
     return el.closest('button, .btn, .panel-add-btn, .tab, .nav-item, [role="button"]');
@@ -5797,9 +5739,5 @@ button:active, .btn:active, .panel-add-btn:active, .tab:active, .nav-item:active
 })();
 </script>
 
-<div style="display:none">
-  <span id="toolbarTitle">SmartJanja</span>
-  <div id="networkStatus" class="network-badge network-online"><i class="fa-solid fa-wifi"></i> Mtandaoni</div>
-</div>
 </body>
 </html>
