@@ -678,7 +678,7 @@
         }
 
         /* Push content below toolbar */
-        body { padding-top: 56px; padding-bottom: 80px; }
+        body { padding-top: 62px; padding-bottom: 24px; }
 
         /* ===== FAB PULSE ANIMATION ===== */
         @keyframes fab-pulse {
@@ -744,7 +744,7 @@
         /* ===== BOTTOM NAVIGATION BAR ===== */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
+            top: 0;
             left: 0;
             right: 0;
             height: 62px;
@@ -753,12 +753,22 @@
             align-items: stretch;
             justify-content: space-around;
             z-index: 9998;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-            border-top: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+            border-bottom: 1px solid var(--border-color);
             padding: 0 4px;
         }
 
-        .bottom-navy {
+        .nav-util-btn {
+            align-self: center;
+            flex: 0 0 auto;
+            width: 34px; height: 34px;
+            font-size: 0.95em;
+            margin: 0 2px;
+        }
+
+        .bottom-navy { display: none !important; }
+
+        .bottom-navy-legacy {
             position: fixed;
             bottom: 0;
             left: 0;
@@ -772,7 +782,7 @@
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
             border-top: 1px solid var(--border-color);
             padding: 0 4px;
-            background-color: black;
+            background-color: #082a45;
         }
 
 
@@ -1244,39 +1254,14 @@
     </div>
  
 
-    <!-- TOP TOOLBAR -->
-    <div class="top-toolbar" id="topToolbar">
-         <div class="toolbar-left">
-              <!--<button id="logoutBtn" class="add-btn btn-danger">
-            <i class="fa-solid fa-right-from-bracket"></i> Toka
-        </button>
-            <button class="toolbar-btn" id="toolbarBackBtn" onclick="handleToolbarBack()" title="Rudi">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button> -->
-           
-       
-    
-    
-
     <!-- BOTTOM NAVIGATION BAR -->
-        <div class="top-toolbar" id="topToolbar">
-            <div class="toolbar-left">
-                <button class="toolbar-btn" id="toolbarBackBtn" onclick="handleToolbarBack()" title="Rudi">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <button class="toolbar-btn" onclick="toggleSidebar()" title="Menyu">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-            <div class="toolbar-center" id="toolbarTitle">SmartJanja</div>
-            <div class="toolbar-right">
-                <div class="network-badge-container">
-                    <div id="networkStatus" class="network-badge network-online">
-                        <i class="fa-solid fa-wifi"></i> Mtandaoni
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="bottom-nav" id="bottomNav" style="display:none;">
+        <button class="toolbar-btn nav-util-btn" id="toolbarBackBtn" onclick="handleToolbarBack()" title="Rudi">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <button class="toolbar-btn nav-util-btn" onclick="toggleSidebar()" title="Menyu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
         <button class="bottom-nav-item active" data-section="store" onclick="switchBottomSection('store')">
             <i class="fa-solid fa-boxes-stacked"></i>
             <span class="nav-label">Stoo</span>
@@ -4734,7 +4719,11 @@
 
         function exportToWord(data) {
             const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Ripoti</title><style>table{width:100%; border-collapse:collapse; margin-bottom:20px;} th,td{border:1px solid #ccc; padding:8px; text-align:left;} th{background:#2ecc71; color:white;}</style></head><body>";
-            const footer = "</body></html>";
+            const footer = "<div style="display:none">
+  <span id="toolbarTitle">SmartJanja</span>
+  <div id="networkStatus" class="network-badge network-online"><i class="fa-solid fa-wifi"></i> Mtandaoni</div>
+</div>
+</body></html>";
             
             let content = `
                 <h2>RIPOTI YA MAPATO NA MATUMIZI - ${data.bName.toUpperCase()}</h2>
@@ -5554,13 +5543,13 @@ body::after  { background: #35b6f0 !important; opacity: .12 !important; }
   box-shadow: 0 12px 34px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.06);
 }
 .modal { background: rgba(1,10,18,.72) !important; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
-.top-toolbar, .bottom-nav, .bottom-navy {
+.bottom-nav {
   background: linear-gradient(180deg, rgba(8,32,50,.88), rgba(3,18,30,.94)) !important;
   border-color: var(--border-color) !important;
   -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
   color: var(--text-main);
 }
-.bottom-nav, .bottom-navy { box-shadow: 0 -10px 34px rgba(0,0,0,.5); }
+.bottom-nav { box-shadow: 0 10px 34px rgba(0,0,0,.5); }
 .bottom-nav-item, .nav-label, .toolbar-btn, .accordion-btn, .back-button,
 .section-header, .total-label, h1, h2, h3, h4, label, p, span, div, td, th { color: inherit; }
 .bottom-nav-item.active, .nav-item.active {
@@ -5781,7 +5770,7 @@ button:active, .btn:active, .panel-add-btn:active, .tab:active, .nav-item:active
     }
     playDrop(a);
   }
-  window.sjWaterDrop = waterDrop;
+  window.sjWaterDrop = function(){};
 
 
   /* ===== Ripple + sound on any button press ===== */
@@ -5791,7 +5780,6 @@ button:active, .btn:active, .panel-add-btn:active, .tab:active, .nav-item:active
   document.addEventListener('pointerdown', function (e) {
     var el = e.target && e.target.closest ? isBtn(e.target) : null;
     if (!el || el.disabled) return;
-    waterDrop();
     var r = el.getBoundingClientRect();
     var size = Math.max(r.width, r.height) * 2.2;
     var span = document.createElement('span');
@@ -5813,5 +5801,9 @@ button:active, .btn:active, .panel-add-btn:active, .tab:active, .nav-item:active
 })();
 </script>
 
+<div style="display:none">
+  <span id="toolbarTitle">SmartJanja</span>
+  <div id="networkStatus" class="network-badge network-online"><i class="fa-solid fa-wifi"></i> Mtandaoni</div>
+</div>
 </body>
 </html>
