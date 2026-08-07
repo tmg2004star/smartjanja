@@ -1237,55 +1237,56 @@
 </head>
 <body>
 
-    <div id="splash-screen">
+ <!--   <div id="splash-screen">
         <h1 style="font-size: 3.5em;">SmartJanja</h1>
         <p>Meneja wa Biashara Yako</p>
        
-    </div>
+    </div>-->
  
-
-    <!-- BOTTOM NAVIGATION BAR -->
-    <div class="bottom-nav" id="bottomNav" style="display:none;">
-        <div class="top-toolbar" id="topToolbar">
-            <div class="toolbar-left">
-                <button class="toolbar-btn" id="toolbarBackBtn" onclick="handleToolbarBack()" title="Rudi">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <button class="toolbar-btn" onclick="toggleSidebar()" title="Menyu">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-            <div class="toolbar-center" id="toolbarTitle">SmartJanja</div>
-            <div class="toolbar-right">
-                <div class="network-badge-container">
-                    <div id="networkStatus" class="network-badge network-online">
-                        <i class="fa-solid fa-wifi"></i> Mtandaoni
-                    </div>
-                </div>
+<!-- 1. TOP TOOLBAR (Inabaki Juu: Ina Menyu, SmartJanja na Hali ya Mtandao) -->
+<div class="top-toolbar" id="topToolbar">
+    <div class="toolbar-left">
+        <button class="toolbar-btn" id="toolbarBackBtn" onclick="handleToolbarBack()" title="Rudi">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <button class="toolbar-btn" onclick="toggleSidebar()" title="Menyu">
+            <i class="fa-solid fa-bars"></i> Menyu
+        </button>
+    </div>
+    <div class="toolbar-center" id="toolbarTitle">SmartJanja</div>
+    <div class="toolbar-right">
+        <div class="network-badge-container">
+            <div id="networkStatus" class="network-badge network-online">
+                <i class="fa-solid fa-wifi"></i> Mtandaoni
             </div>
         </div>
-        <button class="bottom-nav-item active" data-section="store" onclick="switchBottomSection('store')">
-            <i class="fa-solid fa-boxes-stacked"></i>
-            <span class="nav-label">Stoo</span>
-        </button>
-        <button class="bottom-nav-item" data-section="sales" onclick="switchBottomSection('sales')">
-            <i class="fa-solid fa-chart-line"></i>
-            <span class="nav-label">Mauzo</span>
-        </button>
-        <button class="bottom-nav-item" data-section="debts" onclick="switchBottomSection('debts')">
-            <i class="fa-solid fa-hand-holding-dollar"></i>
-            <span class="nav-label">Madeni</span>
-        </button>
-        <button class="bottom-nav-item" data-section="daily-exp" onclick="switchBottomSection('daily-exp')">
-            <i class="fa-solid fa-money-bill-wave"></i>
-            <span class="nav-label">Matumizi</span>
-        </button>
-        <button class="bottom-nav-item" data-section="capital-exp" onclick="switchBottomSection('capital-exp')">
-            <i class="fa-solid fa-wallet"></i>
-            <span class="nav-label">Mtaji</span>
-        </button>
-        
     </div>
+</div>
+
+<!-- 2. BOTTOM NAVIGATION (Inakaa Chini: Ina Stoo, Mauzo, Madeni, Matumizi na Mtaji) -->
+<div class="bottom-nav" id="bottomNav" style="display: flex;">
+    <button class="bottom-nav-item active" data-section="store" onclick="switchBottomSection('store')">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <span class="nav-label">Stoo</span>
+    </button>
+    <button class="bottom-nav-item" data-section="sales" onclick="switchBottomSection('sales')">
+        <i class="fa-solid fa-chart-line"></i>
+        <span class="nav-label">Mauzo</span>
+    </button>
+    <button class="bottom-nav-item" data-section="debts" onclick="switchBottomSection('debts')">
+        <i class="fa-solid fa-hand-holding-dollar"></i>
+        <span class="nav-label">Madeni</span>
+    </button>
+    <button class="bottom-nav-item" data-section="daily-exp" onclick="switchBottomSection('daily-exp')">
+        <i class="fa-solid fa-money-bill-wave"></i>
+        <span class="nav-label">Matumizi</span>
+    </button>
+    <button class="bottom-nav-item" data-section="capital-exp" onclick="switchBottomSection('capital-exp')">
+        <i class="fa-solid fa-wallet"></i>
+        <span class="nav-label">Mtaji</span>
+    </button>
+</div>
+
     
 
     <div id="sidebar" class="sidebar">
