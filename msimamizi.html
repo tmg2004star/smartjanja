@@ -5523,23 +5523,102 @@
 <button class="panel-add-btn btn-purple hidden-fab" id="fab-capital-exp" onclick="addCapitalExpense()" title="Ongeza Matumizi ya Mtaji"><i class="fa-solid fa-plus"></i></button>
 <!-- ===== SMARTJANJA VISUAL ENHANCEMENT LAYER (Index-matched Tech Blue + Water Glass UX) ===== -->
 <style id="sj-enhance">
+/* ===== DEEP OCEAN BLUE (dark) theme — Opal-style glass surfaces ===== */
 :root {
-  --primary: #1a5c8a;
-  --primary-light: #2aa8e0;
-  --primary-gradient: linear-gradient(135deg, #1a5c8a 0%, #2aa8e0 100%);
-  --accent: #2aa8e0;
-  --accent-gradient: linear-gradient(135deg, #2aa8e0 0%, #1a7fc4 100%);
-  --bg-body: #eef5fa;
-  --border-color: #dbe7f0;
-  --shadow-glow: 0 0 24px rgba(42,168,224,0.30);
+  --primary: #14496e;
+  --primary-light: #35b6f0;
+  --primary-gradient: linear-gradient(135deg, #0e5c8a 0%, #35b6f0 100%);
+  --accent: #35b6f0;
+  --accent-gradient: linear-gradient(135deg, #35b6f0 0%, #0e6ba8 100%);
+  --bg-body: #02121e;
+  --bg-card: #07202f;
+  --text-main: #e9f5fc;
+  --text-muted: #8db3c9;
+  --border-color: rgba(120,190,230,0.14);
+  --radius-lg: 26px;
+  --radius-md: 18px;
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.45);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.55);
+  --shadow-card: 0 20px 45px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 26px rgba(53,182,240,0.35);
 }
+html { background: #02121e; }
 body {
+  color: var(--text-main);
   background:
-    radial-gradient(1200px 600px at 12% -10%, rgba(42,168,224,0.13) 0%, transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(26,92,138,0.12) 0%, transparent 65%),
-    var(--bg-body);
+    radial-gradient(1100px 620px at 15% -8%, rgba(53,182,240,0.16) 0%, transparent 62%),
+    radial-gradient(900px 560px at 100% 4%, rgba(14,90,140,0.22) 0%, transparent 66%),
+    linear-gradient(180deg, #04182a 0%, #02121e 55%, #010c15 100%);
   background-attachment: fixed;
 }
+body::before { background: #0e6ba8 !important; opacity: .35 !important; }
+body::after  { background: #35b6f0 !important; opacity: .12 !important; }
+
+/* --- Glass surfaces --- */
+.section, .modal-content, .toast, .fund-card, .welcome-choice, .list-item,
+.sale-add-popup, .dropdown-content, .ai-scan-container, .scan-date-group,
+.scan-result-row, .custom-date-fields, .sidebar, .format-btn, .scan-upload-zone,
+[style*="background: white"], [style*="background:#fff"], [style*="background: #fff"] {
+  background: linear-gradient(160deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.035) 100%) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  box-shadow: 0 12px 34px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.modal { background: rgba(1,10,18,.72) !important; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.top-toolbar, .bottom-nav, .bottom-navy {
+  background: linear-gradient(180deg, rgba(8,32,50,.88), rgba(3,18,30,.94)) !important;
+  border-color: var(--border-color) !important;
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  color: var(--text-main);
+}
+.bottom-nav, .bottom-navy { box-shadow: 0 -10px 34px rgba(0,0,0,.5); }
+.bottom-nav-item, .nav-label, .toolbar-btn, .accordion-btn, .back-button,
+.section-header, .total-label, h1, h2, h3, h4, label, p, span, div, td, th { color: inherit; }
+.bottom-nav-item.active, .nav-item.active {
+  background: linear-gradient(135deg, rgba(53,182,240,.22), rgba(14,107,168,.18)) !important;
+  border-radius: 999px; color: #eaf7ff !important;
+  box-shadow: inset 0 0 0 1px rgba(120,200,240,.25), 0 0 18px rgba(53,182,240,.22);
+}
+input, select, textarea {
+  background: rgba(255,255,255,.06) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+}
+input::placeholder, textarea::placeholder { color: rgba(160,195,215,.55) !important; }
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(53,182,240,.6) !important;
+  box-shadow: 0 0 0 3px rgba(53,182,240,.16) !important;
+}
+select option { background: #07202f; color: #e9f5fc; }
+.item-info, .scan-progress-detail, .portfolio-empty { color: var(--text-muted) !important; }
+.total-row { background: rgba(53,182,240,.12) !important; }
+.item-profit { background: rgba(16,185,129,.14) !important; border-color: rgba(16,185,129,.3) !important; }
+.item-expense { background: rgba(239,68,68,.14) !important; border-color: rgba(239,68,68,.3) !important; }
+.item-debt, .alert-message, .profit-info { background: rgba(245,158,11,.13) !important; border-color: rgba(245,158,11,.3) !important; }
+.alert-message { background: rgba(239,68,68,.14) !important; border-color: rgba(239,68,68,.32) !important; }
+.network-badge { background: rgba(255,255,255,.07) !important; }
+.panel-add-btn, .add-btn {
+  box-shadow: 0 10px 26px rgba(0,0,0,.45), 0 0 22px rgba(53,182,240,.35);
+}
+hr, table, tr, td, th { border-color: var(--border-color) !important; }
+
+/* --- Welcome / onboarding + leftover light surfaces --- */
+#welcome-screen {
+  background: radial-gradient(900px 520px at 50% 0%, rgba(53,182,240,.16) 0%, transparent 65%),
+              linear-gradient(160deg, #062a44 0%, #02121e 100%) !important;
+  color: var(--text-main);
+}
+#welcome-screen .welcome-hero h1, #welcome-screen .welcome-hero h2,
+.welcome-choice .wc-title, .welcome-choice b, .welcome-choice strong { color: #eaf7ff !important; }
+.welcome-choice .wc-text, .welcome-hero p { color: var(--text-muted) !important; }
+[style*="#f8fafc"], [style*="#fffdf2"], [style*="#fffbeb"], [style*="#f0fdf4"], [style*="#eff6ff"] {
+  background: rgba(255,255,255,.06) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+
 
 /* ---- Water-glass press feel on every button ---- */
 button, .btn, .panel-add-btn, .tab, .nav-item {
@@ -5571,7 +5650,7 @@ button:active, .btn:active, .panel-add-btn:active, .tab:active, .nav-item:active
 /* ---- Intro: Karibu Smart Janja ---- */
 #sj-intro {
   position: fixed; inset: 0; z-index: 99999;
-  background: radial-gradient(ellipse at 50% 30%, #1a5c8a 0%, #12456b 55%, #0e3b5c 100%);
+  background: radial-gradient(ellipse at 50% 30%, #0b3f63 0%, #062a44 55%, #01121e 100%);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   overflow: hidden; perspective: 1400px;
   animation: sjIntroOut 1.4s ease-in-out 3.4s forwards;
@@ -5657,36 +5736,65 @@ button:active, .btn:active, .panel-add-btn:active, .tab:active, .nav-item:active
 <script>
 (function () {
   /* ===== Water-drop sound (WebAudio, no external file) ===== */
-  var actx = null;
+  var actx = null, unlocked = false;
   function ctx() {
-    if (!actx) { var AC = window.AudioContext || window.webkitAudioContext; if (AC) actx = new AC(); }
-    if (actx && actx.state === 'suspended') actx.resume();
+    try {
+      if (!actx) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; actx = new AC(); }
+      if (actx.state !== 'running') { actx.resume(); }
+    } catch (e) { return null; }
     return actx;
+  }
+  /* unlock audio on the very first user gesture (autoplay policy) */
+  function unlock() {
+    var a = ctx(); if (!a) return;
+    try {
+      var b = a.createBuffer(1, 1, a.sampleRate), s = a.createBufferSource();
+      s.buffer = b; s.connect(a.destination); s.start(0);
+    } catch (e) {}
+    unlocked = true;
+  }
+  ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'].forEach(function (ev) {
+    document.addEventListener(ev, function once() { unlock(); }, { capture: true, once: false, passive: true });
+  });
+
+  function playDrop(a) {
+    var t = a.currentTime + 0.001;
+    var osc = a.createOscillator(), gain = a.createGain(), flt = a.createBiquadFilter();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1100, t);
+    osc.frequency.exponentialRampToValueAtTime(170, t + 0.16);
+    flt.type = 'lowpass'; flt.frequency.setValueAtTime(3200, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.32, t + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+    osc.connect(flt); flt.connect(gain); gain.connect(a.destination);
+    osc.start(t); osc.stop(t + 0.34);
+
+    /* light splash tail */
+    try {
+      var len = Math.floor(a.sampleRate * 0.12);
+      var buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
+      var src = a.createBufferSource(), ng = a.createGain(), nf = a.createBiquadFilter();
+      src.buffer = buf; nf.type = 'bandpass'; nf.frequency.value = 1800;
+      ng.gain.value = 0.1;
+      src.connect(nf); nf.connect(ng); ng.connect(a.destination);
+      src.start(t + 0.01);
+    } catch (e) {}
   }
   function waterDrop() {
     var a = ctx(); if (!a) return;
-    var t = a.currentTime;
-    var osc = a.createOscillator(), gain = a.createGain(), flt = a.createBiquadFilter();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(900, t);
-    osc.frequency.exponentialRampToValueAtTime(180, t + 0.14);
-    flt.type = 'lowpass'; flt.frequency.setValueAtTime(2400, t);
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(0.16, t + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
-    osc.connect(flt); flt.connect(gain); gain.connect(a.destination);
-    osc.start(t); osc.stop(t + 0.3);
-
-    /* light splash tail */
-    var len = Math.floor(a.sampleRate * 0.12);
-    var buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
-    for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
-    var src = a.createBufferSource(), ng = a.createGain(), nf = a.createBiquadFilter();
-    src.buffer = buf; nf.type = 'bandpass'; nf.frequency.value = 1600;
-    ng.gain.value = 0.05;
-    src.connect(nf); nf.connect(ng); ng.connect(a.destination);
-    src.start(t + 0.01);
+    if (a.state !== 'running' && a.resume) {
+      /* wait for the resume promise, then play so the first tap is audible too */
+      try {
+        var p = a.resume();
+        if (p && p.then) { p.then(function () { playDrop(a); }).catch(function () {}); return; }
+      } catch (e) {}
+    }
+    playDrop(a);
   }
+  window.sjWaterDrop = waterDrop;
+
 
   /* ===== Ripple + sound on any button press ===== */
   function isBtn(el) {
