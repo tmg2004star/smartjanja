@@ -5828,6 +5828,268 @@ button:active, .btn:active, .panel-add-btn:active, .tab:active, .nav-item:active
 })();
 </script>
 
+
+<!-- ===== SMARTJANJA CRYSTAL LIGHT THEME (White-Blue Premium Glass) + PAPER MOTION ===== -->
+<style id="sj-crystal-light">
+/* ============ 1. WHITE-BLUE CRYSTAL TOKENS ============ */
+:root {
+  --primary: #0e6ba8 !important;
+  --primary-light: #35b6f0 !important;
+  --primary-gradient: linear-gradient(135deg, #0e6ba8 0%, #4fc3f7 100%) !important;
+  --accent: #2aa8e0 !important;
+  --accent-gradient: linear-gradient(135deg, #4fc3f7 0%, #0e6ba8 100%) !important;
+  --bg-body: #eaf3fb !important;
+  --bg-card: rgba(255,255,255,0.66) !important;
+  --text-main: #0b2b45 !important;
+  --text-muted: #5b7f9c !important;
+  --border-color: rgba(255,255,255,0.75) !important;
+  --glass-edge: rgba(255,255,255,0.85);
+  --glass-tint: rgba(210,235,252,0.35);
+  --shadow-md: 0 8px 24px rgba(20,80,130,0.10) !important;
+  --shadow-lg: 0 18px 42px rgba(20,80,130,0.16) !important;
+  --shadow-card: 0 24px 60px rgba(20,80,130,0.14) !important;
+  --shadow-glow: 0 0 28px rgba(53,182,240,0.35) !important;
+}
+html { background: #eaf3fb !important; }
+body {
+  color: var(--text-main) !important;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, rgba(79,195,247,0.30) 0%, transparent 62%),
+    radial-gradient(900px 560px at 100% 2%, rgba(174,214,241,0.45) 0%, transparent 66%),
+    radial-gradient(800px 700px at 50% 110%, rgba(120,190,235,0.30) 0%, transparent 70%),
+    linear-gradient(180deg, #f6fbff 0%, #e7f2fb 55%, #dceaf7 100%) !important;
+  background-attachment: fixed !important;
+}
+body::before { background: #7fd0ff !important; opacity: .30 !important; }
+body::after  { background: #b9e2ff !important; opacity: .35 !important; }
+
+/* ============ 2. GLASS SURFACES (crystal) ============ */
+.section, .modal-content, .toast, .fund-card, .welcome-choice, .list-item,
+.sale-add-popup, .dropdown-content, .ai-scan-container, .scan-date-group,
+.scan-result-row, .custom-date-fields, .sidebar, .format-btn, .scan-upload-zone,
+[style*="background: white"], [style*="background:#fff"], [style*="background: #fff"] {
+  background: linear-gradient(150deg, rgba(255,255,255,0.82) 0%, rgba(232,245,255,0.55) 55%, rgba(255,255,255,0.70) 100%) !important;
+  border: 1px solid var(--glass-edge) !important;
+  color: var(--text-main) !important;
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    0 18px 46px rgba(17,74,120,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(140,190,225,0.25) !important;
+}
+.section { position: relative; overflow: hidden; }
+.section::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 32%, rgba(255,255,255,0) 68%, rgba(255,255,255,0.30) 100%);
+}
+.modal { background: rgba(190,220,242,0.55) !important; backdrop-filter: blur(12px); }
+
+/* ============ 3. BARS ============ */
+.bottom-nav {
+  background: linear-gradient(180deg, rgba(255,255,255,0.80), rgba(226,242,254,0.88)) !important;
+  border-color: var(--glass-edge) !important;
+  backdrop-filter: blur(22px) saturate(170%);
+  color: var(--text-main) !important;
+  box-shadow: 0 -12px 34px rgba(17,74,120,0.14), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}
+.top-bar {
+  background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(228,243,255,0.82)) !important;
+  border-color: var(--glass-edge) !important;
+  backdrop-filter: blur(22px) saturate(170%);
+  color: var(--text-main) !important;
+  box-shadow: 0 12px 30px rgba(17,74,120,0.12), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}
+.bottom-nav-item, .nav-label { color: var(--text-muted) !important; }
+.bottom-nav-item.active, .nav-item.active {
+  background: linear-gradient(135deg, rgba(79,195,247,0.28), rgba(14,107,168,0.16)) !important;
+  border-radius: 999px; color: #0a4d78 !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.9), 0 6px 18px rgba(53,182,240,0.28) !important;
+}
+.hamburger-btn, .back-button, .nav-util-btn {
+  background: rgba(255,255,255,0.75) !important;
+  border: 1px solid var(--glass-edge) !important;
+  color: #0a4d78 !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 16px rgba(17,74,120,0.12), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+
+/* ============ 4. FORMS / TEXT ============ */
+h1, h2, h3, h4, label, .section-header, .total-label { color: var(--text-main) !important; }
+.item-info, .scan-progress-detail, .portfolio-empty { color: var(--text-muted) !important; }
+input, select, textarea {
+  background: rgba(255,255,255,0.80) !important;
+  color: var(--text-main) !important;
+  border: 1px solid rgba(150,200,235,0.6) !important;
+  backdrop-filter: blur(8px);
+}
+input::placeholder, textarea::placeholder { color: rgba(90,130,160,0.65) !important; }
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(53,182,240,0.85) !important;
+  box-shadow: 0 0 0 4px rgba(53,182,240,0.18) !important;
+}
+select option { background: #ffffff; color: #0b2b45; }
+.total-row { background: rgba(53,182,240,0.14) !important; }
+.item-profit { background: rgba(16,185,129,0.14) !important; border-color: rgba(16,185,129,0.32) !important; }
+.item-expense { background: rgba(239,68,68,0.12) !important; border-color: rgba(239,68,68,0.30) !important; }
+.item-debt, .alert-message, .profit-info { background: rgba(245,158,11,0.14) !important; border-color: rgba(245,158,11,0.32) !important; }
+.network-badge { background: rgba(255,255,255,0.72) !important; }
+[style*="#f8fafc"], [style*="#fffdf2"], [style*="#fffbeb"], [style*="#f0fdf4"], [style*="#eff6ff"] {
+  background: rgba(255,255,255,0.72) !important;
+  border-color: var(--glass-edge) !important;
+  color: var(--text-main) !important;
+}
+#welcome-screen {
+  background: radial-gradient(900px 520px at 50% 0%, rgba(79,195,247,0.28) 0%, transparent 65%),
+              linear-gradient(160deg, #f7fbff 0%, #dfeefb 100%) !important;
+  color: var(--text-main) !important;
+}
+#welcome-screen .welcome-hero h1, #welcome-screen .welcome-hero h2,
+.welcome-choice .wc-title, .welcome-choice b, .welcome-choice strong { color: #0a3d63 !important; }
+.welcome-choice .wc-text, .welcome-hero p { color: var(--text-muted) !important; }
+hr, table, tr, td, th { border-color: rgba(150,200,235,0.35) !important; }
+.sidebar-header { background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(228,243,255,0.7)) !important; }
+.sidebar-content button { color: var(--text-main) !important; }
+.sidebar-content button:hover { background: rgba(255,255,255,0.75) !important; border-color: var(--glass-edge) !important; }
+.sidebar-overlay { background: rgba(120,170,205,0.35) !important; backdrop-filter: blur(4px); }
+.sj-ripple {
+  background: radial-gradient(circle, rgba(255,255,255,.85) 0%, rgba(42,168,224,.35) 45%, rgba(42,168,224,0) 72%) !important;
+  box-shadow: 0 0 18px rgba(42,168,224,.35), inset 0 0 12px rgba(255,255,255,.7) !important;
+}
+
+/* ============ 5. PAPER / BOOK UNFOLD kwa kurasa za ndani ============ */
+.container, #business-page, #capital-page, #graph-page { perspective: 1800px; perspective-origin: 50% 0%; }
+
+.nav-section-page.active-section {
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  animation: sjPaperOpen .72s cubic-bezier(.22,.9,.24,1) both;
+  will-change: transform, opacity, filter;
+}
+@keyframes sjPaperOpen {
+  0% {
+    opacity: 0;
+    transform: rotateY(-88deg) translateZ(-40px) scale(.94);
+    filter: blur(4px) brightness(1.12);
+    box-shadow: 60px 40px 90px rgba(12,60,100,0.45);
+  }
+  45% {
+    opacity: 1;
+    transform: rotateY(-26deg) translateZ(-8px) scale(.985);
+    filter: blur(0) brightness(1.04);
+    box-shadow: 40px 30px 80px rgba(12,60,100,0.32);
+  }
+  72% {
+    transform: rotateY(6deg) scale(1.005);
+    box-shadow: -14px 22px 56px rgba(12,60,100,0.22);
+  }
+  88% { transform: rotateY(-2.5deg) scale(1); }
+  100% {
+    opacity: 1;
+    transform: rotateY(0deg) scale(1);
+    box-shadow: 0 22px 55px rgba(17,74,120,0.16);
+  }
+}
+/* mkunjo wa karatasi (paper crease) unaopita wakati ukurasa unafunguka */
+.nav-section-page.active-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 6; border-radius: inherit;
+  background: linear-gradient(90deg,
+    rgba(10,60,100,0.30) 0%,
+    rgba(255,255,255,0.55) 14%,
+    rgba(255,255,255,0.05) 32%,
+    rgba(10,60,100,0.14) 55%,
+    rgba(255,255,255,0.35) 74%,
+    rgba(10,60,100,0.06) 100%);
+  mix-blend-mode: soft-light;
+  animation: sjCrease .72s cubic-bezier(.22,.9,.24,1) both;
+}
+@keyframes sjCrease {
+  0% { opacity: 1; transform: scaleX(1); }
+  70% { opacity: .35; }
+  100% { opacity: 0; transform: scaleX(1.04); }
+}
+.nav-section-page { position: relative; }
+
+/* ============ 6. HAMBURGER: SIDEBAR INAJIKUNJA KAMA KARATASI KWENYE ROLLER ============ */
+.sidebar {
+  left: 0 !important;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  perspective: 1400px;
+  transform: rotateY(-98deg) translateX(-14px) scaleX(.72);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform .62s cubic-bezier(.2,.86,.28,1),
+    opacity .35s ease,
+    visibility 0s linear .62s;
+  box-shadow: 30px 0 70px rgba(12,60,100,0.35) !important;
+  border-radius: 0 18px 18px 0;
+}
+.sidebar.open {
+  transform: rotateY(0deg) translateX(0) scaleX(1);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    transform .72s cubic-bezier(.16,1.02,.3,1),
+    opacity .3s ease,
+    visibility 0s;
+  animation: sjRollUnfurl .78s cubic-bezier(.16,1.02,.3,1) both;
+}
+@keyframes sjRollUnfurl {
+  0%   { transform: rotateY(-98deg) scaleX(.62) translateX(-16px); }
+  38%  { transform: rotateY(-34deg) scaleX(.9) translateX(0); }
+  62%  { transform: rotateY(9deg) scaleX(1.02); }
+  80%  { transform: rotateY(-4deg) scaleX(.995); }
+  100% { transform: rotateY(0deg) scaleX(1); }
+}
+/* ukingo wa roller (kijiti cha karatasi) */
+.sidebar::before {
+  content: '';
+  position: absolute; top: 0; bottom: 0; right: -6px; width: 12px;
+  border-radius: 99px; z-index: 3; pointer-events: none;
+  background: linear-gradient(90deg, rgba(10,60,100,0.22), rgba(255,255,255,0.85), rgba(10,60,100,0.18));
+  box-shadow: 0 0 22px rgba(12,60,100,0.28);
+  opacity: .55;
+}
+/* mwanga wa kukunjika unaosogea juu ya karatasi */
+.sidebar.open::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: linear-gradient(90deg,
+    rgba(10,60,100,0.32) 0%,
+    rgba(255,255,255,0.65) 18%,
+    rgba(255,255,255,0.05) 42%,
+    rgba(10,60,100,0.10) 70%,
+    rgba(255,255,255,0.30) 100%);
+  mix-blend-mode: soft-light;
+  animation: sjCrease .78s cubic-bezier(.16,1.02,.3,1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-section-page.active-section, .sidebar, .sidebar.open { animation: none !important; transition: opacity .2s ease !important; transform: none !important; }
+  .nav-section-page.active-section::before, .sidebar.open::after { display: none; }
+}
+</style>
+<script>
+(function () {
+  /* Rudia animation ya karatasi kila mara ukurasa unabadilishwa */
+  var _sw = window.switchBottomSection;
+  if (typeof _sw === 'function') {
+    window.switchBottomSection = function (id) {
+      var r = _sw.apply(this, arguments);
+      var el = document.getElementById('section-' + id);
+      if (el) { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; }
+      return r;
+    };
+  }
+})();
+</script>
+
 <div style="display:none">
   <span id="toolbarTitle">SmartJanja</span>
   <div id="networkStatus" class="network-badge network-online"><i class="fa-solid fa-wifi"></i> Mtandaoni</div>
