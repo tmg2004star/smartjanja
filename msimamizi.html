@@ -1265,11 +1265,11 @@
 </head>
 <body>
 
-    <div id="splash-screen">
+   <!-- <div id="splash-screen">
         <h1 style="font-size: 3.5em;">SmartJanja</h1>
         <p>Meneja wa Biashara Yako</p>
        
-    </div>
+    </div> -->
  
 
     <!-- TOP UTILITY BAR -->
@@ -6075,6 +6075,134 @@ hr, table, tr, td, th { border-color: rgba(150,200,235,0.35) !important; }
   .nav-section-page.active-section::before, .sidebar.open::after { display: none; }
 }
 </style>
+
+<!-- ===== SMARTJANJA LAYER 2: DEEPER OCEAN BLUE + FUNDS ON MTAJI PAGE ONLY ===== -->
+<style id="sj-enhance-2">
+/* ============ A. BLUU IKOLEE ZAIDI (weupe upungue) ============ */
+:root {
+  --primary: #0b3a5e;
+  --primary-light: #29a8e0;
+  --primary-gradient: linear-gradient(135deg, #0a4c78 0%, #29a8e0 100%);
+  --accent: #29a8e0;
+  --accent-gradient: linear-gradient(135deg, #29a8e0 0%, #0a4c78 100%);
+  --bg-body: #010c17;
+  --bg-card: #062136;
+  --text-main: #dff0fb;
+  --text-muted: #7ea8c4;
+  --border-color: rgba(60,160,220,0.20);
+  --glass-edge: rgba(60,160,220,0.28);
+  --shadow-glow: 0 0 30px rgba(41,168,224,0.42);
+}
+html { background: #010a13; }
+body {
+  background:
+    radial-gradient(1200px 680px at 12% -10%, rgba(41,168,224,0.20) 0%, transparent 60%),
+    radial-gradient(1000px 620px at 100% 2%, rgba(8,70,116,0.32) 0%, transparent 64%),
+    linear-gradient(180deg, #062a45 0%, #03192b 45%, #010a13 100%) !important;
+  background-attachment: fixed;
+}
+
+/* Nyuso za kioo: tint ya bluu ya bahari badala ya weupe */
+.section, .modal-content, .toast, .welcome-choice, .list-item,
+.sale-add-popup, .dropdown-content, .ai-scan-container, .scan-date-group,
+.scan-result-row, .custom-date-fields, .sidebar, .format-btn, .scan-upload-zone,
+[style*="background: white"], [style*="background:#fff"], [style*="background: #fff"] {
+  background: linear-gradient(158deg, rgba(15,86,140,0.34) 0%, rgba(6,33,54,0.62) 100%) !important;
+  border: 1px solid var(--glass-edge) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: 0 14px 40px rgba(0,12,24,.55), inset 0 1px 0 rgba(150,215,255,.14) !important;
+}
+.top-bar {
+  background: linear-gradient(180deg, rgba(10,62,100,.92), rgba(4,26,44,.96)) !important;
+  border-color: var(--glass-edge) !important;
+}
+.bottom-nav {
+  background: linear-gradient(180deg, rgba(10,62,100,.90), rgba(3,20,34,.97)) !important;
+  border-color: var(--glass-edge) !important;
+}
+.bottom-nav-item.active, .nav-item.active {
+  background: linear-gradient(135deg, rgba(41,168,224,.34), rgba(10,76,120,.30)) !important;
+  box-shadow: inset 0 0 0 1px rgba(120,205,245,.35), 0 0 22px rgba(41,168,224,.35) !important;
+}
+input, select, textarea {
+  background: rgba(10,62,100,.32) !important;
+  border: 1px solid var(--glass-edge) !important;
+}
+select option { background: #062136; color: #dff0fb; }
+[style*="#f8fafc"], [style*="#fffdf2"], [style*="#fffbeb"], [style*="#f0fdf4"], [style*="#eff6ff"] {
+  background: rgba(15,86,140,.30) !important;
+  color: var(--text-main) !important;
+  border-color: var(--glass-edge) !important;
+}
+#welcome-screen {
+  background: radial-gradient(950px 540px at 50% 0%, rgba(41,168,224,.22) 0%, transparent 62%),
+              linear-gradient(160deg, #063a5e 0%, #010c17 100%) !important;
+}
+.total-row { background: rgba(41,168,224,.18) !important; }
+.sidebar-header { background: linear-gradient(180deg, rgba(10,62,100,.85), rgba(6,33,54,.75)) !important; }
+.sidebar-content button:hover { background: rgba(41,168,224,.18) !important; }
+.sidebar-overlay { background: rgba(2,18,32,.55) !important; }
+h1, h2, h3, h4 { color: #eaf7ff; }
+
+/* ============ B. MTAJI HALISI / FAIDA ILIYOPO — kwenye ukurasa wa Mtaji tu ============ */
+.funds-split { display: none !important; }
+#section-capital-exp .funds-split { display: grid !important; margin: 4px 0 18px; }
+@media (max-width: 380px) {
+  #section-capital-exp .funds-split { grid-template-columns: 1fr !important; }
+}
+#section-capital-exp .fund-card.capital {
+  background: linear-gradient(135deg, #0a4c78 0%, #29a8e0 100%) !important;
+  border: 1px solid rgba(150,220,255,.30) !important;
+  box-shadow: 0 16px 40px rgba(0,12,24,.5), 0 0 26px rgba(41,168,224,.28) !important;
+}
+#section-capital-exp .fund-card.profit {
+  background: linear-gradient(135deg, #045c55 0%, #0fb6a0 100%) !important;
+  border: 1px solid rgba(150,255,235,.25) !important;
+}
+
+/* ============ C. UKURASA KUJIKUNJA KAMA KITABU (imeimarishwa) ============ */
+#business-page, #capital-page, #graph-page { perspective: 2200px; perspective-origin: 50% 30%; }
+.nav-section-page.active-section {
+  animation: sjBookOpen .78s cubic-bezier(.2,.88,.24,1) both !important;
+}
+@keyframes sjBookOpen {
+  0%   { opacity: 0; transform: rotateY(-92deg) translateZ(-60px) scale(.93); filter: blur(5px) brightness(1.15); }
+  40%  { opacity: 1; transform: rotateY(-30deg) translateZ(-14px) scale(.98); filter: blur(0) brightness(1.05); }
+  70%  { transform: rotateY(7deg) scale(1.006); }
+  86%  { transform: rotateY(-3deg) scale(1); }
+  100% { opacity: 1; transform: rotateY(0deg) scale(1); }
+}
+/* kivuli cha ukingo wa kitabu (book spine) */
+.nav-section-page.active-section::after {
+  content: '';
+  position: absolute; top: 0; bottom: 0; left: -10px; width: 22px;
+  pointer-events: none; z-index: 7;
+  background: linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,0));
+  animation: sjSpineFade .78s ease both;
+}
+@keyframes sjSpineFade { 0% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .nav-section-page.active-section::after { display: none; }
+}
+</style>
+
+<script>
+(function () {
+  /* Hamisha kadi za Mtaji Halisi / Faida Iliyopo ziwe kwenye ukurasa wa Mtaji tu */
+  function moveFunds() {
+    var funds = document.querySelector('.funds-split');
+    var target = document.getElementById('section-capital-exp');
+    if (funds && target && funds.parentElement !== target) {
+      target.insertBefore(funds, target.firstChild);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', moveFunds);
+  } else { moveFunds(); }
+  window.addEventListener('load', moveFunds);
+})();
+</script>
+
 <script>
 (function () {
   /* Rudia animation ya karatasi kila mara ukurasa unabadilishwa */
